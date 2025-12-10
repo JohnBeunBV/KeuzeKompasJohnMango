@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2022",
+    "outDir": "./dist",
+    "rootDir": "./src",           // alles staat nu in src
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@domain/*": ["domain/*"]   // verwijst nu naar src/domain
+    },
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts"],    // compileer alles in src
+  "exclude": ["node_modules", "dist"]
+}
