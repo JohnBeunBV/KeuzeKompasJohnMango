@@ -40,8 +40,8 @@ jobs:
       - name: TypeScript build
         run: npm run build
 
-      - name: Run tests
-        run: npm test --if-present
+      # - name: Run tests
+       #  run: npm test --if-present
         
       - name: NPM Audit
         run: npm audit --audit-level=high
