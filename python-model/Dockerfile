@@ -1,12 +1,25 @@
 FROM python:3.11-slim
 
+# System deps (for scipy / implicit)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# ---- spaCy models ----
+RUN python -m spacy download nl_core_news_sm
+RUN python -m spacy download en_core_web_sm
+
 COPY . .
 
-EXPOSE 8443
+EXPOSE 3030
 
-CMD ["uvicorn", "main:app","--host", "0.0.0.0","--port", "8443","--ssl-keyfile", "/certs/server.key","--ssl-certfile", "/certs/server.crt"]
+CMD ["uvicorn", "main:app","--host", "0.0.0.0","--port", "3030"]
+
+# CMD ["uvicorn", "main:app","--host", "0.0.0.0","--port", "3030","--ssl-keyfile", "/certs/server.key","--ssl-certfile", "/certs/server.crt"]

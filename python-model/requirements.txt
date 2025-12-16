@@ -8,4 +8,6 @@ joblib
 matplotlib
 spacy
 nltk
-scikit-surprise
+IPython
+implicit
+dotenv
