@@ -4,9 +4,11 @@ WORKDIR /app
 
 # Build-time argument
 ARG VITE_API_URL
+ARG VITE_PEXELS_KEY
 
 # Make it available for Vite
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_PEXELS_KEY=$VITE_PEXELS_KEY
 
 
 COPY package*.json ./
@@ -14,9 +16,9 @@ RUN npm ci
 COPY . .
 
 # Build Vue + TS app with the build-time VITE_API_URL
-RUN echo "VITE_API_URL=$VITE_API_URL" > .env.production \
+RUN printf "VITE_API_URL=%s\nVITE_PEXELS_KEY=%s\n" \
+    "$VITE_API_URL" "$VITE_PEXELS_KEY" > .env.production \
     && npm run build
-
 
 # Production stage
 FROM nginx:stable-alpine
