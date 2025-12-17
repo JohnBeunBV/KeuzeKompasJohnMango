@@ -84,7 +84,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Scan SBOM for CVEs
-        uses: anchore/grype-action@v1
+        uses: anchore/scan-action@v6
         with:
           sbom: sbom-${{ matrix.service }}.spdx.json
           severity-cutoff: high
