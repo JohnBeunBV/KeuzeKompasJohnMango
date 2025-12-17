@@ -4,12 +4,10 @@ on:
   push:
     branches:
       - dev
-      - JOH-57-Als-developer-wil-ik-deployment-via-Docker-compose
       # - main   # later toevoegen voor productie
   pull_request:
     branches:
       - dev
-      - JOH-57-Als-developer-wil-ik-deployment-via-Docker-compose
       # - main   # later toevoegen voor productie
 
 jobs:
