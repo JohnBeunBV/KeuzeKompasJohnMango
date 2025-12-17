@@ -7,4 +7,4 @@ services:
     environment:
       - API_KEY=${MODEL_API_KEY}
     ports:
-      - "8443:3030"
+      - "8443:${MODEL_API_PORT}"

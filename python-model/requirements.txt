@@ -10,4 +10,5 @@ spacy
 nltk
 IPython
 implicit
+requests
 dotenv

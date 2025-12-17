@@ -11,5 +11,7 @@ class RecommendRequest(BaseModel):
     top_n: int = Field(ge=1, le=50, default=5)
 
 class TrainRequest(BaseModel):
-    modules: list
-    users: list
+    # Training should fetch modules/users from external API. Optional fields kept for backward compatibility.
+    modules: Optional[list] = None
+    users: Optional[list] = None
+    num_dummy_users: Optional[int] = 50

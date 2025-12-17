@@ -1,54 +1,48 @@
 # api_recommend.py
 from fastapi import APIRouter, Depends
 from middleware.security import verify_api_key
-from recommender.hybrid import recommend_hybrid, build_user_vector, build_explanation
+from recommender import recommend_from_model
 from modelstore import load_model
 import numpy as np
+from typing import Dict, Any
+
 
 router = APIRouter()
 
 @router.post("/recommend-explain", dependencies=[Depends(verify_api_key)])
-def recommend(payload: dict):
-    """
-    Hybrid recommendation API
-    Expects:
-    {
-        "user": {
-            "user_id": int,
-            "favorite_id": [module_id, ...],
-            "profile_text": str
-        },
-        "top_n": int
-    }
-    """
+def recommend_explain(payload: Dict[str, Any]):
+    """Hybrid recommendation with simple explanations."""
     model = load_model()
     user = payload.get("user", {})
     top_n = payload.get("top_n", 5)
 
-    # ---- get recommendations ----
-    recs_raw = recommend_hybrid(model, user, top_n=top_n)
+    fav_table, rec_df = recommend_from_model(model, user, top_n=top_n)
 
-    # ---- build explanations ----
-    df = model["df"]
+    # build simple explanation from returned scores
     recs_with_explanation = []
-    for r in recs_raw:
-        module_row = df[df["id"] == r["id"]].iloc[0]
-        user_vector = build_user_vector(model, user)
-        content_score = np.dot(user_vector, model["module_vectors_pca"][module_row.name])
-        explanation = build_explanation(module_row, user, model, content_score)
+    for _, row in rec_df.iterrows():
+        explanation = []
+        if row.content_sim_scaled >= 0.7:
+            explanation.append("Sterke content-match met favorieten")
+        elif row.content_sim_scaled >= 0.4:
+            explanation.append("Redelijke content-match")
+        if row.profile_sim_scaled > 0:
+            explanation.append("Matches profielinteresses")
+        if row.popularity_norm > 0.5:
+            explanation.append("Populair")
         recs_with_explanation.append({
-            "id": r["id"],
-            "score": r["score"],
-            "explanation": explanation
+            "id": int(row.id),
+            "score": float(row.final_score),
+            "explanation": ", ".join(explanation) if explanation else "Geen specifieke verklaring"
         })
 
     return {"recommendations": recs_with_explanation}
 @router.post("/recommend", dependencies=[Depends(verify_api_key)])
-def recommend(payload: dict):
+def recommend(payload: Dict[str, Any]):
     model = load_model()
-
-    user = payload["user"]
+    user = payload.get("user", {})
     top_n = payload.get("top_n", 5)
 
-    recs = recommend_hybrid(model, user, top_n)
-    return {"recommendations": recs}
+    fav_table, rec_df = recommend_from_model(model, user, top_n)
+    # return simple list
+    return {"recommendations": rec_df[["id","final_score"]].rename(columns={"final_score":"score"}).to_dict(orient="records")}
