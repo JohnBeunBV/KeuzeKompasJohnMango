@@ -4,7 +4,7 @@ from pathlib import Path
 from threading import Lock
 from datetime import datetime
 
-MODELS_DIR = Path("/models")
+MODELS_DIR = Path("./models")
 MODELS_DIR.mkdir(exist_ok=True)
 
 _current_model_path = MODELS_DIR / "current.joblib"

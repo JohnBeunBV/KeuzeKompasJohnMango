@@ -100,38 +100,70 @@ def preprocess_text(text, nlp_nl, nlp_en):
     return " ".join(tokens_nl)
 
 
+from security.http import AuthenticatedSession
+
 def fetch_remote_modules_users() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Try to fetch modules and users from external APIs defined in env vars.
-    Fallback to local CSV for modules and an empty users df.
-    Returns (modules_df, users_df)
-    """
     modules_url = os.getenv("MODULES_API_URL")
     users_url = os.getenv("USERS_API_URL")
 
-    if modules_url:
-        try:
-            r = requests.get(modules_url, timeout=10)
-            r.raise_for_status()
-            modules = pd.DataFrame(r.json())
-            return modules, pd.DataFrame() if not users_url else (modules, pd.DataFrame(requests.get(users_url).json()))
-        except Exception:
-            pass
+    session = AuthenticatedSession()
 
-    # fallback to local CSV in repo
-    local = os.path.join(os.path.dirname(__file__), "Uitgebreide_VKM_dataset_cleaned3.csv")
-    if os.path.exists(local):
-        modules = pd.read_csv(local)
-    else:
-        raise RuntimeError("No modules source available: set MODULES_API_URL or include local CSV")
-
+    modules = None
     users = pd.DataFrame()
+
+    if modules_url:
+        r = session.get(modules_url, timeout=15)
+        r.raise_for_status()
+        modules = pd.DataFrame(r.json()["vkms"])
+
     if users_url:
         try:
-            users = pd.DataFrame(requests.get(users_url).json())
+            r = session.get(users_url, timeout=15)
+            r.raise_for_status()
+            users = pd.DataFrame(r.json())
         except Exception:
             users = pd.DataFrame()
 
+    if modules is None:
+        local = os.path.join(
+            os.path.dirname(__file__),
+            os.getenv("MODULES_LOCAL_CSV", "Uitgebreide_VKM_dataset_cleaned.csv")
+        )
+        if not os.path.exists(local):
+            raise RuntimeError("No module source available")
+        modules = pd.read_csv(local)
+
     return modules, users
+
+def build_explanation(row, weights):
+    reasons = []
+    signals = {}
+
+    if row.content_sim_scaled > 0.6:
+        reasons.append("Sterke inhoudelijke overeenkomst met eerdere favorieten")
+        signals["content_match"] = row.content_sim_scaled
+
+    if row.profile_sim_scaled > 0.4:
+        reasons.append("Sluit goed aan bij je profiel en interesses")
+        signals["profile_match"] = row.profile_sim_scaled
+
+    if row.popularity_norm > 0.6:
+        reasons.append("Veel gekozen door andere gebruikers")
+        signals["popularity"] = row.popularity_norm
+
+    if row.cf_score_scaled > 0.4:
+        reasons.append("Aanbevolen op basis van vergelijkbare gebruikers")
+        signals["collaborative"] = row.cf_score_scaled
+
+    if not reasons:
+        reasons.append("Algemene aanbeveling op basis van gecombineerde factoren")
+
+    return {
+        "summary": " • ".join(reasons),
+        "signals": signals,
+        "weights_used": weights,
+        "final_score": float(row.final_score)
+    }
 
 
 def build_model_from_dataframe(
