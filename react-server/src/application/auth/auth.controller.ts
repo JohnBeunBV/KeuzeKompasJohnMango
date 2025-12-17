@@ -9,7 +9,6 @@ const getUserIdFromRequest = (req: AuthRequest): string => {
   }
 
   if (req.auth.type === "user") {
-    console.log("User ID from token:", req);
     return req.auth.id;
   }
 
@@ -71,7 +70,6 @@ export const deleteMe = async (req: AuthRequest, res: Response) => {
 
 export const addFavorite = async (req: AuthRequest, res: Response) => {
   const userId = getUserIdFromRequest(req);
-  console.log("Raw vkmId param:", req.params.vkmId);
   const vkmId = Number(req.params.vkmId);
   if (!vkmId) return res.status(400).json({ error: "VKM ID is required" });
 

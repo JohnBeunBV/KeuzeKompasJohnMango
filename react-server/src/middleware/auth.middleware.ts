@@ -43,7 +43,6 @@ export const jwtAuth = (
 };
 
 if (!process.env.PYTHON_API_KEY ) {
-  console.log("Expected API Key:", process.env.PYTHON_API_KEY!);
   throw new Error("Missing required API keys in environment");
 
 }
@@ -62,9 +61,6 @@ export const apiKeyAuth = (
 ) => {
   const apiKey = req.header("X-API-Key");
   if (!apiKey) return res.status(401).json({ error: "Missing API key" });
-  console.log("API Key received:", apiKey);
-  console.log("Valid API Keys:", Object.keys(SERVICE_KEYS));
-  console.log("Expected API Key:", process.env.PYTHON_API_KEY!);
   const service = SERVICE_KEYS[apiKey];
   if (!service) return res.status(401).json({ error: "Invalid API key" });
 

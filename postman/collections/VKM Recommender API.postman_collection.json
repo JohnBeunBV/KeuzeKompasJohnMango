@@ -1,218 +1,213 @@
 {
-  "info": {
-    "_postman_id": "ac7b9c31-4593-4270-b83c-687f0b77af3f",
-    "name": "VKM Recommender API",
-    "description": "Collection to test the VKM Hybrid Recommender FastAPI service",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "Health",
-      "id": "8b7f2ffc-b753-42f6-8816-176e6a7c1d6a",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "X-API-KEY",
-            "value": "{{api_key}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "{{pyhton_api}}/health",
-          "host": [
-            "{{pyhton_api}}"
-          ],
-          "path": [
-            "health"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Model Status",
-      "id": "0e6b3b32-9238-400b-9a31-e93718d19c63",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "X-API-KEY",
-            "value": "{{api_key}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "{{pyhton_api}}/model/status",
-          "host": [
-            "{{pyhton_api}}"
-          ],
-          "path": [
-            "model",
-            "status"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Start Training (no modules)",
-      "id": "03f208a8-232a-436d-b0bf-80a2c3530a1d",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "X-API-KEY",
-            "value": "{{pythonApiKey}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{}"
-        },
-        "url": {
-          "raw": "{{pyhton_api}}/train",
-          "host": [
-            "{{pyhton_api}}"
-          ],
-          "path": [
-            "train"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Recommend (simple)",
-      "id": "f08ea065-815c-4a10-b82f-923056b4f8da",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "X-API-KEY",
-            "value": "{{pythonApiKey}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"user\": {\n    \"user_id\": 101,\n    \"favorite_id\": [275, 371],\n    \"profile_text\": \"AI, machine learning\"\n  },\n  \"top_n\": 5\n}"
-        },
-        "url": {
-          "raw": "{{pyhton_api}}/recommend/recommend",
-          "host": [
-            "{{pyhton_api}}"
-          ],
-          "path": [
-            "recommend",
-            "recommend"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Recommend with Explanation",
-      "id": "5f10ef48-3d74-43fd-ad37-fcd8bd0cba5e",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "X-API-KEY",
-            "value": "{{pythonApiKey}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"user\": {\n    \"user_id\": 101,\n    \"favorite_id\": [275, 371],\n    \"profile_text\": \"Ik hou van AI en data\"\n  },\n  \"top_n\": 5\n}"
-        },
-        "url": {
-          "raw": "{{pyhton_api}}/recommend/recommend-explain",
-          "host": [
-            "{{pyhton_api}}"
-          ],
-          "path": [
-            "recommend",
-            "recommend-explain"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Evaluate User",
-      "id": "b5d024d9-5fa7-49bc-a3e3-f401fdd8f362",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "X-API-KEY",
-            "value": "{{pythonApiKey}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"user_id\": ,\n  \"k\": 5\n}"
-        },
-        "url": {
-          "raw": "{{pyhton_api}}/evaluate/",
-          "host": [
-            "{{pyhton_api}}"
-          ],
-          "path": [
-            "evaluate",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Plot PCA (image)",
-      "id": "1ec4eaec-8f28-449b-8648-cd51ce2b209c",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          },
-          {
-            "key": "X-API-KEY",
-            "value": "{{pythonApiKey}}"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{}"
-        },
-        "url": {
-          "raw": "{{pyhton_api}}/plot/pca",
-          "host": [
-            "{{pyhton_api}}"
-          ],
-          "path": [
-            "plot",
-            "pca"
-          ]
-        }
-      },
-      "response": []
-    }
-  ]
+	"info": {
+		"_postman_id": "ac7b9c31-4593-4270-b83c-687f0b77af3f",
+		"name": "VKM Recommender API",
+		"description": "Collection to test the VKM Hybrid Recommender FastAPI service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42631642",
+		"_collection_link": "https://none00-1048.postman.co/workspace/0fba53e1-f32f-4fce-a5a0-985edbe913c3/collection/42631642-ac7b9c31-4593-4270-b83c-687f0b77af3f?action=share&source=collection_link&creator=42631642"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-KEY",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{pyhton_api}}/health",
+					"host": [
+						"{{pyhton_api}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Model Status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-API-KEY",
+						"value": "{{api_key}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{pyhton_api}}/model/status",
+					"host": [
+						"{{pyhton_api}}"
+					],
+					"path": [
+						"model",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Start Training (no modules)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-KEY",
+						"value": "{{pythonApiKey}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "{{pyhton_api}}/train",
+					"host": [
+						"{{pyhton_api}}"
+					],
+					"path": [
+						"train"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommend (simple)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-KEY",
+						"value": "{{pythonApiKey}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user\": {\n    \"user_id\": 101,\n    \"favorite_id\": [275, 371],\n    \"profile_text\": \"AI, machine learning\"\n  },\n  \"top_n\": 5\n}"
+				},
+				"url": {
+					"raw": "{{pyhton_api}}/recommend/recommend",
+					"host": [
+						"{{pyhton_api}}"
+					],
+					"path": [
+						"recommend",
+						"recommend"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Recommend with Explanation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-KEY",
+						"value": "{{pythonApiKey}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user\": {\n    \"user_id\": 101,\n    \"favorite_id\": [],\n    \"profile_text\": \"Ik hou van AI en data\"\n  },\n  \"top_n\": 5\n}"
+				},
+				"url": {
+					"raw": "{{pyhton_api}}/recommend/recommend-explain",
+					"host": [
+						"{{pyhton_api}}"
+					],
+					"path": [
+						"recommend",
+						"recommend-explain"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Evaluate User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-KEY",
+						"value": "{{pythonApiKey}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": ,\n  \"k\": 5\n}"
+				},
+				"url": {
+					"raw": "{{pyhton_api}}/evaluate/",
+					"host": [
+						"{{pyhton_api}}"
+					],
+					"path": [
+						"evaluate",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Plot PCA (image)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "X-API-KEY",
+						"value": "{{pythonApiKey}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"url": {
+					"raw": "{{pyhton_api}}/plot/pca",
+					"host": [
+						"{{pyhton_api}}"
+					],
+					"path": [
+						"plot",
+						"pca"
+					]
+				}
+			},
+			"response": []
+		}
+	]
 }
