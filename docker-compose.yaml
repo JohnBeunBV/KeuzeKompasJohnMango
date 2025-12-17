@@ -5,6 +5,6 @@ services:
       - ./models:/models
       - ./certs:/certs
     environment:
-      - API_KEY=${MODEL_API_KEY}
+      - PYTHON_API_KEY=${PYTHON_API_KEY}
     ports:
-      - "8443:${MODEL_API_PORT}"
+      - "${MODEL_API_PORT}:8000"
