@@ -39,7 +39,7 @@ h1 {
 
 .navbar,
 .footer {
-  background: linear-gradient(to right, #FFD54F, #FF8F00); /* mango-achtig */
+  background: linear-gradient(#ff8f00); /* mango-achtig */
   color: white;
 }
 
@@ -177,7 +177,7 @@ html {
 }
 
 .nav-btn.logout {
-  background: linear-gradient(135deg, #ffd54f, #ff8f00);
+  background: linear-gradient(135deg, #ff6f00, #ff00b7);
   color: white;
 }
 
@@ -394,7 +394,7 @@ html {
   min-height: 100vh;          /* Zelfde hoogte behouden */
   margin: 0;                  /* Geen ruimte rondom */
   padding: 0;                 /* Geen binnenruimte */
-  background: linear-gradient(135deg, #fff8e1, #ffe082, #ffd54f, #ffb300, #ff8f00);
+  background: linear-gradient(135deg, #ff7700, #ffe082, #ffd54f, #ffb300, #ff8f00);
   background-size: 300% 300%;
   background-position: center;
   animation: gradientFlow 8s ease infinite;
@@ -822,10 +822,10 @@ html {
   /* Dynamische mango-gradient */
   background: linear-gradient(
     -45deg,
-    #fff8e1,
-    #ffe082,
-    #ffb300,
-    #ff8f00
+    #ffa200,
+    #ff9430,
+    #fffb04
+    
   );
   background-size: 400% 400%;
   animation: mangoWave 10s ease infinite;
@@ -996,7 +996,8 @@ html {
   }
 }
 
-.about-header {
+/* .about-header (we gebruiken de homepage  header nu voor de about page)
+{
   background: linear-gradient(135deg, #ffe082, #ffb300, #ff8f00);
   color: #fffef5;
   padding: 3rem;
@@ -1005,7 +1006,7 @@ html {
   box-shadow: 0 8px 25px rgba(255, 143, 0, 0.4);
   animation: mangoFlow 10s ease infinite;
   background-size: 400% 400%;
-}
+} */
 
 @keyframes mangoFlow {
   0% { background-position: 0% 50%; }
@@ -1119,7 +1120,7 @@ html {
 
 
 .btn-header {
-  background: linear-gradient(135deg, #ffc107, #ff6f00);
+  background: linear-gradient(135deg, #ff6f00, #ff00b7);
   color: white;
   font-weight: 700;
   padding: 0.8rem 1.5rem;
@@ -1148,5 +1149,3 @@ html {
   border-radius: 8px;
   object-fit: cover;
 }
-
-

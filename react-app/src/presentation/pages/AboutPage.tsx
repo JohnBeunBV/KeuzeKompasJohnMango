@@ -176,7 +176,7 @@ const AboutPage: React.FC = () => {
 
   return (
     <div className="about-page">
-      <header className="about-header">
+      <header className="homepage-header">
         <h1>Over dit project</h1>
         <p className="lead">
           Leer meer over de keuzes van frameworks, architectuur en de structuur van mijn VKM-dashboard.
