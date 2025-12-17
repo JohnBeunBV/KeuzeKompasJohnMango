@@ -59,15 +59,16 @@ jobs:
       run:
         working-directory: ${{ matrix.service }}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Generate SBOM
-        uses: anchore/sbom-action@v0
-        with:
-          path: ${{ matrix.service }}
-          output-file: sbom-${{ matrix.service }}.spdx.json
+    - name: Generate SBOM
+      uses: anchore/sbom-action@v0
+      with:
+        path: ${{ matrix.service }}
+        output-file: sbom-${{ matrix.service }}.spdx.json
+        artifact-name: sbom-${{ matrix.service }}
 
   security:
     name: CVE Scan
