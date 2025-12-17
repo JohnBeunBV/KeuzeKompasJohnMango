@@ -70,23 +70,32 @@ jobs:
           output-file: sbom-${{ matrix.service }}.spdx.json
           artifact-name: sbom-${{ matrix.service }}
 
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-artifact-${{ matrix.service }}
+          path: sbom-${{ matrix.service }}.spdx.json
+
   security:
     name: CVE Scan
     runs-on: ubuntu-latest
     needs: sbom
-
     strategy:
       matrix:
         service: [react-server, react-app]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: Download SBOM artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom-artifact-${{ matrix.service }}
 
       - name: Scan SBOM for CVEs
         uses: anchore/scan-action@v6
         with:
-          sbom: sbom-${{ matrix.service }}.spdx.json
+          sbom: "sbom-${{ matrix.service }}.spdx.json"
           severity-cutoff: high
           fail-build: true
 
