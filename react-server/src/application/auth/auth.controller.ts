@@ -2,6 +2,20 @@ import { Request, Response } from "express";
 import * as authService from "./auth.service";
 import { AuthRequest } from "../../middleware/auth.middleware";
 
+// Helper
+const getUserIdFromRequest = (req: AuthRequest): string => {
+  if (!req.auth) {
+    throw new Error("Unauthorized");
+  }
+
+  if (req.auth.type === "user") {
+    return req.auth.id;
+  }
+
+  throw new Error("User context required");
+};
+
+
 export const register = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
 
@@ -28,7 +42,7 @@ export const login = async (req: Request, res: Response) => {
 
 export const getMe = async (req: AuthRequest, res: Response) => {
   try {
-    const user = await authService.getMe(req.user!.id);
+    const user = await authService.getMe(getUserIdFromRequest(req));
     res.json(user);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -38,7 +52,7 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 export const updateMe = async (req: AuthRequest, res: Response) => {
   const { username, email, password } = req.body;
   try {
-    const updatedUser = await authService.updateMe(req.user!.id, username, email, password);
+    const updatedUser = await authService.updateMe(getUserIdFromRequest(req), username, email, password);
     res.json({ message: "Gegevens bijgewerkt!", user: updatedUser });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -47,7 +61,7 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
 
 export const deleteMe = async (req: AuthRequest, res: Response) => {
   try {
-    await authService.deleteMe(req.user!.id);
+    await authService.deleteMe(getUserIdFromRequest(req));
     res.json({ message: "Account verwijderd" });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
@@ -55,7 +69,7 @@ export const deleteMe = async (req: AuthRequest, res: Response) => {
 };
 
 export const addFavorite = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = getUserIdFromRequest(req);
   const vkmId = Number(req.params.vkmId);
   if (!vkmId) return res.status(400).json({ error: "VKM ID is required" });
 
@@ -68,7 +82,7 @@ export const addFavorite = async (req: AuthRequest, res: Response) => {
 };
 
 export const removeFavorite = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = getUserIdFromRequest(req);
   const vkmId = Number(req.params.vkmId);
   if (!vkmId) return res.status(400).json({ error: "VKM ID is required" });
 
@@ -82,16 +96,23 @@ export const removeFavorite = async (req: AuthRequest, res: Response) => {
 
 export const getFavorites = async (req: AuthRequest, res: Response) => {
   try {
-    const favorites = await authService.getFavorites(req.user!.id);
+    const favorites = await authService.getFavorites(getUserIdFromRequest(req));
     res.json({ favorites });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 };
 
+export const getFavoritesByUserId = async (req: AuthRequest, res: Response) => {
+  const { userId } = req.params;
+
+  const favorites = await authService.getFavorites(userId);
+  res.json(favorites);
+};
+
 export const getRecommendations = async (req: AuthRequest, res: Response) => {
   try {
-    const recommendations = await authService.getRecommendations(req.user!.id);
+    const recommendations = await authService.getRecommendations(getUserIdFromRequest(req));
     res.json({ recommendations });
   } catch (err: any) {
     res.status(400).json({ error: err.message });
