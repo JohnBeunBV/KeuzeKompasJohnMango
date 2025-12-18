@@ -394,7 +394,7 @@ html {
   min-height: 100vh;          /* Zelfde hoogte behouden */
   margin: 0;                  /* Geen ruimte rondom */
   padding: 0;                 /* Geen binnenruimte */
-  background: linear-gradient(135deg, #ff7700, #ffe082, #ffd54f, #ffb300, #ff8f00);
+  background: linear-gradient(135deg, #ff7700, #ffd54f, #ffb300, #ff8f00, #ff7700, #ff16dc);
   background-size: 300% 300%;
   background-position: center;
   animation: gradientFlow 8s ease infinite;
@@ -822,9 +822,10 @@ html {
   /* Dynamische mango-gradient */
   background: linear-gradient(
     -45deg,
-    #ffa200,
-    #ff9430,
-    #fffb04
+    #fe382a,
+    #ff9100,
+    #ff6a00,
+    #ff23ab
     
   );
   background-size: 400% 400%;
@@ -855,15 +856,21 @@ html {
   margin-bottom: 1.5rem;
 }
 
-.btn-header {
-  background: linear-gradient(135deg, #FFC107, #FF6F00);
-  color: white;
+.btn-header2 {
+  background: linear-gradient(135deg, #ffffff, #ffffff);
+  color: orange;
   font-weight: 700;
   padding: 0.8rem 1.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(255, 143, 0, 0.5);
   border: none;
   transition: all 0.3s ease;
+}
+.btn-header2:hover {
+  background: linear-gradient(135deg, #ffecb3, #fff3e0);
+  transform: scale(1.05);
+  color: #ff8f00;
+  box-shadow: 0 6px 16px rgba(255, 111, 0, 0.6);
 }
 
 .btn-header:hover {

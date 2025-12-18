@@ -181,7 +181,7 @@ const AboutPage: React.FC = () => {
         <p className="lead">
           Leer meer over de keuzes van frameworks, architectuur en de structuur van mijn VKM-dashboard.
         </p>
-        <button className="btn-header" onClick={toggleAllEpics}>
+        <button className="btn-header2" onClick={toggleAllEpics}>
           {allOpen ? "Alles dichtklappen" : "Alle epics openklappen"}
         </button>
       </header>
