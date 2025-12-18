@@ -24,7 +24,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: frontend
+        working-directory: react-app
 
     steps:
       - uses: actions/checkout@v4
@@ -75,7 +75,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: backend
+        working-directory: react-server
 
     steps:
       - uses: actions/checkout@v4
@@ -125,7 +125,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: python-api
+        working-directory: python-model
 
     steps:
       - uses: actions/checkout@v4
@@ -139,18 +139,28 @@ jobs:
           pip install pytest pip-audit
 
       - run: pytest
-
       - name: Python audit
         run: pip-audit
 
-      - uses: hadolint/hadolint-action@v3.1.0
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: python-api/Dockerfile
 
-      - uses: anchore/sbom-action@v0
+      - name: SBOM (Syft)
+        uses: anchore/sbom-action@v0
         with:
           path: python-api
           output-file: python-sbom.spdx.json
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: python-api
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORG: ${{ secrets.SONAR_ORG }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY_PYTHON }}
 
       - uses: aquasecurity/trivy-action@0.20.0
         with:
