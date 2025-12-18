@@ -1,109 +1,300 @@
-name: NPM Typescript CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - dev
-      # - main   # later toevoegen voor productie
+      - main
   pull_request:
     branches:
       - dev
-      # - main   # later toevoegen voor productie
+      - main
+
+env:
+  NODE_VERSION: '20.x'
+  REGISTRY: ghcr.io
 
 jobs:
-  build:
-    name: build
+  # Frontend Quality Gates
+  frontend-lint-test:
+    name: Frontend - Test
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        service: [react-server, react-app]
-
     defaults:
       run:
-        working-directory: ${{ matrix.service }}
-
+        working-directory: ./react-app
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: react-app/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: TypeScript build
-        run: npm run build
+      - name: Run tests
+        run: npm test -- --watchAll=false
+        env:
+          CI: true
 
-      # - name: Run tests
-       #  run: npm test --if-present
-        
-      - name: NPM Audit
-        run: npm audit --audit-level=high
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: react-app/coverage/
 
-  sbom:
-    name: Generate SBOM
+  # Backend Quality Gates
+  backend-lint-test:
+    name: Backend - Test
     runs-on: ubuntu-latest
-    needs: build
-
-    strategy:
-      matrix:
-        service: [react-server, react-app]
-
     defaults:
       run:
-        working-directory: ${{ matrix.service }}
-
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Generate SBOM
-      uses: anchore/sbom-action@v0
-      with:
-        path: ${{ matrix.service }}
-        output-file: sbom-${{ matrix.service }}.spdx.json
-        artifact-name: sbom-${{ matrix.service }}
-
-  security:
-    name: CVE Scan
-    runs-on: ubuntu-latest
-    needs: sbom
-
-    strategy:
-      matrix:
-        service: [react-server, react-app]
-
+        working-directory: ./react-server
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Scan SBOM for CVEs
-        uses: anchore/grype-action@v0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          sbom: sbom-${{ matrix.service }}.spdx.json
-          severity-cutoff: high
-          fail-build: true
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: react-server/package-lock.json
 
-  deploy:
-    name: Deploy via Portainer
+      - name: Install dependencies
+        run: npm install
+
+#      - name: Run tests
+#        run: npm test
+#
+#      - name: Upload test coverage
+#        uses: actions/upload-artifact@v4
+#        if: always()
+#        with:
+#          name: backend-coverage
+#          path: react-server/coverage/
+
+  # Frontend Security and SBOM
+  frontend-security:
+    name: Frontend - Security Scan & SBOM
     runs-on: ubuntu-latest
-    needs: security
-
-    # nu alleen dev
-    # later voor productie: if aanpassen naar main
-    if: github.ref == 'refs/heads/dev'
-    # if: github.ref == 'refs/heads/main'
-
-    environment: dev
-    # environment: prd   # gebruik deze bij main
-
+    needs: frontend-lint-test
+    defaults:
+      run:
+        working-directory: ./react-app
     steps:
-      - name: Deploy to Portainer
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: react-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: false
+
+      - name: Generate SBOM
         run: |
-          curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
+          npx @cyclonedx/cyclonedx-npm --output-file sbom-frontend.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-frontend
+          path: react-app/sbom-frontend.json
+
+      - name: Scan SBOM for CVEs
+        uses: anchore/scan-action@v3
+        id: grype-scan
+        with:
+          sbom: react-app/sbom-frontend.json
+          fail-build: true
+          severity-cutoff: high
+
+      - name: Upload vulnerability report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-vulnerability-report
+          path: ${{ steps.grype-scan.outputs.sarif }}
+
+  # Backend Security and SBOM
+  backend-security:
+    name: Backend - Security Scan & SBOM
+    runs-on: ubuntu-latest
+    needs: backend-lint-test
+    defaults:
+      run:
+        working-directory: ./react-server
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: react-server/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: false
+
+      - name: Generate SBOM
+        run: |
+          npx @cyclonedx/cyclonedx-npm --output-file sbom-backend.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-backend
+          path: react-server/sbom-backend.json
+
+      - name: Scan SBOM for CVEs
+        uses: anchore/scan-action@v3
+        id: grype-scan
+        with:
+          sbom: react-server/sbom-backend.json
+          fail-build: true
+          severity-cutoff: high
+
+      - name: Upload vulnerability report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-vulnerability-report
+          path: ${{ steps.grype-scan.outputs.sarif }}
+
+  # Build Frontend
+  build-frontend:
+    name: Build Frontend Docker Image
+    runs-on: ubuntu-latest
+    needs: [frontend-lint-test, frontend-security]
+    if: github.event_name == 'push'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}-frontend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./react-app
+          file: ./react-app/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+          build-args: |
+            NODE_ENV=production
+
+  # Build Backend
+  build-backend:
+    name: Build Backend Docker Image
+    runs-on: ubuntu-latest
+    needs: [backend-lint-test, backend-security]
+    if: github.event_name == 'push'
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}-backend
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./react-server
+          file: ./react-server/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+          build-args: |
+            NODE_ENV=production
+
+  # Deploy to Production
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-frontend, build-backend]
+    if: |
+      github.event_name == 'push' && 
+      (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')
+    environment:
+      name: production
+    steps:
+      - name: Set deployment info
+        id: deployment-info
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "environment=production (main branch)" >> $GITHUB_OUTPUT
+          else
+            echo "environment=production (dev branch)" >> $GITHUB_OUTPUT
+          fi
+          echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+
+      - name: Trigger Portainer Webhook
+        run: |
+          curl -X POST "${{ secrets.PORTAINER_WEBHOOK_URL }}" || {
+            echo "::error::Failed to trigger Portainer webhook"
+            exit 1
+          }
