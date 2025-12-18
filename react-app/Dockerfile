@@ -6,16 +6,18 @@ WORKDIR /app
 ARG VITE_API_URL
 ARG VITE_PEXELS_KEY
 
-# Make it available for Vite
+# Build-time env for Vite
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_PEXELS_KEY=$VITE_PEXELS_KEY
 
-
+# Copy only package files first
 COPY package*.json ./
 RUN npm ci
+
+# Copy rest of the source code
 COPY . .
 
-# Build Vue + TS app with the build-time VITE_API_URL
+# Create production env file and build
 RUN printf "VITE_API_URL=%s\nVITE_PEXELS_KEY=%s\n" \
     "$VITE_API_URL" "$VITE_PEXELS_KEY" > .env.production \
     && npm run build

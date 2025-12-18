@@ -29,15 +29,15 @@ services:
       PYTHON_API_KEY: ${PYTHON_API_KEY}
     ports:
       - "${BACKEND_PORT:-5000}:5000"
-  # model-api:
-  #   build: ./python-model
-  #   volumes:
-  #     - ./models:/models
-  #     - ./certs:/certs
-  #   environment:
-  #     PYTHON_API_KEY: ${PYTHON_API_KEY}
-  #   ports:
-  #     - ${MODEL_API_PORT:-8000}:8000
+  model-api:
+    build: ./python-model
+    volumes:
+      - ./models:/models
+      - ./certs:/certs
+    environment:
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
+    ports:
+      - ${MODEL_API_PORT:-8000}:8000
 
   
 # The commented out section below is an example of how to define a PostgreSQL
