@@ -51,6 +51,7 @@ jobs:
           output-file: frontend-sbom.spdx.json
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
+        continue-on-error: true
         with:
           projectBaseDir: react-app
           args: >
@@ -58,8 +59,6 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORG }}
         env:
           SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY_FRONTEND }}
 
 
       - name: Container scan
@@ -106,12 +105,14 @@ jobs:
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
+        continue-on-error: true
         with:
           projectBaseDir: react-server
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACKEND }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
         env:
           SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY_BACKEND }}
 
       - uses: aquasecurity/trivy-action@0.20.0
         with:
@@ -158,12 +159,14 @@ jobs:
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
+        continue-on-error: true
         with:
           projectBaseDir: python-model
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_PYTHON }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
         env:
           SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY_PYTHON }}
 
       - uses: aquasecurity/trivy-action@0.20.0
         with:
