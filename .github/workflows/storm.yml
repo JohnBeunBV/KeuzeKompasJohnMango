@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-
+  workflow_dispatch:
 concurrency:
   group: deploy-main
   cancel-in-progress: true
@@ -49,6 +49,15 @@ jobs:
         with:
           path: frontend
           output-file: frontend-sbom.spdx.json
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: frontend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORG: ${{ secrets.SONAR_ORG }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY_FRONTEND }}
+
 
       - name: Container scan
         uses: aquasecurity/trivy-action@0.20.0
@@ -78,16 +87,28 @@ jobs:
       - run: npm ci
       - run: npm test -- --ci
 
-      - run: npm audit --audit-level=high
+      - name: NPM audit
+        run: npm audit --audit-level=high
 
-      - uses: hadolint/hadolint-action@v3.1.0
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: backend/Dockerfile
 
-      - uses: anchore/sbom-action@v0
+      - name: SBOM (Syft)
+        uses: anchore/sbom-action@v0
         with:
           path: backend
           output-file: backend-sbom.spdx.json
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORG: ${{ secrets.SONAR_ORG }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY_BACKEND }}
 
       - uses: aquasecurity/trivy-action@0.20.0
         with:
