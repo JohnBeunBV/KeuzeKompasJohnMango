@@ -16,8 +16,8 @@ env:
 
 jobs:
   # Frontend Quality Gates
-  frontend-lint-test:
-    name: Frontend - Test
+  frontend-build:
+    name: Frontend - Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -49,8 +49,8 @@ jobs:
           path: react-app/coverage/
 
   # Backend Quality Gates
-  backend-lint-test:
-    name: Backend - Test
+  backend-build:
+    name: Backend - Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -69,21 +69,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-#      - name: Run tests
-#        run: npm test
-#
-#      - name: Upload test coverage
-#        uses: actions/upload-artifact@v4
-#        if: always()
-#        with:
-#          name: backend-coverage
-#          path: react-server/coverage/
+  #      - name: Run tests
+  #        run: npm test
+  #
+  #      - name: Upload test coverage
+  #        uses: actions/upload-artifact@v4
+  #        if: always()
+  #        with:
+  #          name: backend-coverage
+  #          path: react-server/coverage/
 
   # Frontend Security and SBOM
   frontend-security:
     name: Frontend - Security Scan & SBOM
     runs-on: ubuntu-latest
-    needs: frontend-lint-test
+    needs: frontend-build
     defaults:
       run:
         working-directory: ./react-app
@@ -134,7 +134,7 @@ jobs:
   backend-security:
     name: Backend - Security Scan & SBOM
     runs-on: ubuntu-latest
-    needs: backend-lint-test
+    needs: backend-build
     defaults:
       run:
         working-directory: ./react-server
@@ -185,7 +185,7 @@ jobs:
   build-frontend:
     name: Build Frontend Docker Image
     runs-on: ubuntu-latest
-    needs: [frontend-lint-test, frontend-security]
+    needs: [frontend-build, frontend-security]
     if: github.event_name == 'push'
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}
@@ -230,7 +230,7 @@ jobs:
   build-backend:
     name: Build Backend Docker Image
     runs-on: ubuntu-latest
-    needs: [backend-lint-test, backend-security]
+    needs: [backend-build, backend-security]
     if: github.event_name == 'push'
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}
