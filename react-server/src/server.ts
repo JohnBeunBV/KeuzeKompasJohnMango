@@ -2,13 +2,14 @@ import rateLimit from "express-rate-limit";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config();
 import { connectDB } from "./infrastructure/db";
 import vkmsRouter from "./application/vkms/vkm.routes";
 import authRouter from "./application/auth/auth.routes"; // ← toevoegen
 import * as path from "path";
 
 
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
 
 
 const app = express();

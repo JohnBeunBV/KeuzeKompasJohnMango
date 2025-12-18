@@ -11,6 +11,27 @@ import * as validator from "validator";
 const userRepo: UserRepository = new UserMongoRepository();
 const vkmRepo: VkmsRepository = new VkmsMongoRepository();
 
+// Helper
+const signUserToken = (user: User) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      email: user.email,
+      type: "user",
+      roles: ["user"],
+      scopes: ["read:vkm"]
+    },
+    process.env.JWT_SECRET!,
+    {
+      expiresIn: "1h",
+      issuer: "vkm-api",
+      audience: "vkm-users"
+    }
+  );
+};
+
+
+
 // 🔹 Validatie functie (herbruikbaar voor register & update)
 export const validateUserInput = (username?: string, email?: string, password?: string) => {
   if (username && username.length < 3) throw new Error("Gebruikersnaam moet minstens 3 tekens bevatten.");
@@ -41,14 +62,18 @@ export const login = async (email: string, password: string) => {
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new Error("Ongeldige inloggegevens");
 
-  const token = jwt.sign(
-    { id: user._id, email: user.email },
-    process.env.JWT_SECRET!,
-    { expiresIn: "1h" }
-  );
+  const token = signUserToken(user);
 
-  return { token, user };
+  return {
+    token,
+    user: {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    }
+  };
 };
+
 
 export const getMe = async (userId: string) => {
   const user = await userRepo.getById(userId);
