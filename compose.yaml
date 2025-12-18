@@ -17,7 +17,7 @@ services:
     environment:
       NODE_ENV: production
     ports:
-      - 5173:5173
+      - {FRONTEND_PORT:-5173}:5173
   
   backend:
     build:
@@ -27,9 +27,18 @@ services:
       PORT: ${PORT}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
     ports:
-      - 5000:5000
-
+      - {BACKEND_PORT:-5000}:5000
+  model-api:
+    build: ./python-model
+    volumes:
+      - ./models:/models
+      - ./certs:/certs
+    environment:
+      PYTHON_API_KEY: ${PYTHON_API_KEY}
+    ports:
+      - ${MODEL_API_PORT:-8000}:8000
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
 # start the database before your application. The `db-data` volume persists the

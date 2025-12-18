@@ -1,0 +1,167 @@
+name: CI → Security → Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: ${{ secrets.NODE_VERSION }}
+  PYTHON_VERSION: ${{ secrets.PYTHON_VERSION }}
+
+jobs:
+
+  # ================================
+  # FRONTEND
+  # ================================
+  frontend:
+    name: Frontend – Tests & Security
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm ci
+      - run: npm test -- --ci
+
+      - name: NPM audit
+        run: npm audit --audit-level=high
+
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: frontend/Dockerfile
+
+      - name: SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          path: frontend
+          output-file: frontend-sbom.spdx.json
+
+      - name: Container scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: frontend
+          scan-type: fs
+          severity: HIGH,CRITICAL
+
+  # ================================
+  # BACKEND
+  # ================================
+  backend:
+    name: Backend – Tests & Security
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm ci
+      - run: npm test -- --ci
+
+      - run: npm audit --audit-level=high
+
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: backend/Dockerfile
+
+      - uses: anchore/sbom-action@v0
+        with:
+          path: backend
+          output-file: backend-sbom.spdx.json
+
+      - uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: backend
+          scan-type: fs
+          severity: HIGH,CRITICAL
+
+  # ================================
+  # PYTHON API
+  # ================================
+  python:
+    name: Python API – Tests & Security
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: python-api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - run: |
+          pip install -r requirements.txt
+          pip install pytest pip-audit
+
+      - run: pytest
+
+      - name: Python audit
+        run: pip-audit
+
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: python-api/Dockerfile
+
+      - uses: anchore/sbom-action@v0
+        with:
+          path: python-api
+          output-file: python-sbom.spdx.json
+
+      - uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: python-api
+          scan-type: fs
+          severity: HIGH,CRITICAL
+
+  # ================================
+  # DEPLOY
+  # ================================
+  deploy:
+    name: Deploy to Portainer
+    needs: [frontend, backend, python]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Portainer Webhook
+        run: |
+          curl -X POST "${{ secrets.STORM_PORTAINER_WEBHOOK_URL }}"
+
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Verify service is running
+        run: |
+          for i in {1..5}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.STORM_DEPLOY_HEALTHCHECK_URL }}")
+            if [ "$STATUS" = "200" ]; then
+              echo "Service is healthy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Service failed health check"
+          exit 1
