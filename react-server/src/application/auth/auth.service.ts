@@ -3,6 +3,7 @@ import { User } from "../../domain/models/user.model";
 import { UserMongoRepository } from "../../infrastructure/repositories/UsermongoRepository";
 import { VkmsMongoRepository } from "../../infrastructure/repositories/VkmsmongoRepository";
 import { VkmsRepository } from "../../domain/repositories/VkmsRepository";
+import { recommendWithAI } from "../../infrastructure/ai/ai.client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as validator from "validator";
@@ -29,8 +30,6 @@ const signUserToken = (user: User) => {
     }
   );
 };
-
-
 
 // 🔹 Validatie functie (herbruikbaar voor register & update)
 export const validateUserInput = (username?: string, email?: string, password?: string) => {
@@ -73,7 +72,6 @@ export const login = async (email: string, password: string) => {
     }
   };
 };
-
 
 export const getMe = async (userId: string) => {
   const user = await userRepo.getById(userId);
@@ -146,40 +144,34 @@ export const getFavorites = async (userId: string) => {
 
 export const getRecommendations = async (userId: string) => {
   const user = await userRepo.getById(userId);
-  if (!user) throw new Error("User not found");
+  if (!user || !user.favorites?.length) return [];
 
-  if (!user.favorites || user.favorites.length === 0) return [];
+  // 🔹 Extract only IDs (handles favorites as numbers or full VKM objects)
+  const favoriteIds = user.favorites.map(fav =>
+    typeof fav === "number" ? fav : fav.id
+  );
 
-  const favoriteVkms = await Promise.all(user.favorites.map(id => vkmRepo.getById(id)));
-  const validFavorites = favoriteVkms.filter(v => v !== null);
-  if (validFavorites.length === 0) return [];
+  const aiResult = await recommendWithAI({
+    user: {
+      favorite_id: favoriteIds,
+      profile_text: user.profile_text ?? "",
+    },
+    top_n: 5,
+  });
 
-  const favoriteTags = new Set(
-    validFavorites.flatMap(vkm => {
-      const tags = vkm!.module_tags;
-      if (!tags) return [];
-      return Array.isArray(tags) ? tags : tags.split(",").map(t => t.trim());
+  const vkms = await Promise.all(
+    aiResult.recommendations.map(async (r: any) => {
+      const vkm = await vkmRepo.getById(r.id);
+      if (!vkm) return null;
+
+      return {
+        ...vkm,
+        score: Math.round(r.score * 100),
+        explanation: r.explanation,
+        details: r.details,
+      };
     })
   );
 
-  const { vkms: allVkms } = await vkmRepo.getAll();
-
-  const recommended = allVkms.filter(vkm => {
-    const tags = vkm.module_tags;
-    if (!tags) return false;
-    const tagArray = Array.isArray(tags) ? tags : tags.split(",").map(t => t.trim());
-    const overlap = tagArray.some(tag => favoriteTags.has(tag));
-    return overlap && !user.favorites?.includes(vkm.id);
-  });
-
-  const scored = recommended.map(vkm => {
-    const tags = Array.isArray(vkm.module_tags)
-      ? vkm.module_tags
-      : vkm.module_tags.split(",").map(t => t.trim());
-    const overlapCount = tags.filter(tag => favoriteTags.has(tag)).length;
-    return { vkm, score: overlapCount };
-  });
-
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, 10).map(s => s.vkm);
+  return vkms.filter(Boolean);
 };
