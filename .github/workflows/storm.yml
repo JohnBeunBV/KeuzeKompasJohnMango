@@ -42,17 +42,17 @@ jobs:
       - name: Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: frontend/Dockerfile
+          dockerfile: react-app/Dockerfile
 
       - name: SBOM (Syft)
         uses: anchore/sbom-action@v0
         with:
-          path: frontend
+          path: react-app
           output-file: frontend-sbom.spdx.json
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectBaseDir: frontend
+          projectBaseDir: react-app
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_ORG: ${{ secrets.SONAR_ORG }}
@@ -93,18 +93,18 @@ jobs:
       - name: Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: backend/Dockerfile
+          dockerfile: react-server/Dockerfile
 
       - name: SBOM (Syft)
         uses: anchore/sbom-action@v0
         with:
-          path: backend
+          path: react-server
           output-file: backend-sbom.spdx.json
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectBaseDir: backend
+          projectBaseDir: react-server
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_ORG: ${{ secrets.SONAR_ORG }}
@@ -145,18 +145,18 @@ jobs:
       - name: Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: python-api/Dockerfile
+          dockerfile: python-model/Dockerfile
 
       - name: SBOM (Syft)
         uses: anchore/sbom-action@v0
         with:
-          path: python-api
+          path: python-model
           output-file: python-sbom.spdx.json
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectBaseDir: python-api
+          projectBaseDir: python-model
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_ORG: ${{ secrets.SONAR_ORG }}
