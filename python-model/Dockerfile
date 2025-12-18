@@ -1,11 +1,14 @@
 FROM python:3.11-slim
 
 # ---- System deps (for scipy / implicit) ----
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     g++ \
     && rm -rf /var/lib/apt/lists/*
+
+
 
 WORKDIR /app
 
