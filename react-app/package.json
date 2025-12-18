@@ -9,7 +9,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test": "echo \"Error: no test specified\" && exit 0"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.0",

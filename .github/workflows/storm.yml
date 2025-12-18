@@ -1,0 +1,205 @@
+name: CI → Security → Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: ${{ secrets.NODE_VERSION }}
+  PYTHON_VERSION: ${{ secrets.PYTHON_VERSION }}
+
+jobs:
+
+  # ================================
+  # FRONTEND
+  # ================================
+  frontend:
+    name: Frontend – Tests & Security
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: react-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm ci
+      - run: npm test -- --ci
+
+      - name: NPM audit
+        run: npm audit --audit-level=high
+
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: react-app/Dockerfile
+
+      - name: SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          path: react-app
+          output-file: frontend-sbom.spdx.json
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        continue-on-error: true
+        with:
+          projectBaseDir: react-app
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_FRONTEND }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+        env:
+          SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
+
+
+      - name: Container scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: frontend
+          scan-type: fs
+          severity: HIGH,CRITICAL
+
+  # ================================
+  # BACKEND
+  # ================================
+  backend:
+    name: Backend – Tests & Security
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: react-server
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: npm ci
+      - run: npm test -- --ci
+
+      - name: NPM audit
+        run: npm audit --audit-level=high
+
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: react-server/Dockerfile
+
+      - name: SBOM (Syft)
+        uses: anchore/sbom-action@v0
+        with:
+          path: react-server
+          output-file: backend-sbom.spdx.json
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        continue-on-error: true
+        with:
+          projectBaseDir: react-server
+          args: >
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_BACKEND }}
+            -Dsonar.organization=${{ secrets.SONAR_ORG }}
+        env:
+          SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
+
+      - uses: aquasecurity/trivy-action@0.20.0
+        with:
+          image-ref: backend
+          scan-type: fs
+          severity: HIGH,CRITICAL
+
+  # ================================
+  # PYTHON API
+  # ================================
+  # python:
+  #   name: Python API – Tests & Security
+  #   runs-on: ubuntu-latest
+
+  #   defaults:
+  #     run:
+  #       working-directory: python-model
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
+
+  #     - run: |
+  #         pip install -r requirements.txt
+  #         pip install pytest pip-audit
+
+  #     - run: pytest
+  #     - name: Python audit
+  #       run: pip-audit
+
+  #     - name: Hadolint
+  #       uses: hadolint/hadolint-action@v3.1.0
+  #       with:
+  #         dockerfile: python-model/Dockerfile
+
+  #     - name: SBOM (Syft)
+  #       uses: anchore/sbom-action@v0
+  #       with:
+  #         path: python-model
+  #         output-file: python-sbom.spdx.json
+
+  #     - name: SonarCloud Scan
+  #       uses: SonarSource/sonarcloud-github-action@v2
+  #       continue-on-error: true
+  #       with:
+  #         projectBaseDir: python-model
+  #         args: >
+  #           -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_PYTHON }}
+  #           -Dsonar.organization=${{ secrets.SONAR_ORG }}
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
+
+  #     - uses: aquasecurity/trivy-action@0.20.0
+  #       with:
+  #         image-ref: python-api
+  #         scan-type: fs
+  #         severity: HIGH,CRITICAL
+
+  # ================================
+  # DEPLOY
+  # ================================
+  deploy:
+    name: Deploy to Portainer
+    needs: [frontend, backend]
+    # needs: [frontend, backend, python]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Portainer Webhook
+        run: |
+          curl -X POST "${{ secrets.STORM_PORTAINER_WEBHOOK_URL }}"
+
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Verify service is running
+        run: |
+          for i in {1..5}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.STORM_DEPLOY_HEALTHCHECK_URL }}")
+            if [ "$STATUS" = "200" ]; then
+              echo "Service is healthy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Service failed health check"
+          exit 1
