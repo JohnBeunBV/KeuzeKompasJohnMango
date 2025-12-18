@@ -17,19 +17,18 @@ services:
     environment:
       NODE_ENV: production
     ports:
-      - ${FRONTEND_PORT:-5173}:5173
+      - "${FRONTEND_PORT:-5173}:5173"
   
   backend:
     build:
       context: ./react-server
     environment:
       MONGO_URI: ${MONGO_URI}
-      PORT: ${PORT}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
       PYTHON_API_KEY: ${PYTHON_API_KEY}
     ports:
-      - ${BACKEND_PORT:-5000}:5000
+      - "${BACKEND_PORT:-5000}:5000"
   # model-api:
   #   build: ./python-model
   #   volumes:

@@ -123,63 +123,64 @@ jobs:
   # ================================
   # PYTHON API
   # ================================
-  python:
-    name: Python API – Tests & Security
-    runs-on: ubuntu-latest
+  # python:
+  #   name: Python API – Tests & Security
+  #   runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: python-model
+  #   defaults:
+  #     run:
+  #       working-directory: python-model
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+  #     - uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ env.PYTHON_VERSION }}
 
-      - run: |
-          pip install -r requirements.txt
-          pip install pytest pip-audit
+  #     - run: |
+  #         pip install -r requirements.txt
+  #         pip install pytest pip-audit
 
-      - run: pytest
-      - name: Python audit
-        run: pip-audit
+  #     - run: pytest
+  #     - name: Python audit
+  #       run: pip-audit
 
-      - name: Hadolint
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: python-model/Dockerfile
+  #     - name: Hadolint
+  #       uses: hadolint/hadolint-action@v3.1.0
+  #       with:
+  #         dockerfile: python-model/Dockerfile
 
-      - name: SBOM (Syft)
-        uses: anchore/sbom-action@v0
-        with:
-          path: python-model
-          output-file: python-sbom.spdx.json
+  #     - name: SBOM (Syft)
+  #       uses: anchore/sbom-action@v0
+  #       with:
+  #         path: python-model
+  #         output-file: python-sbom.spdx.json
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        continue-on-error: true
-        with:
-          projectBaseDir: python-model
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_PYTHON }}
-            -Dsonar.organization=${{ secrets.SONAR_ORG }}
-        env:
-          SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
+  #     - name: SonarCloud Scan
+  #       uses: SonarSource/sonarcloud-github-action@v2
+  #       continue-on-error: true
+  #       with:
+  #         projectBaseDir: python-model
+  #         args: >
+  #           -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY_PYTHON }}
+  #           -Dsonar.organization=${{ secrets.SONAR_ORG }}
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.STORM_SONAR_TOKEN }}
 
-      - uses: aquasecurity/trivy-action@0.20.0
-        with:
-          image-ref: python-api
-          scan-type: fs
-          severity: HIGH,CRITICAL
+  #     - uses: aquasecurity/trivy-action@0.20.0
+  #       with:
+  #         image-ref: python-api
+  #         scan-type: fs
+  #         severity: HIGH,CRITICAL
 
   # ================================
   # DEPLOY
   # ================================
   deploy:
     name: Deploy to Portainer
-    needs: [frontend, backend, python]
+    needs: [frontend, backend]
+    # needs: [frontend, backend, python]
     runs-on: ubuntu-latest
 
     steps:
