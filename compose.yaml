@@ -36,6 +36,7 @@ services:
       - ./certs:/certs
     environment:
       PYTHON_API_KEY: ${PYTHON_API_KEY}
+      MODULES_API_URL: ${MODULES_API_URL}
     ports:
       - ${MODEL_API_PORT:-8000}:8000
 
