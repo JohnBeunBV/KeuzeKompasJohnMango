@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+numpy
+pandas
+scikit-learn
+joblib
+matplotlib
+spacy
+nltk
+IPython
+implicit
+requests
+dotenv

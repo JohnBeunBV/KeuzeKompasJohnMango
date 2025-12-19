@@ -1,0 +1,333 @@
+{
+	"info": {
+		"_postman_id": "6854f279-d616-422b-abc9-f37cd1a476d3",
+		"name": "VKM API – Users + Services",
+		"description": "Test JWT user auth and API-key service auth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42631642",
+		"_collection_link": "https://none00-1048.postman.co/workspace/0fba53e1-f32f-4fce-a5a0-985edbe913c3/collection/42631642-6854f279-d616-422b-abc9-f37cd1a476d3?action=share&source=collection_link&creator=42631642"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password!1\"\n}"
+						},
+						"url": {
+							"raw": "{{node_api}}/auth/register",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"pm.environment.set('jwtToken', json.token);",
+									"pm.environment.set('userId', json.user.id);"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"stormkroonen@hotmail.nl\",\n  \"password\": \"S-2004-Enzo!\"\n}"
+						},
+						"url": {
+							"raw": "{{node_api}}/auth/login",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User (JWT)",
+			"item": [
+				{
+					"name": "Get Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/auth/me",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Me",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"updatedUser\"\n}"
+						},
+						"url": {
+							"raw": "{{node_api}}/auth/me",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Favorites (me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/auth/me/favorites",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"me",
+								"favorites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Favorite",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/auth/users/favorites/{{vkmId}}?vkmId={{vkmId}}",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"favorites",
+								"{{vkmId}}"
+							],
+							"query": [
+								{
+									"key": "vkmId",
+									"value": "{{vkmId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Favorite",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/auth/users/favorites/{{vkmId}}?vkmId={{vkmId}}",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"favorites",
+								"{{vkmId}}"
+							],
+							"query": [
+								{
+									"key": "vkmId",
+									"value": "{{vkmId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recommendations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/recommendations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"recommendations"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "VKM (JWT or API Key)",
+			"item": [
+				{
+					"name": "Get All VKMs (JWT)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/vkms",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"vkms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All VKMs (API Key)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{pythonApiKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/vkms",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"vkms"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Service (Python)",
+			"item": [
+				{
+					"name": "Get User Favorites (Service)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{pythonApiKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/auth/users/{{userId}}/favorites",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								"{{userId}}",
+								"favorites"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
