@@ -79,7 +79,9 @@ export const getMe = async (userId: string) => {
   
   // Haal alle VKMs volledig op
   const favoriteVkms = await Promise.all(
-    (user.favorites || []).map(id => vkmRepo.getById(id))
+    (user.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return { 
@@ -112,7 +114,9 @@ export const addFavorite = async (userId: string, vkmId: number) => {
   const updatedUser = await userRepo.addFavorite(userId, vkmId);
 
   const favoriteVkms = await Promise.all(
-    (updatedUser.favorites || []).map(id => vkmRepo.getById(id))
+    (updatedUser.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return { ...updatedUser, favorites: favoriteVkms.filter(v => v !== null) };
@@ -125,7 +129,9 @@ export const removeFavorite = async (userId: string, vkmId: number) => {
   const updatedUser = await userRepo.removeFavorite(userId, vkmId);
 
   const favoriteVkms = await Promise.all(
-    (updatedUser.favorites || []).map(id => vkmRepo.getById(id))
+    (updatedUser.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return { ...updatedUser, favorites: favoriteVkms.filter(v => v !== null) };
@@ -136,7 +142,9 @@ export const getFavorites = async (userId: string) => {
   if (!user) throw new Error("User not found");
 
   const favoriteVkms = await Promise.all(
-    (user.favorites || []).map(id => vkmRepo.getById(id))
+    (user.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return favoriteVkms.filter(v => v !== null);
@@ -144,34 +152,55 @@ export const getFavorites = async (userId: string) => {
 
 export const getRecommendations = async (userId: string) => {
   const user = await userRepo.getById(userId);
-  if (!user || !user.favorites?.length) return [];
+  
+  // 1. Safety check: If no user or no favorites, return empty immediately
+  // This prevents sending empty/invalid data to the AI model
+  if (!user || !user.favorites || user.favorites.length === 0) {
+    return [];
+  }
 
-  // 🔹 Extract only IDs (handles favorites as numbers or full VKM objects)
-  const favoriteIds = user.favorites.map(fav =>
-    typeof fav === "number" ? fav : fav.id
-  );
+  // 2. Extract IDs safely
+  // Ensures we handle both [1, 2] and [{id:1}, {id:2}] formats
+  const favoriteIds = user.favorites
+    .map((fav) => (typeof fav === "number" ? fav : fav.id))
+    .filter((id) => typeof id === "number" && !isNaN(id));
 
-  const aiResult = await recommendWithAI({
-    user: {
-      favorite_id: favoriteIds,
-      profile_text: user.profile_text ?? "",
-    },
-    top_n: 5,
-  });
+  // Double check we have IDs left
+  if (favoriteIds.length === 0) return [];
 
-  const vkms = await Promise.all(
-    aiResult.recommendations.map(async (r: any) => {
-      const vkm = await vkmRepo.getById(r.id);
-      if (!vkm) return null;
+  console.log("Sending to AI:", { favorite_id: favoriteIds, profile_text: user.profile_text });
 
-      return {
-        ...vkm,
-        score: Math.round(r.score * 100),
-        explanation: r.explanation,
-        details: r.details,
-      };
-    })
-  );
+  try {
+    const aiResult = await recommendWithAI({
+      user: {
+        favorite_id: favoriteIds,
+        profile_text: user.profile_text ?? "", // Ensure string, never undefined
+      },
+      top_n: 5,
+    });
 
-  return vkms.filter(Boolean);
+    const vkms = await Promise.all(
+      aiResult.recommendations.map(async (r: any) => {
+        const vkm = await vkmRepo.getById(r.id);
+        if (!vkm) return null;
+
+        return {
+          ...vkm,
+          // Python sends 0.0-1.0 or 0-100?
+          // If python sends 0.85, this makes it 85.
+          // If python sends 85, this makes it 8500. Check your Python output! 
+          // Assuming Python 0-1 based on your 'weights' dict:
+          score: Math.round(r.score * 100), 
+          explanation: r.explanation,
+          details: r.details,
+        };
+      })
+    );
+
+    return vkms.filter(Boolean);
+  } catch (err: any) {
+    console.error("AI Service Error:", err.message);
+    // Return empty array instead of crashing so frontend still loads
+    return []; 
+  }
 };
