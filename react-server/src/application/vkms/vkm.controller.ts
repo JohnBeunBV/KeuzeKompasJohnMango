@@ -54,3 +54,15 @@ export const getVkmById = async (req: Request, res: Response) => {
     res.status(500).json({ error: (err as Error).message });
   }
 };
+
+
+// Nieuwe controller functie voor swipe VKMs
+export const getVkmsForSwipe = async (_req: Request, res: Response) => {
+  try {
+    const result = await vkmService.getAllVkms(1, 1000);
+    res.json(result.vkms);
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+  }
+};
+
