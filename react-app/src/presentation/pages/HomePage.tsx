@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
           Ontdek en beheer VKM's in een stijlvol, kleurrijk en interactief mango-thema.
         </p>
         <Button
-          className="btn-header"
+          className="btn-header2"
           onClick={() => navigate("/vkms")}
         >
           Ontdek VKM's
@@ -28,22 +28,35 @@ const HomePage: React.FC = () => {
             <img
               className="d-block w-100 carousel-image"
               src="/beautiful-outdoor-landscape-tropical-nature-with-sea-beach-sunset-sunrise.jpg"
-              alt="Ontdek VKM's"
+              alt="Swipe VKM's"
             />
             <Carousel.Caption className="carousel-caption">
-              <h3>Ontdek VKM's</h3>
-              <p>Vind eenvoudig VKM's die passen bij jouw studie en interesses.</p>
+              <h3>Swipe VKM's</h3>
+              <p>Swipe VKM's die passen bij jouw studie en interesses.</p>
+              <Button
+                className="btn-header"
+                onClick={() => navigate("/swipe")}
+              >
+                Swipe VKM's
+              </Button>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
             <img
               className="d-block w-100 carousel-image"
               src="/low-angle-shot-clouds-colorful-sky-captured-twilight.jpg"
-              alt="Favorieten bijhouden"
+              alt="Smart Study Coach"
             />
             <Carousel.Caption className="carousel-caption">
-              <h3>Favorieten bijhouden</h3>
-              <p>Markeer jouw favoriete VKM's en bekijk ze snel terug.</p>
+              <h3>Smart Study Coach</h3>
+              <p>Bekijk jouw aanbevolen VKM's op je profiel pagina!</p>
+
+              <Button
+                className="btn-header"
+                onClick={() => navigate("/account")}
+              >
+                Ga naar profiel
+              </Button>
             </Carousel.Caption>
           </Carousel.Item>
           <Carousel.Item>
