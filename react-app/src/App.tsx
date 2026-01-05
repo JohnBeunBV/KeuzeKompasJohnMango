@@ -11,7 +11,7 @@ import RegisterPage from "./presentation/pages/RegisterPage";
 import AccountPage from "./presentation/pages/AccountPage";
 import ErrorPage from "./presentation/pages/ErrorPage"; // pas het pad aan naar jouw file
 import AboutPage from "./presentation/pages/AboutPage";
-
+import SwipePage from "./presentation/pages/SwipePage";
 
 
 function App() {
@@ -28,6 +28,7 @@ function App() {
                 <Route path="*" element={<ErrorPage  />} />
                 <Route path="/unauthorized" element={<ErrorPage />} />
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/swipe" element={<SwipePage />} />
 
       </Route>
     </Routes>
