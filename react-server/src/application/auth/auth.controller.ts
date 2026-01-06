@@ -40,6 +40,22 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+export const loginMicrosoft = async (req: Request, res: Response) => {
+  const { idToken } = req.body;
+
+  if (!idToken) {
+    return res.status(400).json({ error: "Missing idToken" });
+  }
+
+  try {
+    const result = await authService.loginWithMicrosoft(idToken);
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+
 export const getMe = async (req: AuthRequest, res: Response) => {
   try {
     const user = await authService.getMe(getUserIdFromRequest(req));
