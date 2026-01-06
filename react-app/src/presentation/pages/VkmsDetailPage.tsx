@@ -19,7 +19,10 @@ const VkmsDetailPage: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loadingFavorites, setLoadingFavorites] = useState(true);
 
-  const imageUrl = (location.state as any)?.imageUrl || "/images/default-vkm.png";
+  const [imageUrl, setImageUrl] = useState<string>(
+  (location.state as any)?.imageUrl || "/images/default-vkm.png"
+);
+
 
   // 🔹 Fetch VKM data
   useEffect(() => {
@@ -62,6 +65,59 @@ const VkmsDetailPage: React.FC = () => {
 
     fetchVkm();
   }, [id, token, navigate]);
+
+   useEffect(() => {
+  const fetchPexelsImage = async () => {
+    if (!vkm) return;
+
+    const cacheKey = `vkm-image-${vkm.id}`;
+
+    // 1️⃣ Check localStorage cache
+    const cachedImage = localStorage.getItem(cacheKey);
+    if (cachedImage) {
+      setImageUrl(cachedImage);
+      return;
+    }
+
+    // 2️⃣ Als image via state is meegekomen → opslaan & stoppen
+    const stateImage = (location.state as any)?.imageUrl;
+    if (stateImage) {
+      localStorage.setItem(cacheKey, stateImage);
+      setImageUrl(stateImage);
+      return;
+    }
+
+    // 3️⃣ Anders: ophalen via Pexels
+    try {
+      const res = await fetch(
+        `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+          vkm.name
+        )}&orientation=landscape&per_page=1`,
+        {
+          headers: {
+            Authorization: import.meta.env.VITE_PEXELS_KEY,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      const img =
+        data.photos?.[0]?.src?.large ||
+        data.photos?.[0]?.src?.medium ||
+        "/images/default-vkm.png";
+
+      localStorage.setItem(cacheKey, img);
+      setImageUrl(img);
+    } catch (err) {
+      console.error("Pexels image ophalen mislukt:", err);
+      setImageUrl("/images/default-vkm.png");
+    }
+  };
+
+  fetchPexelsImage();
+}, [vkm, location.state]);
+
 
   // 🔹 Fetch favorite status
   useEffect(() => {
@@ -134,6 +190,8 @@ const VkmsDetailPage: React.FC = () => {
               alt={vkm.name || "Onbekend"}
               className="vkm-detail-image mb-4"
               style={{ width: "100%", borderRadius: "16px", objectFit: "cover" }}
+               onError={(e) => {
+    (e.target as HTMLImageElement).src = "/john-mango.png";}} // fallback bij broken image
             />
             <h4 className="mb-3">Module Info</h4>
             <hr />
