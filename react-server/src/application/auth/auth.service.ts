@@ -1,5 +1,5 @@
 import { UserRepository } from "../../domain/repositories/UserRepository";
-import { User } from "../../domain/models/user.model";
+import { User, StudentProfile } from "../../domain/models/user.model";
 import { UserMongoRepository } from "../../infrastructure/repositories/UsermongoRepository";
 import { VkmsMongoRepository } from "../../infrastructure/repositories/VkmsmongoRepository";
 import { VkmsRepository } from "../../domain/repositories/VkmsRepository";
@@ -188,17 +188,19 @@ export const updateProfile = async (
   userId: string,
   profile: { interests?: string[]; values?: string[]; goals?: string[] }
 ) => {
-  const updates: Partial<User> = { profile: { interests: [], values: [], goals: [] } };
+  const safeProfile: StudentProfile = {
+    interests: profile.interests || [],
+    values: profile.values || [],
+    goals: profile.goals || []
+  };
 
-  if (profile.interests) updates.profile!.interests = profile.interests;
-  if (profile.values) updates.profile!.values = profile.values;
-  if (profile.goals) updates.profile!.goals = profile.goals;
-
-  const updatedUser = await userRepo.update(userId, updates);
+  const updatedUser = await userRepo.update(userId, { profile: safeProfile });
   if (!updatedUser) throw new Error("User niet gevonden");
 
   return updatedUser;
 };
+
+
 
 export const getProfile = async (userId: string) => {
   const user = await userRepo.getById(userId);

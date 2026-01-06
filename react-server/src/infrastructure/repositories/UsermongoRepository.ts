@@ -20,11 +20,26 @@ export class UserMongoRepository implements UserRepository {
     return { ...createdUser.toObject(), _id: createdUser._id.toString() };
   }
 
-  async update(id: string, user: Partial<User>): Promise<User | null> {
-    const updatedUser = await UserModel.findByIdAndUpdate(id, user, { new: true }).lean();
-    if (!updatedUser) return null;
-    return { ...updatedUser, _id: updatedUser._id.toString() };
+async update(id: string, updates: Partial<User>): Promise<User | null> {
+  const user = await UserModel.findById(id);
+  if (!user) return null;
+
+  // Merge updates, maar behoud bestaande nested objects zoals profile
+  if (updates.profile) {
+    user.profile = user.profile || { interests: [], values: [], goals: [] };
+    if (updates.profile.interests) user.profile.interests = updates.profile.interests;
+    if (updates.profile.values) user.profile.values = updates.profile.values;
+    if (updates.profile.goals) user.profile.goals = updates.profile.goals;
+    delete updates.profile; // verwijder zodat we niet overschrijven
   }
+
+  Object.assign(user, updates); // rest van de velden
+  await user.save();
+
+  return { ...user.toObject(), _id: user._id.toString() };
+}
+
+
 
   async delete(id: string): Promise<void> {
     await UserModel.findByIdAndDelete(id);

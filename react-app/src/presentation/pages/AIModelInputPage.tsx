@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import "../index.css";
 import "../AIModelInputPage.css";
+import apiClient from "../../infrastructure/ApiClient";
 
 const interests_options = [
   "Business & Innovatie",
@@ -65,23 +66,33 @@ export default function AIModelInputPage() {
     setSavedProfile(null);
   }, [interests, values, goals]);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setTouched(true);
+ async function handleSubmit(e: React.FormEvent) {
+  e.preventDefault();
+  setTouched(true);
 
-    if (!isValid) return;
+  if (!isValid) return;
 
-    const payload: SavedProfile = {
-      interests,
-      values,
-      goals,
-    };
+  const payload: SavedProfile = {
+    interests,
+    values,
+    goals,
+  };
 
-    console.log("AI model input payload:", payload);
-    localStorage.setItem("aiModelInput", JSON.stringify(payload));
+  try {
+    // PUT call naar backend via apiClient
+    const response = await apiClient.put("/auth/me/profile", payload);
 
-    setSavedProfile(payload);
+    // apiClient geeft al response.data
+    setSavedProfile(response.data.profile); // update state met opgeslagen data
+    console.log("Profiel succesvol opgeslagen in DB:", response.data.profile);
+  } catch (err) {
+    console.error("Fout bij opslaan profiel:", err);
+    alert("Er is een fout opgetreden bij het opslaan van je profiel.");
   }
+}
+
+
+
 
   return (
   <main className="ai-container">
