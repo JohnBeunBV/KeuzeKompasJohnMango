@@ -1,58 +1,150 @@
-    /* Page layout */
-    .swipe-page {
-    display: flex;
-    justify-content: center;
-    margin-top: 60px;
-    }
+/* ============================
+   Page layout
+============================ */
+.swipe-page {
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+}
 
-    /* Wrapper */
-    .swipe-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    }
+/* ============================
+   Wrapper & Stack
+============================ */
+.swipe-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    /* Swipe card */
-    .swipe-card {
-    width: 300px;
-    height: 420px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
-    margin-bottom: 24px;
-    }
+/* Card stack container */
+.card-stack {
+  position: relative;
+  width: 380px;
+  height: 560px; /* vaste hoogte zodat buttons niet springen */
+}
 
-    /* Buttons container */
-    .swipe-actions {
-    display: flex;
-    gap: 22px;
-    }
+/* ============================
+   Swipe Cards (positioning)
+============================ */
+.card-stack .swipe-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  will-change: transform;
+}
 
-    /* Custom "emoji" buttons */
-    .swipe-btn.brand {
-    width: 58px;
-    height: 58px;
-    border-radius: 999px;
+/* Bovenste kaart */
+.swipe-card-top {
+  z-index: 2;
+}
 
-    background: #ff8f00;
-    color: #000;
+/* Onderste kaart (cardstock effect) */
+.swipe-card-under {
+  z-index: 1;
+  transform: translateY(18px) scale(0.96);
+  opacity: 0.92;
+  pointer-events: none;
+  filter: saturate(0.95);
+}
 
-    border: 2px solid #000;
-    font-size: 26px;
-    font-weight: 700;
+/* ============================
+   Mango VKM Info Card
+============================ */
+.vkm-info-card {
+  background: #ffffff;
+  border: 2.5px solid #FFD54F;
+  border-radius: 20px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  padding: 1.25rem;
+  width: 100%;
 
-    cursor: pointer;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-    }
+  box-shadow:
+    0 10px 24px rgba(255, 143, 0, 0.28),
+    0 4px 10px rgba(0, 0, 0, 0.12);
 
-    .swipe-btn.brand:hover {
-    background: #e67e00;
-    }
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.25s ease;
+}
 
-    .swipe-btn.brand:active {
-    transform: scale(0.96);
-    }
+/* Subtiele hover (desktop) */
+.vkm-info-card:hover {
+  box-shadow:
+    0 16px 34px rgba(255, 143, 0, 0.45),
+    0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+/* ============================
+   Card Content
+============================ */
+.vkm-info-card img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 2px solid #FFECB3;
+  margin-bottom: 0.75rem;
+}
+
+.vkm-info-card h4 {
+  color: #FF8F00;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.vkm-info-card p {
+  margin-bottom: 0.45rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* ============================
+   Swipe Feedback
+============================ */
+.swipe-card[style*="translateX("] .vkm-info-card {
+  box-shadow:
+    0 20px 40px rgba(255, 143, 0, 0.55),
+    0 10px 22px rgba(0, 0, 0, 0.25);
+}
+
+/* ============================
+   Swipe Actions (Buttons)
+============================ */
+.swipe-actions {
+  position: relative;
+  margin-top: 520px; /* altijd onder de stack */
+  display: flex;
+  gap: 22px;
+}
+
+/* Buttons */
+.swipe-btn.brand {
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+
+  background: linear-gradient(135deg, #FFD54F, #FF8F00);
+  color: #000;
+
+  border: 2px solid #000;
+  font-size: 26px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.swipe-btn.brand:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.swipe-btn.brand:active {
+  transform: scale(0.95);
+}
