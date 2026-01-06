@@ -358,6 +358,16 @@ html {
   margin-bottom: 15px;
 }
 
+.vkm-filter-card {
+  border: 2px solid #FFB74D; /* mango-ish border */
+  border-radius: 14px;
+  padding: 1rem;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(255, 183, 77, 0.25),
+  0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 /* Knop styling */
 .btn-detail {
   background: linear-gradient(135deg, #FFD54F, #FF8F00);
