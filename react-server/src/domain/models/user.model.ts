@@ -7,5 +7,4 @@ export interface User {
   token?: string;
   password: string;
   favorites?: number[] | Vkm[];
-  profile_text?: string;
 }

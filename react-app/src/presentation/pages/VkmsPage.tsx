@@ -8,6 +8,8 @@ import { fetchVkms } from "../../application/Slices/vkmsSlice";
 import { login } from "../../application/Slices/authSlice";
 import type { Vkm } from "@domain/models/vkm.model";
 import "../index.css";
+import "../vkmspage.css";
+import AccountDrawer from "../components/AccountDrawer";
 
 const VkmsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,6 +28,8 @@ const VkmsPage: React.FC = () => {
   const [pexelsImages, setPexelsImages] = useState<string[]>([]);
   const [pexelsLoading, setPexelsLoading] = useState(true);
   const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // 🔹 Sync Redux auth met localStorage
   useEffect(() => {
@@ -223,6 +227,22 @@ const VkmsPage: React.FC = () => {
           )
         )}
       </div>
+      <div className={`side-drawer ${isDrawerOpen ? "open" : ""}`}>
+        <button
+          className="side-drawer-toggle"
+          onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+          aria-label="Toggle side panel"
+        >
+          <span className="toggle-arrow">‹</span>
+        </button>
+
+        <div className="side-drawer-panel">
+          </div>
+
+          <div className="side-drawer-content">
+            <AccountDrawer />
+          </div>
+        </div>
     </Container>
   );
 };

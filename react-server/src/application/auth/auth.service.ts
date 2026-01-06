@@ -168,13 +168,12 @@ export const getRecommendations = async (userId: string) => {
   // Double check we have IDs left
   if (favoriteIds.length === 0) return [];
 
-  console.log("Sending to AI:", { favorite_id: favoriteIds, profile_text: user.profile_text });
+  console.log("Sending to AI:", { favorite_id: favoriteIds});
 
   try {
     const aiResult = await recommendWithAI({
       user: {
         favorite_id: favoriteIds,
-        profile_text: user.profile_text ?? "", // Ensure string, never undefined
       },
       top_n: 5,
     });
