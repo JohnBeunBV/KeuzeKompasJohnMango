@@ -5,10 +5,11 @@
   display: flex;
   justify-content: center;
   margin-top: 60px;
+  padding-bottom: 100px; /* ruimte onder buttons */
 }
 
 /* ============================
-   Wrapper & Stack
+   Wrapper
 ============================ */
 .swipe-wrapper {
   display: flex;
@@ -16,20 +17,21 @@
   align-items: center;
 }
 
-/* Card stack container */
+/* ============================
+   Card Stack
+============================ */
 .card-stack {
   position: relative;
   width: 380px;
-  height: 560px; /* vaste hoogte zodat buttons niet springen */
+  height: 570px; 
 }
 
 /* ============================
-   Swipe Cards (positioning)
+   Swipe Cards
 ============================ */
-.card-stack .swipe-card {
+.swipe-card {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   will-change: transform;
 }
@@ -39,7 +41,7 @@
   z-index: 2;
 }
 
-/* Onderste kaart (cardstock effect) */
+/* Onderste kaart */
 .swipe-card-under {
   z-index: 1;
   transform: translateY(18px) scale(0.96);
@@ -55,9 +57,9 @@
   background: #ffffff;
   border: 2.5px solid #FFD54F;
   border-radius: 20px;
-
   padding: 1.25rem;
   width: 100%;
+  height: 100%;
 
   box-shadow:
     0 10px 24px rgba(255, 143, 0, 0.28),
@@ -68,7 +70,7 @@
     transform 0.25s ease;
 }
 
-/* Subtiele hover (desktop) */
+/* Hover effect (desktop) */
 .vkm-info-card:hover {
   box-shadow:
     0 16px 34px rgba(255, 143, 0, 0.45),
@@ -76,7 +78,7 @@
 }
 
 /* ============================
-   Card Content
+   Card content
 ============================ */
 .vkm-info-card img {
   width: 100%;
@@ -100,7 +102,7 @@
 }
 
 /* ============================
-   Swipe Feedback
+   Swipe feedback (live)
 ============================ */
 .swipe-card[style*="translateX("] .vkm-info-card {
   box-shadow:
@@ -112,10 +114,11 @@
    Swipe Actions (Buttons)
 ============================ */
 .swipe-actions {
-  position: relative;
-  margin-top: 520px; /* altijd onder de stack */
+  margin-top: 40px; /* 🟢 nu netjes onder de stack */
   display: flex;
   gap: 22px;
+  justify-content: center;
+  z-index: 3;
 }
 
 /* Buttons */
@@ -147,4 +150,40 @@
 
 .swipe-btn.brand:active {
   transform: scale(0.95);
+}
+
+/* ============================
+   Responsive tweak
+============================ */
+@media (max-width: 420px) {
+  .card-stack {
+    width: 340px;
+    height: 500px;
+  }
+
+  .swipe-btn.brand {
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+  }
+}
+
+/* ============================
+   Disable text selection during swipe
+============================ */
+.swipe-card,
+.vkm-info-card,
+.vkm-info-card * {
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none;     /* Edge */
+}
+
+/* ============================
+   Disable image dragging (desktop)
+============================ */
+.vkm-info-card img {
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }

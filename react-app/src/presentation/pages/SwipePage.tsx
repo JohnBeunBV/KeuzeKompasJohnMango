@@ -7,18 +7,21 @@ import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY;
+const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
 
 export default function SwipePage() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  /* =========================
+     State
+  ========================= */
   const [vkms, setVkms] = useState<Vkm[]>([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const [pexelsImages, setPexelsImages] = useState<string[]>([]);
-  const [pexelsLoading, setPexelsLoading] = useState(true);
+  // 🔹 EXACT dezelfde structuur als VkmsPage
+  const [pexelsImages, setPexelsImages] = useState<Record<number, string>>({});
 
   const [x, setX] = useState(0);
   const [dragging, setDragging] = useState(false);
@@ -27,7 +30,7 @@ export default function SwipePage() {
   const SWIPE_THRESHOLD = 120;
 
   /* =====================================================
-    Auth check → EXACT zoals VkmsPage
+     Auth check
   ===================================================== */
   useEffect(() => {
     if (!token) {
@@ -41,7 +44,7 @@ export default function SwipePage() {
   }, [token, navigate]);
 
   /* =====================================================
-    Fetch VKMs → redirect bij error (500)
+     Fetch VKMs → redirect bij DB/API fout
   ===================================================== */
   useEffect(() => {
     if (!token) return;
@@ -53,6 +56,7 @@ export default function SwipePage() {
         });
         setVkms(res.data.vkms);
       } catch (err) {
+        console.error(err);
         navigate("/error", {
           state: {
             status: 500,
@@ -68,32 +72,53 @@ export default function SwipePage() {
   }, [token, navigate]);
 
   /* =====================================================
-    Fetch Pexels images
+      Afbeeldingen laden
   ===================================================== */
   useEffect(() => {
     const fetchImages = async () => {
-      setPexelsLoading(true);
-      try {
-        const res = await fetch(
-          "https://api.pexels.com/v1/search?query=education&orientation=landscape&per_page=30",
-          { headers: { Authorization: PEXELS_API_KEY } }
-        );
-        const data = await res.json();
-        setPexelsImages(data.photos.map((p: any) => p.src.large));
-      } catch {
-        setPexelsImages([]);
-      } finally {
-        setPexelsLoading(false);
-      }
+      const promises = vkms.map(async (vkm) => {
+        const cacheKey = `vkm-image-${vkm.id}`;
+        const cached = localStorage.getItem(cacheKey);
+
+        if (cached) return { id: vkm.id, img: cached };
+
+        try {
+          const res = await fetch(
+            `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+              vkm.name
+            )}&orientation=landscape&per_page=1`,
+            { headers: { Authorization: PEXELS_API_KEY } }
+          );
+
+          const json = await res.json();
+          const img =
+            json.photos?.[0]?.src?.large ||
+            json.photos?.[0]?.src?.medium ||
+            "/john-mango.png";
+
+          localStorage.setItem(cacheKey, img);
+          return { id: vkm.id, img };
+        } catch {
+          return { id: vkm.id, img: "/john-mango.png" };
+        }
+      });
+
+      const results = await Promise.all(promises);
+
+      setPexelsImages((prev) => {
+        const updated = { ...prev };
+        results.forEach(({ id, img }) => (updated[id] = img));
+        return updated;
+      });
     };
 
-    fetchImages();
-  }, []);
+    if (vkms.length) fetchImages();
+  }, [vkms]);
 
   /* =====================================================
-    Inladen
+     Loading
   ===================================================== */
-  if (loading || pexelsLoading) {
+  if (loading) {
     return (
       <div className="swipe-page">
         <p>Modules laden...</p>
@@ -112,13 +137,11 @@ export default function SwipePage() {
     );
   }
 
-  const getImage = (i: number) =>
-    pexelsImages.length > 0
-      ? pexelsImages[i % pexelsImages.length]
-      : "/images/default-vkm.png";
+  const getImage = (vkm?: Vkm) =>
+    vkm ? pexelsImages[vkm.id] || "/john-mango.png" : "/john-mango.png";
 
   /* =====================================================
-    Swipe logic
+     Swipe logic
   ===================================================== */
   const commitSwipe = () => {
     setIndex((prev) => prev + 1);
@@ -142,32 +165,30 @@ export default function SwipePage() {
   };
 
   /* =====================================================
-    Uitleg swiper popover
+     Popover uitleg
   ===================================================== */
   const swipeHelpPopover = (
     <Popover id="swipe-help-popover">
       <Popover.Header as="h3">Hoe werkt swipen?</Popover.Header>
       <Popover.Body>
-        👉 <strong>Swipe naar rechts</strong> om een module te liken
+        <strong>Swipe naar rechts of klik op ♥</strong> om een module te liken
         <br />
-        👈 <strong>Swipe naar links</strong> om een module te disliken
+        <br />
+        <strong>Swipe naar links of klik op X</strong> om een module te disliken
       </Popover.Body>
     </Popover>
   );
 
   /* =====================================================
-    Card layout (info-box)
+     Card layout 
   ===================================================== */
-  const renderCard = (vkm: Vkm, img: string) => (
+  const renderCard = (vkm: Vkm) => (
     <div className="vkm-info-card">
       <img
-        src={img}
+        src={getImage(vkm)}
         alt={vkm.name}
-        style={{
-          width: "100%",
-          borderRadius: "16px",
-          objectFit: "cover",
-          maxHeight: "220px",
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = "/john-mango.png";
         }}
       />
 
@@ -185,35 +206,35 @@ export default function SwipePage() {
   );
 
   /* =====================================================
-    Render Swiper
+     Render
   ===================================================== */
   return (
     <div className="swipe-page">
-      <div className="swipe-wrapper card-stack">
-        {/* Onderste kaart */}
-        {nextVkm && (
-          <div className="swipe-card swipe-card-under">
-            {renderCard(nextVkm, getImage(index + 1))}
-          </div>
-        )}
+      <div className="swipe-wrapper">
 
-        {/* Bovenste kaart */}
-        <div
-          className="swipe-card swipe-card-top"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-          style={{
-            transform: `translateX(${x}px) rotate(${x / 12}deg)`,
-            transition: dragging ? "none" : "transform 0.3s ease",
-            touchAction: "none",
-          }}
-        >
-          {renderCard(currentVkm, getImage(index))}
+        <div className="card-stack">
+          {nextVkm && (
+            <div className="swipe-card swipe-card-under">
+              {renderCard(nextVkm)}
+            </div>
+          )}
+
+          <div
+            className="swipe-card swipe-card-top"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+            style={{
+              transform: `translateX(${x}px) rotate(${x / 12}deg)`,
+              transition: dragging ? "none" : "transform 0.3s ease",
+              touchAction: "none",
+            }}
+          >
+            {renderCard(currentVkm)}
+          </div>
         </div>
 
-        {/* Acties */}
         <div className="swipe-actions">
           <button className="swipe-btn brand" onClick={commitSwipe}>
             X
