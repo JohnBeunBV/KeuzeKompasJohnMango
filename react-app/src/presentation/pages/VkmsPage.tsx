@@ -23,8 +23,8 @@ const VkmsPage: React.FC = () => {
   const [creditsInput, setCreditsInput] = useState("");
   const [filters, setFilters] = useState({ search: "", location: "", credits: "" });
 
-  const [pexelsImages, setPexelsImages] = useState<string[]>([]);
-  const [pexelsLoading, setPexelsLoading] = useState(true);
+  const [pexelsImages, setPexelsImages] = useState<Record<number, string>>({});
+  // const [pexelsLoading, setPexelsLoading] = useState(false);
   const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
 
   // 🔹 Sync Redux auth met localStorage
@@ -60,23 +60,43 @@ const VkmsPage: React.FC = () => {
 
   // 🔹 Fetch Pexels afbeeldingen met loading-state
   useEffect(() => {
-    const fetchPexelsImages = async () => {
-      setPexelsLoading(true);
+  const fetchImages = async () => {
+    const promises = data.map(async (vkm) => {
+      const cacheKey = `vkm-image-${vkm.id}`;
+      const cached = localStorage.getItem(cacheKey);
+
+      if (cached) return { id: vkm.id, img: cached };
+
       try {
         const res = await fetch(
-          `https://api.pexels.com/v1/search?query=nature&orientation=landscape&per_page=12&page=${page}`,
+          `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+            vkm.name
+          )}&orientation=landscape&per_page=1`,
           { headers: { Authorization: PEXELS_API_KEY } }
         );
-        const data = await res.json();
-        setPexelsImages(data.photos.map((p: any) => p.src.medium));
+        const json = await res.json();
+        const img = json.photos?.[0]?.src?.medium || "/john-mango.png";
+
+        localStorage.setItem(cacheKey, img);
+        return { id: vkm.id, img };
       } catch {
-        setPexelsImages([]);
-      } finally {
-        setPexelsLoading(false);
+        return { id: vkm.id, img: "/john-mango.png" };
       }
-    };
-    fetchPexelsImages();
-  }, [page, PEXELS_API_KEY]);
+    });
+
+    const results = await Promise.all(promises);
+
+    setPexelsImages((prev) => {
+      const updated = { ...prev };
+      results.forEach(({ id, img }) => (updated[id] = img));
+      return updated;
+    });
+  };
+
+  if (data.length) fetchImages();
+}, [data, PEXELS_API_KEY]);
+
+
 
   // 🔹 Redirect bij VKM-fetch errors
   useEffect(() => {
@@ -153,48 +173,59 @@ const VkmsPage: React.FC = () => {
 
       {/* Kaarten */}
       <Row>
-        {data.map((vkm: Vkm, index: number) => (
-          <Col md={4} key={vkm.id} className="mb-4 d-flex">
-            <div className="vkm-card-wrapper" style={{ animationDelay: `${index * 100}ms` }}>
-              <div className="vkm-card card h-100 d-flex flex-column">
-                {pexelsLoading ? (
-                  <div
-                    style={{
-                      height: "180px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "#333",
-                    }}
-                  >
-                    <Spinner animation="border" variant="light" />
-                  </div>
-                ) : (
-                  <img
-                    src={pexelsImages[index] || "/images/default-vkm.png"}
-                    alt={vkm.name}
-                    style={{ height: "180px", objectFit: "cover" }}
-                    className="card-img-top"
-                  />
-                )}
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">
-                    {vkm.name} <small className="text-muted">({vkm.studycredit})</small>
-                  </h5>
-                  <p className="card-text mb-2">{vkm.shortdescription}</p>
-                  <hr />
-                  <p className="card-text text-muted mt-auto">Locatie: {vkm.location}</p>
-                  <div className="mt-3">
-                    <Link to={`/vkms/${vkm.id}`} state={{ imageUrl: pexelsImages[index] }}>
-                      <Button className="btn-detail">Bekijk details</Button>
-                    </Link>
-                  </div>
-                </div>
+  {data.map((vkm: Vkm, index: number) => {
+    const img = pexelsImages[vkm.id]; // individuele afbeelding voor deze vkm
+
+    return (
+      <Col md={4} key={vkm.id} className="mb-4 d-flex">
+        <div className="vkm-card-wrapper" style={{ animationDelay: `${index * 100}ms` }}>
+          <div className="vkm-card card h-100 d-flex flex-column">
+
+            {/* 🔹 Per-kaart loading */}
+            {!img ? (
+              <div
+                style={{
+                  height: "180px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#333",
+                }}
+              >
+                <Spinner animation="border" variant="light" />
+              </div>
+            ) : (
+              <img
+                src={img || "/john-mango.png"}
+                alt={vkm.name}
+                style={{ height: "180px", objectFit: "cover" }}
+                className="card-img-top"
+                onError={(e) => {
+    (e.target as HTMLImageElement).src = "/john-mango.png"; // fallback bij broken image
+  }}
+              />
+            )}
+
+            <div className="card-body d-flex flex-column">
+              <h5 className="card-title">
+                {vkm.name} <small className="text-muted">({vkm.studycredit})</small>
+              </h5>
+              <p className="card-text mb-2">{vkm.shortdescription}</p>
+              <hr />
+              <p className="card-text text-muted mt-auto">Locatie: {vkm.location}</p>
+              <div className="mt-3">
+                <Link to={`/vkms/${vkm.id}`} state={{ imageUrl: img }}>
+                  <Button className="btn-detail">Bekijk details</Button>
+                </Link>
               </div>
             </div>
-          </Col>
-        ))}
-      </Row>
+          </div>
+        </div>
+      </Col>
+    );
+  })}
+</Row>
+
 
       {/* Pagination */}
       <div className="d-flex justify-content-center mt-4">
