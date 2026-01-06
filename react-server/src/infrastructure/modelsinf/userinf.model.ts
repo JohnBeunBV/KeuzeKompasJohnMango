@@ -8,6 +8,11 @@ const UserSchema = new mongoose.Schema<UserDocument>({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   favorites: { type: [Number], default: [] },
+  profile: {
+    interests: { type: [String], default: [] },
+    values: { type: [String], default: [] },
+    goals: { type: [String], default: [] }
+  }
 });
 
 export const UserModel = mongoose.model<UserDocument>("User", UserSchema, "users");

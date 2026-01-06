@@ -51,7 +51,7 @@ export const register = async (username: string, email: string, password: string
   if (existingUser) throw new Error("Email al in gebruik");
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser: User = { username, email, password: hashedPassword, favorites: [] };
+  const newUser: User = { username, email, password: hashedPassword, favorites: [], profile: { interests: [], values: [], goals: [] } };
   return userRepo.create(newUser);
 };
 
@@ -183,3 +183,27 @@ export const getRecommendations = async (userId: string) => {
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, 10).map(s => s.vkm);
 };
+
+export const updateProfile = async (
+  userId: string,
+  profile: { interests?: string[]; values?: string[]; goals?: string[] }
+) => {
+  const updates: Partial<User> = { profile: { interests: [], values: [], goals: [] } };
+
+  if (profile.interests) updates.profile!.interests = profile.interests;
+  if (profile.values) updates.profile!.values = profile.values;
+  if (profile.goals) updates.profile!.goals = profile.goals;
+
+  const updatedUser = await userRepo.update(userId, updates);
+  if (!updatedUser) throw new Error("User niet gevonden");
+
+  return updatedUser;
+};
+
+export const getProfile = async (userId: string) => {
+  const user = await userRepo.getById(userId);
+  if (!user) throw new Error("User niet gevonden");
+
+  return user.profile || { interests: [], values: [], goals: [] };
+};
+

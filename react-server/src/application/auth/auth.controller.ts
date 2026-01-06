@@ -118,3 +118,25 @@ export const getRecommendations = async (req: AuthRequest, res: Response) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+export const updateProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = getUserIdFromRequest(req);
+    const { interests, values, goals } = req.body;
+
+    const updatedUser = await authService.updateProfile(userId, { interests, values, goals });
+    res.json({ message: "Profiel bijgewerkt!", profile: updatedUser.profile });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+export const getProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = getUserIdFromRequest(req);
+    const profile = await authService.getProfile(userId);
+    res.json({ profile });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};

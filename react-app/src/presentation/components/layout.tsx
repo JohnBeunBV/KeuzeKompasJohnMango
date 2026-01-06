@@ -74,6 +74,9 @@ const Layout: React.FC = () => {
             <Link to="/swipe" className="nav-link">
               Swipe
             </Link>
+            <Link to="/studentenprofiel" className="nav-link">
+              Studentenprofiel
+            </Link>
             <Link to="/about" className="nav-link">
               About
             </Link>

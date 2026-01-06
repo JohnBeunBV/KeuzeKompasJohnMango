@@ -52,6 +52,23 @@ export class UserMongoRepository implements UserRepository {
   return user.favorites || [];
 }
 
+  async updateProfile(userId: string, profile: { interests?: string[]; values?: string[]; goals?: string[] }): Promise<User> {
+    const user = await UserModel.findById(userId);
+    if (!user) throw new Error("User not found");
+
+    user.profile = user.profile || { interests: [], values: [], goals: [] };
+
+    if (profile.interests) user.profile.interests = profile.interests;
+    if (profile.values) user.profile.values = profile.values;
+    if (profile.goals) user.profile.goals = profile.goals;
+
+    await user.save();
+    return { ...user.toObject(), _id: user._id.toString() };
+  }
+
+  async getProfile(userId: string): Promise<{ interests: string[]; values: string[]; goals: string[] }> {
+    const user = await UserModel.findById(userId).lean();
+    if (!user) throw new Error("User not found");
+    return user.profile || { interests: [], values: [], goals: [] };
+  }
 }
-
-
