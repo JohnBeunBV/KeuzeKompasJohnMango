@@ -1,27 +1,25 @@
-// src/pages/VkmsPage.tsx
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Spinner, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Spinner, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { RootState, AppDispatch } from "../../application/store/store";
 import { fetchVkms } from "../../application/Slices/vkmsSlice";
 import { login } from "../../application/Slices/authSlice";
 import type { Vkm } from "@domain/models/vkm.model";
+import VkmFilter from "../components/VkmFilter";
 import "../index.css";
 
 const VkmsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { data, status, error, totalPages } = useSelector(
-    (state: RootState) => state.vkms
-  );
+  const location = useLocation();
+
+  const { data, status, error } = useSelector((state: RootState) => state.vkms);
   const { user } = useSelector((state: RootState) => state.auth);
 
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [allVkms, setAllVkms] = useState<Vkm[]>([]);
   const [page, setPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [locationInput, setLocationInput] = useState("");
-  const [creditsInput, setCreditsInput] = useState("");
-  const [filters, setFilters] = useState({ search: "", location: "", credits: "" });
 
   const [pexelsImages, setPexelsImages] = useState<Record<number, string>>({});
   // const [pexelsLoading, setPexelsLoading] = useState(false);
@@ -43,22 +41,19 @@ const VkmsPage: React.FC = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/error", {
-        state: {
-          status: 401,
-          message: "Je bent niet ingelogd. Log in om deze pagina te bekijken.",
-        },
+        state: { status: 401, message: "Je bent niet ingelogd. Log in om deze pagina te bekijken." },
       });
     }
   }, [navigate]);
 
-  // 🔹 Fetch VKMs
+  // 🔹 Fetch all VKMs once
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    dispatch(fetchVkms({ page, limit: 12, ...filters }));
-  }, [dispatch, page, filters]);
+    dispatch(fetchVkms({ page: 1, limit: 1000 }));
+  }, [dispatch]);
 
-  // 🔹 Fetch Pexels afbeeldingen met loading-state
+  // 🔹 Store all VKMs when data changes
   useEffect(() => {
   const fetchImages = async () => {
     const promises = data.map(async (vkm) => {
@@ -107,69 +102,66 @@ const VkmsPage: React.FC = () => {
     }
   }, [status, error, navigate]);
 
-  const handleSearch = () => {
-    setPage(1);
-    setFilters({ search: searchInput, location: locationInput, credits: creditsInput });
+  // 🔹 Handle filters update
+  const handleFilterChange = (newFilters: Record<string, string>) => {
+    setFilters(newFilters);
+    setPage(1); // reset to first page
   };
 
-  const handleReset = () => {
-    setSearchInput("");
-    setLocationInput("");
-    setCreditsInput("");
-    setFilters({ search: "", location: "", credits: "" });
-    setPage(1);
-  };
+  // 🔹 Client-side filtering
+  const filteredVkms = allVkms.filter((vkm) => {
+    for (const [key, value] of Object.entries(filters)) {
+      if (!value) continue;
+
+      if (key.startsWith("search")) {
+        // Check name
+        const nameMatch = vkm.name?.toLowerCase().includes(value.toLowerCase());
+        // Check tags
+        let tags: string[] = [];
+        if (Array.isArray(vkm.module_tags)) {
+          tags = vkm.module_tags;
+        } else if (typeof vkm.module_tags === "string") {
+          tags = vkm.module_tags.split(",").map((t) => t.trim());
+        }
+        const tagsMatch = tags.some((t) => t.toLowerCase().includes(value.toLowerCase()));
+        if (!nameMatch && !tagsMatch) return false;
+      } else if (key === "location" && vkm.location !== value) return false;
+      else if (key === "credits" && vkm.studycredit?.toString() !== value) return false;
+      else if (key === "level" && vkm.level !== value) return false;
+    }
+    return true;
+  });
+
+  // 🔹 Pagination
+  const itemsPerPage = 12;
+  const startIndex = (page - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedVkms = filteredVkms.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredVkms.length / itemsPerPage);
 
   const getPages = () => {
     const pages: (number | string)[] = [];
-    const max = totalPages;
     const range = 2;
     if (page > range + 2) pages.push(1, "...");
-    for (let i = Math.max(1, page - range); i <= Math.min(max, page + range); i++)
-      pages.push(i);
-    if (page < max - range - 1) pages.push("...", max);
+    for (let i = Math.max(1, page - range); i <= Math.min(totalPages, page + range); i++) pages.push(i);
+    if (page < totalPages - range - 1) pages.push("...", totalPages);
     return pages;
   };
 
   if (status === "loading") return <Spinner animation="border" className="mt-5" />;
 
   return (
-    <Container className="mt-4 vkms-page">
-      <h1 className="page-title">Beschikbare VKM’s</h1>
-      <hr />
-      {/* Filters */}
-      <Row className="mb-3 align-items-end">
-        <Col md={3}>
-          <Form.Control
-            type="text"
-            placeholder="Zoek op naam..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+      <Container className="mt-4 vkms-page">
+        <h1 className="page-title">Beschikbare VKM's</h1>
+        <hr />
+
+        {/* VkmFilter Component */}
+        <div className="mb-4">
+          <VkmFilter
+              onFilterChange={handleFilterChange}
+              initialFilters={location.state?.tagSearch ? { search1: location.state.tagSearch } : {}}
           />
-        </Col>
-        <Col md={3}>
-          <Form.Select value={locationInput} onChange={(e) => setLocationInput(e.target.value)}>
-            <option value="">Alle locaties</option>
-            <option value="Breda">Breda</option>
-            <option value="Den Bosch">Den Bosch</option>
-          </Form.Select>
-        </Col>
-        <Col md={3}>
-          <Form.Select value={creditsInput} onChange={(e) => setCreditsInput(e.target.value)}>
-            <option value="">Alle studiepunten</option>
-            <option value="15">15</option>
-            <option value="30">30</option>
-          </Form.Select>
-        </Col>
-        <Col md={3} className="d-flex gap-2">
-          <Button className="btn-search" onClick={handleSearch}>
-            Zoeken
-          </Button>
-          <Button variant="secondary" onClick={handleReset}>
-            Reset
-          </Button>
-        </Col>
-      </Row>
+        </div>
 
       {/* Kaarten */}
       <Row>
@@ -242,19 +234,19 @@ const VkmsPage: React.FC = () => {
             >
               ...
             </span>
-          ) : (
-            <Button
-              key={p}
-              variant={p === page ? "warning" : "light"}
-              className="mx-1"
-              onClick={() => setPage(p as number)}
-            >
-              {p}
-            </Button>
-          )
-        )}
-      </div>
-    </Container>
+              ) : (
+                  <Button
+                      key={p}
+                      variant={p === page ? "warning" : "light"}
+                      className="mx-1"
+                      onClick={() => setPage(p as number)}
+                  >
+                    {p}
+                  </Button>
+              )
+          )}
+        </div>
+      </Container>
   );
 };
 
