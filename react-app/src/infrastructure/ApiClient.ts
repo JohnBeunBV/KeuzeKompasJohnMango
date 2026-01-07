@@ -30,12 +30,20 @@ apiClient.interceptors.response.use(
       return new Promise(() => {}); // houdt de promise pending zodat React niks flasht
     }
 
-    if (status === 401) {
+        if (status === 401) {
+      // Hard logout
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.dispatchEvent(new Event("logout"));
+
+      // Naar error page met context
       window.location.href = `/error?status=401&message=${encodeURIComponent(
-        message || "Ongeldige sessie, log opnieuw in."
+        message || "Je sessie is verlopen. Log opnieuw in."
       )}`;
+
       return new Promise(() => {});
     }
+
 
     return Promise.reject(error);
   }

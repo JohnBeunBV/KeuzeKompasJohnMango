@@ -40,6 +40,7 @@
     outline: none;
     border-color: #FF8F00;
     box-shadow: 0 0 6px rgba(255, 143, 0, 0.4);
+    /* color: #FF8F00; */
 }
 
 /* Errors */
@@ -104,7 +105,7 @@
 
 /* Confirmation box */
 .ai-confirmation {
-    margin-top: 20px;
+    margin-bottom: 20px;
     padding: 16px;
     background: #f6fff2;
     border: 1px solid #cce6b8;
@@ -118,4 +119,37 @@
 
 .ai-confirmation ul {
     padding-left: 18px;
+}
+
+.ai-current-profile {
+    margin: 24px 0;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.ai-current-profile h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+.ai-current-profile ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+.ai-current-profile li {
+    margin-bottom: 4px;
+}
+
+.ai-current-hint {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.ai-select option:checked {
+    background-color: #ff9100b3;
+    color: white;
 }

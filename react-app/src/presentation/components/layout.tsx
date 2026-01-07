@@ -6,24 +6,42 @@ const Layout: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const navigate = useNavigate();
 
+
+  const isTokenExpired = (token: string): boolean => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp && payload.exp < now;
+  } catch {
+    return true;
+  }
+};
+
+
   // 🔹 Helperfunctie om gebruiker uit token of localStorage te halen
-  const loadUserFromToken = () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setUserName(
-          payload.username ||
-            JSON.parse(localStorage.getItem("user") || "{}").username ||
-            null
-        );
-      } catch {
-        setUserName(null);
-      }
-    } else {
-      setUserName(null);
-    }
-  };
+ const loadUserFromToken = () => {
+  const token = localStorage.getItem("token");
+
+  if (!token || isTokenExpired(token)) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUserName(null);
+    window.dispatchEvent(new Event("logout"));
+    return;
+  }
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    setUserName(
+      payload.username ||
+        JSON.parse(localStorage.getItem("user") || "{}").username ||
+        null
+    );
+  } catch {
+    setUserName(null);
+  }
+};
+
 
   useEffect(() => {
     // Bij mount

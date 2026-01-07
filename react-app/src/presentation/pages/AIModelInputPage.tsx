@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import "../index.css";
 import "../AIModelInputPage.css";
 import apiClient from "../../infrastructure/ApiClient";
@@ -53,6 +53,8 @@ export default function AIModelInputPage() {
   const [values, setValues] = useState<Option[]>([]);
   const [goals, setGoals] = useState<Option[]>([]);
   const [touched, setTouched] = useState(false);
+  const [hasJustSaved, setHasJustSaved] = useState(false);
+  const savedProfileRef = useRef<HTMLDivElement>(null);
 
   // Snapshot van écht opgeslagen data
   const [savedProfile, setSavedProfile] = useState<SavedProfile | null>(null);
@@ -61,15 +63,35 @@ export default function AIModelInputPage() {
     return interests.length > 0 && values.length > 0 && goals.length > 0;
   }, [interests, values, goals]);
 
-  // Als gebruiker iets wijzigt → niet meer "opgeslagen"
-  useEffect(() => {
-    setSavedProfile(null);
+    useEffect(() => {
+    setHasJustSaved(false);
   }, [interests, values, goals]);
+
+  useEffect(() => {
+  async function fetchProfile() {
+    try {
+      const response = await apiClient.get("/auth/me/profile");
+
+      if (response.data?.profile) {
+        const profile = response.data.profile;
+
+        setInterests(profile.interests ?? []);
+        setValues(profile.values ?? []);
+        setGoals(profile.goals ?? []);
+        setSavedProfile(profile);
+      }
+    } catch (err) {
+      console.error("Kon profiel niet ophalen:", err);
+    }
+  }
+
+  fetchProfile();
+}, []);
+
 
  async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
   setTouched(true);
-
   if (!isValid) return;
 
   const payload: SavedProfile = {
@@ -79,12 +101,14 @@ export default function AIModelInputPage() {
   };
 
   try {
-    // PUT call naar backend via apiClient
-    const response = await apiClient.put("/auth/me/profile", payload);
+  const response = await apiClient.put("/auth/me/profile", payload);
+  setSavedProfile(response.data.profile);
+  setHasJustSaved(true);
 
-    // apiClient geeft al response.data
-    setSavedProfile(response.data.profile); // update state met opgeslagen data
-    console.log("Profiel succesvol opgeslagen in DB:", response.data.profile);
+  console.log("Profiel succesvol opgeslagen in DB:", response.data.profile);
+
+  // Scroll naar boven bij opgeslagen profiel
+  savedProfileRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (err) {
     console.error("Fout bij opslaan profiel:", err);
     alert("Er is een fout opgetreden bij het opslaan van je profiel.");
@@ -106,6 +130,41 @@ export default function AIModelInputPage() {
     <p className="ai-subtext">
       Je kunt meerdere opties selecteren (Ctrl/⌘ + klik).
     </p>
+
+    {savedProfile && (
+  <section className="ai-current-profile" ref={savedProfileRef}>
+
+    {hasJustSaved && (
+      <div className="ai-confirmation">
+        <h3>Profiel succesvol opgeslagen!</h3>
+      </div>
+    )}
+    
+    <h2>Huidige ingevulde profielvoorkeuren</h2>
+
+    <ul>
+      <li>
+        <strong>Interesses:</strong>{" "}
+        {(hasJustSaved ? savedProfile : savedProfile).interests.join(", ")}
+      </li>
+      <li>
+        <strong>Waarden:</strong>{" "}
+        {(hasJustSaved ? savedProfile : savedProfile).values.join(", ")}
+      </li>
+      <li>
+        <strong>Leerdoelen:</strong>{" "}
+        {(hasJustSaved ? savedProfile : savedProfile).goals.join(", ")}
+      </li>
+    </ul>
+
+    <p className="ai-current-hint">
+      Je kunt hieronder je profiel aanpassen en opnieuw opslaan.
+    </p>
+  </section>
+)}
+
+
+
 
     <form onSubmit={handleSubmit} className="ai-form">
       {/* Interesses */}
@@ -183,21 +242,7 @@ export default function AIModelInputPage() {
   >
     Opslaan
   </button>
-</div>
-
-
-
-      {/* Bevestiging */}
-      {savedProfile && (
-        <div className="ai-confirmation">
-          <h3>Profiel opgeslagen!</h3>
-          <ul>
-            <li><strong>Interesses:</strong> {savedProfile.interests.join(", ")}</li>
-            <li><strong>Waarden:</strong> {savedProfile.values.join(", ")}</li>
-            <li><strong>Doelen:</strong> {savedProfile.goals.join(", ")}</li>
-          </ul>
-        </div>
-      )}
+  </div>
     </form>
   </main>
 );
