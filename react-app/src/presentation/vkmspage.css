@@ -1,22 +1,17 @@
-/* ===== ROOT ===== */
 .side-drawer {
   position: fixed;
   top: 8%;
   right: 0;
   z-index: 1200;
-  display: flex;
-  align-items: flex-start;
 }
 
-/* ===== PANEL ===== */
+/* PANEL */
 .side-drawer-panel {
-  width: 420px;
+  width: 460px;
   max-height: 84vh;
-
   background: #111;
   border-radius: 14px 0 0 14px;
-
-  box-shadow: -12px 0 28px rgba(0, 0, 0, 0.55);
+  box-shadow: none;
 
   display: flex;
   flex-direction: column;
@@ -28,23 +23,15 @@
 /* OPEN STATE */
 .side-drawer.open .side-drawer-panel {
   transform: translateX(0);
+  box-shadow: -12px 0 28px rgba(0, 0, 0, 0.55);
 }
 
-/* ===== HEADER ===== */
-.side-drawer-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 12px 16px;
-  background: #0d0d0d;
-
-  border-radius: 14px 0 0 0;
-}
-
-/* ===== TOGGLE BUTTON ===== */
-/* Toggle sits outside the panel so it's visible when closed */
+/* TOGGLE BUTTON */
 .side-drawer-toggle {
+  position: absolute;
+  left: -40px; /* sits outside the panel edge */
+  top: 10px;
+
   width: 40px;
   height: 40px;
 
@@ -54,34 +41,25 @@
 
   font-size: 22px;
   font-weight: bold;
-
   border-radius: 10px 0 0 10px;
   cursor: pointer;
-
-  margin-right: -12px; /* overlap the panel edge */
-  z-index: 1300;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.35s ease;
 }
 
-/* Arrow rotates */
-.side-drawer.open .side-drawer-toggle {
-  transform: translateX(-420px);
-}
-
-/* rotate only the arrow inside the button */
+/* Arrow rotation only */
 .side-drawer-toggle .toggle-arrow {
-  display: inline-block;
   transition: transform 0.35s ease;
-}
-.side-drawer.open .side-drawer-toggle .toggle-arrow {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
-/* ===== CONTENT ===== */
+.side-drawer.open .side-drawer-toggle .toggle-arrow {
+  transform: rotate(270deg);
+}
+
+/* CONTENT */
 .side-drawer-content {
   padding: 16px;
   overflow-y: auto;
