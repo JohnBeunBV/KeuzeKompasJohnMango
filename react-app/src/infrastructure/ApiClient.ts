@@ -1,4 +1,9 @@
 import axios, { AxiosError } from "axios";
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+    authToken = token;
+};
 
 // ⚠️ Let erop dat VITE_ prefix nodig is voor frontend env variables
 const API_BASE_URL = import.meta.env.VITE_API_URL;
@@ -8,9 +13,8 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (authToken) {
+    config.headers.Authorization = `Bearer ${authToken}`;
   }
   return config;
 });

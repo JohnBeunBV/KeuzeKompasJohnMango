@@ -7,6 +7,9 @@ dotenv.config();
 import {connectDB} from "./infrastructure/db";
 import vkmsRouter from "./application/vkms/vkm.routes";
 import authRouter from "./application/auth/auth.routes";
+import adminRouter from "./application/admin/admin.routes";
+import teacherRouter from "./application/teacher/teacher.routes";
+
 import {seedAdminUser} from "./application/seed/admin.seed";
 import * as path from "path";
 
@@ -40,6 +43,8 @@ app.use("/api/", apiLimiter);
 // 🔹 API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/vkms", vkmsRouter);
+app.use("/api/admin", adminRouter);
+app.use("/api/teacher", teacherRouter);
 
 // 🔹 Debug logging van alle routes
 app._router?.stack.forEach((middleware: any) => {

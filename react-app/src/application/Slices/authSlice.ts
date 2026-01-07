@@ -1,40 +1,67 @@
-// src/vkms/authSlice.ts
-import { createSlice } from "@reduxjs/toolkit";
-import type { User } from "@domain/models/user.model";
+import { createSlice} from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-interface AuthState {
-  user: User | null;
-  token: string | null;
+export interface AuthUser {
+  id: string;
+  username: string;
+  email: string;
+  roles: string[];
 }
 
-const getInitialState = (): AuthState => ({
-  user: JSON.parse(localStorage.getItem("user") || "null"),
+interface AuthState {
+  token: string | null;
+  user: AuthUser | null;
+  roles: string[];
+  isAuthenticated: boolean;
+}
+
+const initialState: AuthState = {
   token: localStorage.getItem("token"),
-});
+  user: localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user")!)
+      : null,
+  roles: localStorage.getItem("roles")
+      ? JSON.parse(localStorage.getItem("roles")!)
+      : [],
+  isAuthenticated: !!localStorage.getItem("token"),
+};
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: getInitialState(),
+  initialState,
   reducers: {
-    login: (state, action: PayloadAction<{ user: User; token: string }>) => {
-      state.user = action.payload.user;
+    loginSuccess: (
+        state,
+        action: PayloadAction<{
+          token: string;
+          user: AuthUser;
+        }>
+    ) => {
       state.token = action.payload.token;
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      state.user = action.payload.user;
+      state.roles = action.payload.user.roles;
+      state.isAuthenticated = true;
+
+      // persist
       localStorage.setItem("token", action.payload.token);
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem(
+          "roles",
+          JSON.stringify(action.payload.user.roles)
+      );
     },
+
     logout: (state) => {
-      state.user = null;
       state.token = null;
-      localStorage.removeItem("user");
+      state.user = null;
+      state.roles = [];
+      state.isAuthenticated = false;
+
       localStorage.removeItem("token");
-    },
-    loadFromStorage: (state) => {
-      state.user = JSON.parse(localStorage.getItem("user") || "null");
-      state.token = localStorage.getItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("roles");
     },
   },
 });
 
-export const { login, logout, loadFromStorage } = authSlice.actions;
+export const { loginSuccess, logout } = authSlice.actions;
 export default authSlice.reducer;

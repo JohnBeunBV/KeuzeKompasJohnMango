@@ -1156,3 +1156,17 @@ html {
   border-radius: 8px;
   object-fit: cover;
 }
+.nav-link.role-link.admin {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nav-link.role-link.teacher {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nav-link.role-link.admin:hover,
+.nav-link.role-link.teacher:hover {
+  text-decoration: underline;
+}
