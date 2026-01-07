@@ -25,6 +25,7 @@ services:
     environment:
       MONGO_URI: ${MONGO_URI}
       JWT_SECRET: ${JWT_SECRET}
+      MODEL_API_URL: ${MODEL_API_URL}
       NODE_ENV: production
       PYTHON_API_KEY: ${PYTHON_API_KEY}
     ports:
