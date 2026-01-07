@@ -4,12 +4,13 @@ export interface StudentProfile {
   goals: string[];
 }
 
+import { Vkm } from "./vkm.model";
 export interface User {
   _id?: string;
   username: string;
   email: string;
   password: string;
   token?: string;
-  favorites?: number[];
   profile?: StudentProfile;
+  favorites?: number[] | Vkm[];
 }

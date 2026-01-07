@@ -3,6 +3,7 @@ import { User, StudentProfile } from "../../domain/models/user.model";
 import { UserMongoRepository } from "../../infrastructure/repositories/UsermongoRepository";
 import { VkmsMongoRepository } from "../../infrastructure/repositories/VkmsmongoRepository";
 import { VkmsRepository } from "../../domain/repositories/VkmsRepository";
+import { recommendWithAI } from "../../infrastructure/ai/ai.client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as validator from "validator";
@@ -29,8 +30,6 @@ const signUserToken = (user: User) => {
     }
   );
 };
-
-
 
 // 🔹 Validatie functie (herbruikbaar voor register & update)
 export const validateUserInput = (username?: string, email?: string, password?: string) => {
@@ -74,14 +73,15 @@ export const login = async (email: string, password: string) => {
   };
 };
 
-
 export const getMe = async (userId: string) => {
   const user = await userRepo.getById(userId);
   if (!user) throw new Error("User niet gevonden");
   
   // Haal alle VKMs volledig op
   const favoriteVkms = await Promise.all(
-    (user.favorites || []).map(id => vkmRepo.getById(id))
+    (user.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return { 
@@ -114,7 +114,9 @@ export const addFavorite = async (userId: string, vkmId: number) => {
   const updatedUser = await userRepo.addFavorite(userId, vkmId);
 
   const favoriteVkms = await Promise.all(
-    (updatedUser.favorites || []).map(id => vkmRepo.getById(id))
+    (updatedUser.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return { ...updatedUser, favorites: favoriteVkms.filter(v => v !== null) };
@@ -127,7 +129,9 @@ export const removeFavorite = async (userId: string, vkmId: number) => {
   const updatedUser = await userRepo.removeFavorite(userId, vkmId);
 
   const favoriteVkms = await Promise.all(
-    (updatedUser.favorites || []).map(id => vkmRepo.getById(id))
+    (updatedUser.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return { ...updatedUser, favorites: favoriteVkms.filter(v => v !== null) };
@@ -138,7 +142,9 @@ export const getFavorites = async (userId: string) => {
   if (!user) throw new Error("User not found");
 
   const favoriteVkms = await Promise.all(
-    (user.favorites || []).map(id => vkmRepo.getById(id))
+    (user.favorites || [])
+      .map(fav => typeof fav === "number" ? fav : fav.id)
+      .map(id => vkmRepo.getById(id))
   );
 
   return favoriteVkms.filter(v => v !== null);
@@ -146,42 +152,56 @@ export const getFavorites = async (userId: string) => {
 
 export const getRecommendations = async (userId: string) => {
   const user = await userRepo.getById(userId);
-  if (!user) throw new Error("User not found");
+  
+  // 1. Safety check: If no user or no favorites, return empty immediately
+  // This prevents sending empty/invalid data to the AI model
+  if (!user || !user.favorites || user.favorites.length === 0) {
+    return [];
+  }
 
-  if (!user.favorites || user.favorites.length === 0) return [];
+  // 2. Extract IDs safely
+  // Ensures we handle both [1, 2] and [{id:1}, {id:2}] formats
+  const favoriteIds = user.favorites
+    .map((fav) => (typeof fav === "number" ? fav : fav.id))
+    .filter((id) => typeof id === "number" && !isNaN(id));
 
-  const favoriteVkms = await Promise.all(user.favorites.map(id => vkmRepo.getById(id)));
-  const validFavorites = favoriteVkms.filter(v => v !== null);
-  if (validFavorites.length === 0) return [];
+  // Double check we have IDs left
+  if (favoriteIds.length === 0) return [];
 
-  const favoriteTags = new Set(
-    validFavorites.flatMap(vkm => {
-      const tags = vkm!.module_tags;
-      if (!tags) return [];
-      return Array.isArray(tags) ? tags : tags.split(",").map(t => t.trim());
-    })
-  );
+  console.log("Sending to AI:", { favorite_id: favoriteIds});
 
-  const { vkms: allVkms } = await vkmRepo.getAll();
+  try {
+    const aiResult = await recommendWithAI({
+      user: {
+        favorite_id: favoriteIds,
+      },
+      top_n: 5,
+    });
 
-  const recommended = allVkms.filter(vkm => {
-    const tags = vkm.module_tags;
-    if (!tags) return false;
-    const tagArray = Array.isArray(tags) ? tags : tags.split(",").map(t => t.trim());
-    const overlap = tagArray.some(tag => favoriteTags.has(tag));
-    return overlap && !user.favorites?.includes(vkm.id);
-  });
+    const vkms = await Promise.all(
+      aiResult.recommendations.map(async (r: any) => {
+        const vkm = await vkmRepo.getById(r.id);
+        if (!vkm) return null;
 
-  const scored = recommended.map(vkm => {
-    const tags = Array.isArray(vkm.module_tags)
-      ? vkm.module_tags
-      : vkm.module_tags.split(",").map(t => t.trim());
-    const overlapCount = tags.filter(tag => favoriteTags.has(tag)).length;
-    return { vkm, score: overlapCount };
-  });
+        return {
+          ...vkm,
+          // Python sends 0.0-1.0 or 0-100?
+          // If python sends 0.85, this makes it 85.
+          // If python sends 85, this makes it 8500. Check your Python output! 
+          // Assuming Python 0-1 based on your 'weights' dict:
+          score: Math.round(r.score * 100), 
+          explanation: r.explanation,
+          details: r.details,
+        };
+      })
+    );
 
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, 10).map(s => s.vkm);
+    return vkms.filter(Boolean);
+  } catch (err: any) {
+    console.error("AI Service Error:", err.message);
+    // Return empty array instead of crashing so frontend still loads
+    return []; 
+  }
 };
 
 export const updateProfile = async (
