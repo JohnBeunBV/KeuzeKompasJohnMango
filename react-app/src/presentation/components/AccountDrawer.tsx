@@ -208,7 +208,7 @@ const AccountDrawer: React.FC = () => {
 
                 {showXaiModal && (
                   <div
-                    className="xai-hover-box"
+                    className="xai-hover-box2"
                     onMouseEnter={() => setShowXaiModal(true)}
                     onMouseLeave={() => setShowXaiModal(false)}
                   >

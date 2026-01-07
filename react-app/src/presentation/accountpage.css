@@ -25,7 +25,24 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   padding: 10px;
-  transform: translateX(-10%);
+  transform: translateX(-42%);
+}
+
+.xai-hover-box2 {
+  position: fixed;
+  top: 28px;
+  /* adjust depending on button size */
+  left: 0;
+  width: 700px;
+  max-width: 90vw;
+  background-color: #111;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding: 10px;
+  transform: translateX(-55%);
 }
 
 .xai-header {
