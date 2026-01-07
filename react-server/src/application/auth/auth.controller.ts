@@ -51,6 +51,7 @@ export const loginMicrosoft = async (req: Request, res: Response) => {
     const result = await authService.loginWithMicrosoft(idToken);
     res.json(result);
   } catch (err: any) {
+    console.error(err);
     res.status(400).json({ error: err.message });
   }
 };

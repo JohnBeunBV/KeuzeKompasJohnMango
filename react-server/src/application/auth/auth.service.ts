@@ -6,13 +6,23 @@ import {VkmsRepository} from "../../domain/repositories/VkmsRepository";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as validator from "validator";
-import {UserModel} from "../../infrastructure/modelsinf/userinf.model";
+import jwksClient from "jwks-rsa";
 
 // Repositories
 const userRepo: UserRepository = new UserMongoRepository();
 const vkmRepo: VkmsRepository = new VkmsMongoRepository();
 
-// Helper
+const client = jwksClient({
+    jwksUri: `https://login.microsoftonline.com/common/discovery/v2.0/keys`,
+});
+
+function getKey(header: any, callback: any) {
+    client.getSigningKey(header.kid, function (err, key: any) {
+        const signingKey = key.getPublicKey();
+        callback(null, signingKey);
+    });
+}
+
 const signUserToken = (user: User) => {
     return jwt.sign(
         {
@@ -51,11 +61,36 @@ interface MicrosoftTokenPayload {
 }
 
 export const loginWithMicrosoft = async (idToken: string) => {
-    // const payload = jwtDecode<MicrosoftTokenPayload>(idToken);
-    const payload = jwt.verify(idToken, process.env.JWT_SECRET!) as any;
+    const microsoftPayload: any = await new Promise((resolve, reject) => {
+        jwt.verify(
+            idToken,
+            getKey,
+            {
+                audience: process.env.MICROSOFT_CLIENT_ID,
+                algorithms: ["RS256"]
+            },
+            (err, decoded) => {
+                if (err) reject(err);
+                else resolve(decoded);
+            }
+        );
+    });
 
-    const microsoftId = payload.oid;
-    const email = payload.email || payload.preferred_username;
+    const issuer = microsoftPayload.iss;
+
+    const allowedIssuers = [
+        // "https://login.microsoftonline.com/consumers/v2.0",
+        // "https://login.microsoftonline.com/common/v2.0",
+        `https://login.microsoftonline.com/${process.env.MICROSOFT_TENANT_ID}/v2.0`
+    ];
+
+    if (!allowedIssuers.includes(issuer)) {
+        throw new Error(`Invalid Microsoft token issuer: ${issuer}`);
+    }
+
+    const microsoftId = microsoftPayload.oid || microsoftPayload.sub;
+    const email = microsoftPayload.email || microsoftPayload.preferred_username;
+    const name = microsoftPayload.name;
 
     if (!microsoftId || !email) {
         throw new Error("Invalid Microsoft token");
@@ -64,16 +99,15 @@ export const loginWithMicrosoft = async (idToken: string) => {
     // Existing OAuth user
     let user = await userRepo.getByOAuth("microsoft", microsoftId);
 
-    // Existing LOCAL user → block
+    // Block if local account exists
     const emailUser = await userRepo.getByEmail(email);
     if (!user && emailUser) {
         throw new Error("Account bestaat al met email/wachtwoord");
     }
 
-    // Create OAuth user
     if (!user) {
         user = await userRepo.create({
-            username: email.split("@")[0],
+            username: name,
             email,
             authMethod: "oauth",
             oauth: {
@@ -97,6 +131,7 @@ export const loginWithMicrosoft = async (idToken: string) => {
         }
     };
 };
+
 
 
 export const register = async (username: string, email: string, password: string) => {
