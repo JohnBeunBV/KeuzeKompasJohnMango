@@ -20,7 +20,7 @@ const VkmsPage: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [allVkms, setAllVkms] = useState<Vkm[]>([]);
+  const [allVkms] = useState<Vkm[]>([]);
   const [page, setPage] = useState(1);
 
   const [pexelsImages, setPexelsImages] = useState<Record<number, string>>({});
