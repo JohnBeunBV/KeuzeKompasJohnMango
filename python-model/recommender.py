@@ -264,7 +264,15 @@ def build_model_from_dataframe(
     return model_bundle
 
 
-def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any], top_n: int =5, w_content=0.45, w_pop=0.05, w_cf=0.0, w_profile=0.5):
+def recommend_from_model(
+    model_bundle: Dict[str, Any],
+    user_row: Dict[str, Any],
+    top_n: int = 5,
+    w_content: float = 0.45,
+    w_pop: float = 0.05,
+    w_cf: float = 0.0,
+    w_profile: float = 0.5,
+):
     df = model_bundle["df"]
     module_vectors_pca = model_bundle["module_vectors_pca"]
     module_tfidf_dense = model_bundle["module_tfidf_dense"]
@@ -273,9 +281,18 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
     item_map_inv = model_bundle.get("item_map_inv", {})
     interaction_matrix = model_bundle.get("interaction_matrix")
 
+    # Favorites
     fav_ids = [fid for fid in user_row.get("favorite_id", []) if fid in df["id"].values]
     fav_indices = df[df["id"].isin(fav_ids)].index.tolist()
 
+    # Profile tekst
+    has_profile = bool(user_row.get("profile_text", "").strip())
+
+    # Als geen favorites en geen profieltekst → return lege recommendations
+    if not fav_indices and not has_profile:
+        return pd.DataFrame(columns=["id", "name", "shortdescription", "tags_list"]), pd.DataFrame()
+
+    # --- Content vector gebaseerd op favorites of gemiddelde modules ---
     if fav_indices:
         fav_vectors = module_vectors_pca[fav_indices]
         user_vec = fav_vectors.mean(axis=0).reshape(1, -1)
@@ -285,33 +302,52 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
     sims = cosine_similarity(normalize(user_vec), normalize(module_vectors_pca))[0]
     content_sim_scaled = (sims - sims.min()) / max(1e-9, sims.max() - sims.min())
 
+    # --- Profile similarity ---
     profile_scaled = np.zeros(len(df))
-    if user_row.get("profile_text", "").strip() and len(model_bundle.get("users_demo", [])):
-        uidx_series = model_bundle["users_demo"][model_bundle["users_demo"]["user_id"] == user_row.get("user_id")].index
-        if len(uidx_series):
-            uidx = uidx_series[0]
-            profile_vec = model_bundle["user_profile_tfidf"][uidx].reshape(1, -1)
-            profile_sims = cosine_similarity(profile_vec, module_tfidf_dense)[0]
-            profile_scaled = (profile_sims - profile_sims.min()) / max(1e-9, profile_sims.max() - profile_sims.min())
+    if has_profile:
+        vectorizer = model_bundle["vectorizer"]
+        nlp_nl, nlp_en = _get_spacy_models()
 
+        profile_text_clean = preprocess_text(user_row["profile_text"], nlp_nl, nlp_en)
+        profile_vec = vectorizer.transform([profile_text_clean]).toarray()
+        profile_sims = cosine_similarity(profile_vec, module_tfidf_dense)[0]
+
+        profile_scaled = (profile_sims - profile_sims.min()) / max(1e-9, profile_sims.max() - profile_sims.min())
+
+    # --- Popularity ---
     popularity_norm = df["popularity_score"] / (df["popularity_score"].max() + 1e-9) if "popularity_score" in df.columns else np.zeros(len(df))
 
+    # --- Collaborative filtering (optioneel) ---
     cf_raw = np.zeros(len(df))
-    if user_row.get("user_id") in user_map and als_model is not None and interaction_matrix is not None:
-        uidx = user_map[user_row.get("user_id")]
-        rec_ids, rec_scores = als_model.recommend(userid=uidx, user_items=interaction_matrix.T, N=len(item_map_inv), filter_already_liked_items=False)
+    if fav_indices and user_row.get("user_id") in user_map and als_model is not None and interaction_matrix is not None:
+        uidx = user_map[user_row["user_id"]]
+        rec_ids, rec_scores = als_model.recommend(
+            userid=uidx, user_items=interaction_matrix.T, N=len(item_map_inv), filter_already_liked_items=False
+        )
         score_map = {item_map_inv[i]: s for i, s in zip(rec_ids, rec_scores)}
         cf_raw = np.array([score_map.get(mid, 0.0) for mid in df["id"]])
 
     cf_scaled = (cf_raw - cf_raw.min()) / max(1e-9, cf_raw.max() - cf_raw.min())
 
-    hybrid_final = (
-        w_content * content_sim_scaled +
-        w_pop * popularity_norm +
-        w_cf * cf_scaled +
-        w_profile * profile_scaled
-    )
+    # --- Dynamische weging afhankelijk van aanwezige signalen ---
+    active_weights = {
+        "content": w_content if fav_indices else 0,
+        "profile": w_profile if has_profile else 0,
+        "popularity": w_pop if "popularity_score" in df.columns else 0,
+        "collaborative": w_cf if fav_indices else 0
+    }
+    weight_sum = sum(active_weights.values())
+    if weight_sum == 0:  # edge-case safeguard
+        weight_sum = 1
 
+    hybrid_final = (
+        active_weights["content"] * content_sim_scaled +
+        active_weights["profile"] * profile_scaled +
+        active_weights["popularity"] * popularity_norm +
+        active_weights["collaborative"] * cf_scaled
+    ) / weight_sum
+
+    # --- Bouw recommendation rows ---
     rows = []
     for idx, row in df.iterrows():
         if row["id"] in fav_ids:
@@ -322,14 +358,24 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
             "shortdescription": row.get("shortdescription", ""),
             "content_sim_scaled": float(content_sim_scaled[idx]),
             "profile_sim_scaled": float(profile_scaled[idx]),
-            "popularity_norm": float(popularity_norm[idx]) if hasattr(popularity_norm, '__len__') else float(popularity_norm[idx]),
+            "popularity_norm": float(popularity_norm[idx]) if hasattr(popularity_norm, "__len__") else float(popularity_norm[idx]),
             "cf_score_scaled": float(cf_scaled[idx]),
             "final_score": float(hybrid_final[idx])
         })
 
     rec_df = pd.DataFrame(rows).sort_values("final_score", ascending=False).head(top_n)
     fav_table = df.loc[fav_indices][["id", "name", "shortdescription", "tags_list"]]
+
+    print(
+        "PROFILE DEBUG:",
+        "has_profile_text=", has_profile,
+        "profile_mean=", float(profile_scaled.mean()),
+        "profile_max=", float(profile_scaled.max()),
+        "final_mean=", float(hybrid_final.mean())
+    )
+
     return fav_table, rec_df
+
 
 
 def evaluate_user_from_model(model_bundle: Dict[str, Any], user_id: int, k: int =5, sim_threshold: float =0.35):

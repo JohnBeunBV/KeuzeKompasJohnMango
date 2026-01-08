@@ -151,32 +151,69 @@ export const getFavorites = async (userId: string) => {
 };
 
 export const getRecommendations = async (userId: string) => {
-  const user = await userRepo.getById(userId);
-  
-  // 1. Safety check: If no user or no favorites, return empty immediately
-  // This prevents sending empty/invalid data to the AI model
-  if (!user || !user.favorites || user.favorites.length === 0) {
-    return [];
-  }
+  console.log("🔥 getRecommendations called with userId:", userId);
 
-  // 2. Extract IDs safely
-  // Ensures we handle both [1, 2] and [{id:1}, {id:2}] formats
-  const favoriteIds = user.favorites
+  const user = await userRepo.getById(userId);
+
+  console.log("📦 User from DB:", user);
+
+  if (!user) return [];
+
+
+  // 1. Favorites veilig extraheren
+  const favoriteIds = (user.favorites || [])
     .map((fav) => (typeof fav === "number" ? fav : fav.id))
     .filter((id) => typeof id === "number" && !isNaN(id));
 
-  // Double check we have IDs left
-  if (favoriteIds.length === 0) return [];
+  // 2. Profiel → tekst
+  const profile = user.profile;
+  console.log("RAW USER PROFILE FROM DB:", user.profile);
 
-  console.log("Sending to AI:", { favorite_id: favoriteIds});
+  const hasProfileData =
+  profile &&
+  (profile.interests.length > 0 ||
+   profile.values.length > 0 ||
+   profile.goals.length > 0);
+
+    const profileText = hasProfileData
+      ? [
+          profile.interests.length
+            ? `Interesses: ${profile.interests.join(", ")}.`
+            : "",
+          profile.values.length
+            ? `Waarden: ${profile.values.join(", ")}.`
+            : "",
+          profile.goals.length
+            ? `Doelen: ${profile.goals.join(", ")}.`
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")
+      : "";
+
+  console.log("🧠 PROFILE OBJECT:", profile);
+console.log("📝 PROFILE TEXT:", profileText);
+
+  // 3. Final safety check
+  // 👉 alleen stoppen als BEIDE leeg zijn
+  if (favoriteIds.length === 0 && !profileText) {
+    return [];
+  }
+
+  console.log("Sending to AI:", {
+    favorite_id: favoriteIds,
+    profile_text: profileText,
+  });
 
   try {
-    const aiResult = await recommendWithAI({
-      user: {
-        favorite_id: favoriteIds,
-      },
-      top_n: 5,
-    });
+      const aiResult = await recommendWithAI({
+    user: {
+      favorite_id: favoriteIds.length > 0 ? favoriteIds : [],
+      profile_text: profileText || "",
+    },
+    top_n: 5,
+  });
+
 
     const vkms = await Promise.all(
       aiResult.recommendations.map(async (r: any) => {
@@ -185,11 +222,7 @@ export const getRecommendations = async (userId: string) => {
 
         return {
           ...vkm,
-          // Python sends 0.0-1.0 or 0-100?
-          // If python sends 0.85, this makes it 85.
-          // If python sends 85, this makes it 8500. Check your Python output! 
-          // Assuming Python 0-1 based on your 'weights' dict:
-          score: Math.round(r.score * 100), 
+          score: Math.round(r.score * 100),
           explanation: r.explanation,
           details: r.details,
         };
@@ -199,10 +232,10 @@ export const getRecommendations = async (userId: string) => {
     return vkms.filter(Boolean);
   } catch (err: any) {
     console.error("AI Service Error:", err.message);
-    // Return empty array instead of crashing so frontend still loads
-    return []; 
+    return [];
   }
 };
+
 
 export const updateProfile = async (
   userId: string,
