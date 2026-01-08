@@ -5,7 +5,7 @@
 		"description": "Test JWT user auth and API-key service auth",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "42631642",
-		"_collection_link": "https://none00-1048.postman.co/workspace/0fba53e1-f32f-4fce-a5a0-985edbe913c3/collection/42631642-6854f279-d616-422b-abc9-f37cd1a476d3?action=share&source=collection_link&creator=42631642"
+		"_collection_link": "https://none00-1048.postman.co/workspace/JohnMango~0fba53e1-f32f-4fce-a5a0-985edbe913c3/collection/42631642-6854f279-d616-422b-abc9-f37cd1a476d3?action=share&source=collection_link&creator=42631642"
 	},
 	"item": [
 		{
@@ -13,6 +13,39 @@
 			"item": [
 				{
 					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Register succeeds or user already exists\", function () {\r",
+									"    pm.expect([201, 400]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 201) {\r",
+									"    const json = pm.response.json();\r",
+									"\r",
+									"    pm.test(\"New user structure is valid\", function () {\r",
+									"        pm.expect(json).to.have.property(\"user\");\r",
+									"        pm.expect(json.user.username).to.eql(pm.environment.get(\"test_username\"));\r",
+									"        pm.expect(json.user.email).to.eql(pm.environment.get(\"test_email\"));\r",
+									"    });\r",
+									"}\r",
+									"\r",
+									"if (pm.response.code === 409) {\r",
+									"    pm.test(\"Duplicate user error is acceptable\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json.message || json.error).to.exist;\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [
@@ -23,7 +56,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password!1\"\n}"
+							"raw": "{\n  \"username\": \"{{test_username}}\",\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}\n"
 						},
 						"url": {
 							"raw": "{{node_api}}/auth/register",
@@ -45,9 +78,26 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"pm.test(\"Login succeeded\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
 									"const json = pm.response.json();",
-									"pm.environment.set('jwtToken', json.token);",
-									"pm.environment.set('userId', json.user.id);"
+									"",
+									"pm.test(\"JWT token present\", function () {",
+									"    pm.expect(json.token).to.be.a(\"string\");",
+									"});",
+									"",
+									"pm.test(\"User object present\", function () {",
+									"    pm.expect(json.user).to.have.property(\"id\");",
+									"    pm.expect(json.user.email)",
+									"        .to.eql(pm.environment.get(\"test_email\"));",
+									"});",
+									"",
+									"// Save for next requests",
+									"pm.environment.set(\"jwtToken\", json.token);",
+									"pm.environment.set(\"userId\", json.user.id);",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {},
@@ -65,7 +115,49 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"stormkroonen@hotmail.nl\",\n  \"password\": \"S-2004-Enzo!\"\n}"
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}\n"
+						},
+						"url": {
+							"raw": "{{node_api}}/auth/login",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Wrong password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login fails with wrong password\", function () {",
+									"    pm.expect([400, 401]).to.include(pm.response.code);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"WrongPassword123\"\n}\n"
 						},
 						"url": {
 							"raw": "{{node_api}}/auth/login",
@@ -87,12 +179,70 @@
 			"item": [
 				{
 					"name": "Get Me",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Get Me returns user data\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"email\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
 								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/auth/me",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Me Unauth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Unauthorized access is blocked\", function () {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"disabled": true
 							}
 						],
 						"url": {
@@ -140,6 +290,54 @@
 					"response": []
 				},
 				{
+					"name": "Update Me Unauth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Unauthorized access is blocked\", function () {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"updatedUser\"\n}"
+						},
+						"url": {
+							"raw": "{{node_api}}/auth/me",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get Favorites (me)",
 					"request": {
 						"method": "GET",
@@ -147,6 +345,47 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{jwtToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/auth/me/favorites",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"auth",
+								"me",
+								"favorites"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Favorites (me) Unauth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Unauthorized access is blocked\", function () {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"disabled": true
 							}
 						],
 						"url": {
@@ -236,9 +475,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/auth/recommendations",
+							"raw": "{{node_api}}/auth/recommendations",
 							"host": [
-								"{{baseUrl}}"
+								"{{node_api}}"
 							],
 							"path": [
 								"auth",
@@ -255,6 +494,71 @@
 			"item": [
 				{
 					"name": "Get All VKMs (JWT)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const json = pm.response.json();\r",
+									"\r",
+									"/* Root structure */\r",
+									"pm.test(\"Response has vkms array and meta object\", function () {\r",
+									"    pm.expect(json).to.have.property(\"vkms\").that.is.an(\"array\");\r",
+									"    pm.expect(json).to.have.property(\"meta\").that.is.an(\"object\");\r",
+									"});\r",
+									"\r",
+									"/* Meta validation */\r",
+									"pm.test(\"Meta structure is valid\", function () {\r",
+									"    pm.expect(json.meta).to.have.property(\"total\").that.is.a(\"number\");\r",
+									"    pm.expect(json.meta).to.have.property(\"serviceMode\").eql(false);\r",
+									"});\r",
+									"\r",
+									"/* VKM object structure (validate first item only) */\r",
+									"pm.test(\"VKM item structure is valid\", function () {\r",
+									"    if (json.vkms.length === 0) return; // allow empty dataset\r",
+									"\r",
+									"    const vkm = json.vkms[0];\r",
+									"\r",
+									"    pm.expect(vkm).to.include.keys(\r",
+									"        \"_id\",\r",
+									"        \"id\",\r",
+									"        \"name\",\r",
+									"        \"shortdescription\",\r",
+									"        \"description\",\r",
+									"        \"content\",\r",
+									"        \"studycredit\",\r",
+									"        \"location\",\r",
+									"        \"contact_id\",\r",
+									"        \"level\",\r",
+									"        \"learningoutcomes\",\r",
+									"        \"module_tags\",\r",
+									"        \"interests_match_score\",\r",
+									"        \"popularity_score\",\r",
+									"        \"estimated_difficulty\",\r",
+									"        \"available_spots\",\r",
+									"        \"start_date\"\r",
+									"    );\r",
+									"\r",
+									"    pm.expect(vkm._id).to.be.a(\"string\");\r",
+									"    pm.expect(vkm.id).to.be.a(\"number\");\r",
+									"    pm.expect(vkm.name).to.be.a(\"string\");\r",
+									"    pm.expect(vkm.studycredit).to.be.a(\"number\");\r",
+									"    pm.expect(vkm.interests_match_score).to.be.a(\"number\");\r",
+									"    pm.expect(vkm.available_spots).to.be.a(\"number\");\r",
+									"    pm.expect(vkm.start_date).to.match(/^\\d{4}-\\d{2}-\\d{2}T/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -276,13 +580,150 @@
 					"response": []
 				},
 				{
+					"name": "Get All VKMs (JWT) Unauth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Unauthorized access is blocked\", function () {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwtToken}}",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/vkms",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"vkms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get All VKMs (API Key)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"API key access allowed\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    pm.expect(pm.response.json().vkms).to.be.an(\"array\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Respones is in serivce mode\", function (){\r",
+									"    pm.expect(pm.response.json().meta).to.have.property(\"serviceMode\").eql(true);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "X-API-Key",
 								"value": "{{pythonApiKey}}"
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/vkms",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"vkms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All VKMs (API Key) Unauth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Missing API key is rejected\", function () {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{pythonApiKey}}",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{node_api}}/vkms",
+							"host": [
+								"{{node_api}}"
+							],
+							"path": [
+								"vkms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All VKMs (API Key) invalid",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Missing API key is rejected\", function () {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-Key",
+								"value": "{{pythonApiKey}}",
+								"disabled": true
 							}
 						],
 						"url": {
@@ -328,6 +769,42 @@
 					"response": []
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"pm.test(\"Response time is acceptable\", function () {\r",
+					"    pm.expect(pm.response.responseTime)\r",
+					"        .to.be.below(parseInt(pm.environment.get(\"maxResponseTimeMs\")));\r",
+					"});\r",
+					"\r",
+					"pm.test(\"Response is JSON (if applicable)\", function () {\r",
+					"    if (pm.response.headers.get(\"Content-Type\")) {\r",
+					"        pm.expect(\r",
+					"            pm.response.headers.get(\"Content-Type\")\r",
+					"        ).to.include(\"application/json\");\r",
+					"    }\r",
+					"});\r",
+					""
+				]
+			}
 		}
 	]
 }
