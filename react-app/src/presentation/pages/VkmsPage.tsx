@@ -117,6 +117,8 @@ const VkmsPage: React.FC = () => {
             initialFilters={filters}
         />
 
+        <br />
+
         {/* Kaarten */}
         <Row>
           {data.map((vkm: Vkm, index: number) => (
