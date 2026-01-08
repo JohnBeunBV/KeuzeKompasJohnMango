@@ -1,5 +1,6 @@
 import rateLimit from "express-rate-limit";
 import express from "express";
+import helmet from "helmet";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
@@ -13,6 +14,7 @@ import * as path from "path";
 
 
 const app = express();
+app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
 // 🔹 Middleware

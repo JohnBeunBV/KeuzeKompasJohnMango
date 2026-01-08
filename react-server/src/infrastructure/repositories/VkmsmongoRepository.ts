@@ -5,7 +5,7 @@ import { Vkm } from "../../domain/models/vkm.model";
 
 export class VkmsMongoRepository implements VkmsRepository {
   async getById(id: number): Promise<Vkm | null> {
-    return VkmModel.findOne({ id }).lean();
+    return VkmModel.findOne({ id: Number(id) }).lean();
   }
 
   async getAll(filter?: any, skip = 0, limit = 10): Promise<{ vkms: Vkm[]; total: number }> {
