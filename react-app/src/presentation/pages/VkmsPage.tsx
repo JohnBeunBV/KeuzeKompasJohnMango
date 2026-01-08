@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Spinner, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Spinner, Button } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import type { RootState, AppDispatch } from "../../application/store/store";
 import { fetchVkms } from "../../application/Slices/vkmsSlice";
 import { login } from "../../application/Slices/authSlice";
 import type { Vkm } from "@domain/models/vkm.model";
-import "../index.css";
-import "../vkmspage.css";
+// import "../index.css";
+// import "../vkmspage.css";
 import AccountDrawer from "../components/AccountDrawer";
+import VkmFilter from "../components/VkmFilter";
 
 const VkmsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,10 +20,9 @@ const VkmsPage: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [page, setPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [locationInput, setLocationInput] = useState("");
-  const [creditsInput, setCreditsInput] = useState("");
-  const [filters, setFilters] = useState({ search: "", location: "", credits: "" });
+  const [filters, setFilters] = useState<Record<string, string>>(() => {
+    return JSON.parse(localStorage.getItem("activeVkmFilters") || "{}");
+  });
 
   const [pexelsImages, setPexelsImages] = useState<string[]>([]);
   const [pexelsLoading, setPexelsLoading] = useState(true);
@@ -90,19 +90,6 @@ const VkmsPage: React.FC = () => {
     }
   }, [status, error, navigate]);
 
-  const handleSearch = () => {
-    setPage(1);
-    setFilters({ search: searchInput, location: locationInput, credits: creditsInput });
-  };
-
-  const handleReset = () => {
-    setSearchInput("");
-    setLocationInput("");
-    setCreditsInput("");
-    setFilters({ search: "", location: "", credits: "" });
-    setPage(1);
-  };
-
   const getPages = () => {
     const pages: (number | string)[] = [];
     const max = totalPages;
@@ -120,39 +107,15 @@ const VkmsPage: React.FC = () => {
       <Container className="mt-4 vkms-page">
         <h1 className="page-title">Beschikbare VKM’s</h1>
         <hr />
+
         {/* Filters */}
-        <Row className="mb-3 align-items-end">
-          <Col md={3}>
-            <Form.Control
-                type="text"
-                placeholder="Zoek op naam..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-            />
-          </Col>
-          <Col md={3}>
-            <Form.Select value={locationInput} onChange={(e) => setLocationInput(e.target.value)}>
-              <option value="">Alle locaties</option>
-              <option value="Breda">Breda</option>
-              <option value="Den Bosch">Den Bosch</option>
-            </Form.Select>
-          </Col>
-          <Col md={3}>
-            <Form.Select value={creditsInput} onChange={(e) => setCreditsInput(e.target.value)}>
-              <option value="">Alle studiepunten</option>
-              <option value="15">15</option>
-              <option value="30">30</option>
-            </Form.Select>
-          </Col>
-          <Col md={3} className="d-flex gap-2">
-            <Button className="btn-search" onClick={handleSearch}>
-              Zoeken
-            </Button>
-            <Button variant="secondary" onClick={handleReset}>
-              Reset
-            </Button>
-          </Col>
-        </Row>
+        <VkmFilter
+            onFilterChange={(newFilters) => {
+              setFilters(newFilters);
+              setPage(1);
+            }}
+            initialFilters={filters}
+        />
 
         {/* Kaarten */}
         <Row>

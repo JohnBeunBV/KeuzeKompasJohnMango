@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Form, Button, Row, Col, Card, Badge } from "react-bootstrap";
 
 interface VkmFilterProps {
@@ -9,38 +9,41 @@ interface VkmFilterProps {
 export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFilterProps) {
     const [filters, setFilters] = useState<Record<string, string>>({});
     const [open, setOpen] = useState(false);
-    const [searchInput, setSearchInput] = useState(""); // 🔹 tijdelijke state voor zoekbalk
+    const [searchInput, setSearchInput] = useState("");
+    const isInitialMount = useRef(true);
 
     const filterLabels: Record<string, string> = {
-        course: "Opleiding",
         location: "Locatie",
-        period: "Periode",
-        language: "Taal",
         level: "Niveau",
         credits: "Studiepunten",
         search: "Zoekterm",
     };
 
-    // 🔹 Load filters from localStorage on mount
+// Load filters from localStorage on mount only
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem("activeVkmFilters") || "{}");
         const merged = { ...saved, ...initialFilters };
         setFilters(merged);
-        onFilterChange(merged);
+
+        isInitialMount.current = false;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 🔹 Save filters to localStorage whenever they change
+    // Only save to localStorage when filters change (skip initial mount)
     useEffect(() => {
-        localStorage.setItem("activeVkmFilters", JSON.stringify(filters));
-        onFilterChange(filters);
+        if (!isInitialMount.current) {
+            localStorage.setItem("activeVkmFilters", JSON.stringify(filters));
+        }
     }, [filters]);
 
     function handleChange(e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) {
         const { name, value } = e.target;
         if (name === "search") {
-            setSearchInput(value); // 🔹 wijzig alleen tijdelijke searchInput
+            setSearchInput(value);
         } else {
-            setFilters((prev) => ({ ...prev, [name]: value }));
+            const newFilters = { ...filters, [name]: value };
+            setFilters(newFilters);
+            onFilterChange(newFilters);
         }
     }
 
@@ -48,7 +51,6 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
         const searchValue = searchInput.trim();
         if (!searchValue) return;
 
-        // 🔹 Find next available search key
         let index = 1;
         let key = `search${index}`;
         const newFilters = { ...filters };
@@ -59,18 +61,21 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
 
         newFilters[key] = searchValue;
         setFilters(newFilters);
-        setSearchInput(""); // 🔹 clear input pas na toevoegen
+        onFilterChange(newFilters);
+        setSearchInput("");
     }
 
     function handleReset() {
         setFilters({});
         setSearchInput("");
+        onFilterChange({});
     }
 
     function removeFilter(key: string) {
         const updated = { ...filters };
         delete updated[key];
         setFilters(updated);
+        onFilterChange(updated);
     }
 
     const activeFilters = Object.entries(filters);
