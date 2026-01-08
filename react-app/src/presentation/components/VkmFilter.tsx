@@ -35,7 +35,7 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
         onFilterChange(filters);
     }, [filters]);
 
-    function handleChange(e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) {
+    function handleChange(e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) {
         const { name, value } = e.target;
         if (name === "search") {
             setSearchInput(value); // 🔹 wijzig alleen tijdelijke searchInput
