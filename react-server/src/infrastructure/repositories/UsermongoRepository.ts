@@ -1,7 +1,8 @@
-import {UserModel} from "../modelsinf/userinf.model";
-import {UserRepository} from "../../domain/repositories/UserRepository";
-import {User} from "../../domain/models/user.model";
-import mongoose from "mongoose";
+// infrastructure/repositories/UsermongoRepository.ts
+import { UserModel } from "../modelsinf/userinf.model";
+import { UserRepository } from "../../domain/repositories/UserRepository";
+import { User } from "../../domain/models/user.model";
+import { Types } from "mongoose";
 
 export class UserMongoRepository implements UserRepository {
     async getById(id: string): Promise<User | null> {

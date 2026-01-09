@@ -2,7 +2,7 @@
 FROM node:20-alpine as build
 WORKDIR /app
 
-# Build-time argument
+# Build-time arguments
 ARG VITE_API_URL
 ARG VITE_PEXELS_KEY
 ARG VITE_MICROSOFT_CLIENT_ID
@@ -28,7 +28,18 @@ RUN printf "VITE_API_URL=%s\nVITE_PEXELS_KEY=%s\nVITE_MICROSOFT_CLIENT_ID=%s\nVI
 
 # Production stage
 FROM nginx:stable-alpine
+
+# Copy built assets
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Fix permissions for non-root nginx user
+RUN chown -R nginx:nginx /usr/share/nginx/html \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /var/run
+
+# Drop root
+USER nginx
+
 EXPOSE 5173
 CMD ["nginx", "-g", "daemon off;"]

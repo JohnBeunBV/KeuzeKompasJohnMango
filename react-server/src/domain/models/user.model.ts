@@ -1,3 +1,4 @@
+import { Vkm } from "./vkm.model";
 export type AuthMethod = "local" | "oauth";
 
 export interface OAuthInfo {
@@ -21,4 +22,5 @@ export interface User {
     roles: ("admin" | "teacher" | "student")[];
     favorites?: number[];
     profile?: StudentProfile;
+  favorites?: number[] | Vkm[];
 }

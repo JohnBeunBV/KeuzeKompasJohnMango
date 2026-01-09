@@ -88,7 +88,11 @@ export const deleteMe = async (req: AuthRequest, res: Response) => {
 export const addFavorite = async (req: AuthRequest, res: Response) => {
   const userId = getUserIdFromRequest(req);
   const vkmId = Number(req.params.vkmId);
-  if (!vkmId) return res.status(400).json({ error: "VKM ID is required" });
+
+  // Fix: Check for NaN specifically
+  if (isNaN(vkmId)) {
+    return res.status(400).json({ error: "VKM ID must be a valid number." });
+  }
 
   try {
     const updatedUser = await authService.addFavorite(userId, vkmId);
@@ -101,7 +105,11 @@ export const addFavorite = async (req: AuthRequest, res: Response) => {
 export const removeFavorite = async (req: AuthRequest, res: Response) => {
   const userId = getUserIdFromRequest(req);
   const vkmId = Number(req.params.vkmId);
-  if (!vkmId) return res.status(400).json({ error: "VKM ID is required" });
+
+  // Fix: Check for NaN specifically
+  if (isNaN(vkmId)) {
+    return res.status(400).json({ error: "VKM ID must be a valid number." });
+  }
 
   try {
     const updatedUser = await authService.removeFavorite(userId, vkmId);

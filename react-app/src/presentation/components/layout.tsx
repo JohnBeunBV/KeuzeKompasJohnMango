@@ -3,6 +3,7 @@ import { Outlet, useNavigate, Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../application/store/hooks";
 import { logout } from "../../application/Slices/authSlice";
 import "../index.css";
+import "../accountpage.css";
 
 const Layout: React.FC = () => {
     const navigate = useNavigate();
