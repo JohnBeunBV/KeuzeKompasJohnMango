@@ -6,6 +6,8 @@ const router = Router();
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
+router.post("/login/oauth/microsoft", authController.loginMicrosoft);
+
 
 router.get("/me", jwtAuth, requireUser, authController.getMe);
 router.put("/me", jwtAuth, requireUser, authController.updateMe);

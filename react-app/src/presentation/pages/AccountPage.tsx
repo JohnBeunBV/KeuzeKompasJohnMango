@@ -73,12 +73,6 @@ const AccountPage: React.FC = () => {
   // 🔹 Haal gebruiker en favorieten op
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/error", { state: { status: 401, message: "Je bent niet ingelogd." } });
-        return;
-      }
-
       try {
         const res = await apiClient.get("/auth/me");
         const data: UserData = res.data;

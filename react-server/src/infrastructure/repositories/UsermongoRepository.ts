@@ -35,9 +35,23 @@ export class UserMongoRepository implements UserRepository {
 
         Object.assign(user, updates); // rest van de velden
         await user.save();
+    async delete(id: string): Promise<void> {
+        await UserModel.findByIdAndDelete(id);
+    }
 
         return {...user.toObject(), _id: user._id.toString()};
     }
+
+    async getByOAuth(provider: string, providerId: string): Promise<User | null> {
+        const user = await UserModel.findOne({
+            "oauth.provider": provider,
+            "oauth.providerId": providerId
+        }).lean();
+
+        if (!user) return null;
+        return {...user, _id: user._id.toString()};
+    }
+
 
 
     async delete(id: string): Promise<void> {

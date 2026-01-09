@@ -5,10 +5,14 @@ WORKDIR /app
 # Build-time argument
 ARG VITE_API_URL
 ARG VITE_PEXELS_KEY
+ARG VITE_MICROSOFT_CLIENT_ID
+ARG VITE_MICROSOFT_TENANT_ID
 
 # Build-time env for Vite
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_PEXELS_KEY=$VITE_PEXELS_KEY
+ENV VITE_MICROSOFT_CLIENT_ID=$VITE_MICROSOFT_CLIENT_ID
+ENV VITE_MICROSOFT_TENANT_ID=$VITE_MICROSOFT_TENANT_ID
 
 # Copy only package files first
 COPY package*.json ./
@@ -18,8 +22,8 @@ RUN npm ci
 COPY . .
 
 # Create production env file and build
-RUN printf "VITE_API_URL=%s\nVITE_PEXELS_KEY=%s\n" \
-    "$VITE_API_URL" "$VITE_PEXELS_KEY" > .env.production \
+RUN printf "VITE_API_URL=%s\nVITE_PEXELS_KEY=%s\nVITE_MICROSOFT_CLIENT_ID=%s\nVITE_MICROSOFT_TENANT_ID=%s\n" \
+    "$VITE_API_URL" "$VITE_PEXELS_KEY" "$VITE_MICROSOFT_CLIENT_ID" "VITE_MICROSOFT_TENANT_ID"> .env.production \
     && npm run build
 
 # Production stage
