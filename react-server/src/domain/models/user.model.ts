@@ -6,9 +6,9 @@ export interface OAuthInfo {
 }
 
 export interface StudentProfile {
-  interests: string[];
-  values: string[];
-  goals: string[];
+    interests: string[];
+    values: string[];
+    goals: string[];
 }
 
 export interface User {
@@ -20,5 +20,5 @@ export interface User {
     oauth?: OAuthInfo;
     roles: ("admin" | "teacher" | "student")[];
     favorites?: number[];
-  profile?: StudentProfile;
+    profile?: StudentProfile;
 }

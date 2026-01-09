@@ -1,16 +1,17 @@
 import {UserModel} from "../modelsinf/userinf.model";
 import {UserRepository} from "../../domain/repositories/UserRepository";
 import {User} from "../../domain/models/user.model";
+import mongoose from "mongoose";
 
 export class UserMongoRepository implements UserRepository {
     async getById(id: string): Promise<User | null> {
-        const user = await UserModel.findById({id: Number(id)}).lean();
+        const user = await UserModel.findById({_id: id}).lean();
         if (!user) return null;
         return {...user, _id: user._id.toString()};
     }
 
     async getByEmail(email: string): Promise<User | null> {
-        const user = await UserModel.findOne({$eq: email}).lean();
+        const user = await UserModel.findOne({email: email}).lean();
         if (!user) return null;
         return {...user, _id: user._id.toString()};
     }
@@ -35,9 +36,7 @@ export class UserMongoRepository implements UserRepository {
 
         Object.assign(user, updates); // rest van de velden
         await user.save();
-    async delete(id: string): Promise<void> {
-        await UserModel.findByIdAndDelete(id);
-    }
+
 
         return {...user.toObject(), _id: user._id.toString()};
     }
@@ -53,10 +52,14 @@ export class UserMongoRepository implements UserRepository {
     }
 
 
-
     async delete(id: string): Promise<void> {
-        await UserModel.findByIdAndDelete({$eq: id});
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            throw new Error("Invalid ID");
+        }
+
+        await UserModel.findByIdAndDelete(id);
     }
+
 
     async addFavorite(userId: string, vkmId: number): Promise<User> {
         const user = await UserModel.findById(userId);

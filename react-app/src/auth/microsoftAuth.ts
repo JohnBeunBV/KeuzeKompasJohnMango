@@ -15,7 +15,6 @@ export const msalInstance = new PublicClientApplication({
 let initialized = false;
 
 export const initMsal = async () => {
-    console.log("MS Client ID:", import.meta.env.VITE_MICROSOFT_CLIENT_ID);
 
     if (!initialized) {
         await msalInstance.initialize();

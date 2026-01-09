@@ -32,12 +32,12 @@ const UserSchema = new mongoose.Schema<UserDocument>({
         default: ["student"]
     },
 
-    favorites: {type: [Number], default: []}
-  profile: {
-    interests: { type: [String], default: [] },
-    values: { type: [String], default: [] },
-    goals: { type: [String], default: [] }
-  }
+    favorites: {type: [Number], default: []},
+    profile: {
+        interests: {type: [String], default: []},
+        values: {type: [String], default: []},
+        goals: {type: [String], default: []}
+    }
 });
 
 
