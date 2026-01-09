@@ -12,16 +12,26 @@ const ErrorPage: React.FC = () => {
     const queryStatus = Number(searchParams.get("status"));
     const queryMessage = searchParams.get("message");
 
+    const reason = searchParams.get("reason") as
+        | "missing_token"
+        | "expired_token"
+        | null;
+
     const displayStatus = state?.status || queryStatus || 404;
+
     const displayMessage =
-        state?.message || queryMessage ||
-        (displayStatus === 401
-            ? "Ongeldige sessie. Log opnieuw in."
-            : displayStatus === 403
-                ? "Je hebt geen toegang tot deze pagina."
-                : displayStatus === 429
-                    ? "Te veel requests. Wacht even en probeer later opnieuw."
-                    : "Pagina niet gevonden.");
+        state?.message ||
+        queryMessage ||
+        (displayStatus === 401 && reason === "missing_token"
+            ? "Je bent niet ingelogd."
+            : displayStatus === 401 && reason === "expired_token"
+                ? "Je sessie is verlopen. Log opnieuw in."
+                : displayStatus === 403
+                    ? "Je hebt geen toegang tot deze pagina."
+                    : displayStatus === 429
+                        ? "Te veel requests. Wacht even en probeer later opnieuw."
+                        : "Pagina niet gevonden.");
+
 
     let buttonLabel = "Home";
     let buttonAction = () => navigate("/");
@@ -57,12 +67,15 @@ const ErrorPage: React.FC = () => {
                             {displayMessage}
                         </h2>
                         <p style={{color: "#555"}}>
-                            {displayStatus === 401
-                                ? "Klik op de knop hieronder om in te loggen."
-                                : displayStatus === 429
-                                    ? "Probeer later opnieuw."
-                                    : "Ga terug naar de homepagina."}
+                            {displayStatus === 401 && reason === "expired_token"
+                                ? "Voor je veiligheid is je sessie automatisch beëindigd."
+                                : displayStatus === 401
+                                    ? "Je moet ingelogd zijn om deze pagina te bekijken."
+                                    : displayStatus === 429
+                                        ? "Probeer later opnieuw."
+                                        : "Ga terug naar de homepagina."}
                         </p>
+
                         <Button className="btn-warning" onClick={buttonAction}>
                             {buttonLabel}
                         </Button>
