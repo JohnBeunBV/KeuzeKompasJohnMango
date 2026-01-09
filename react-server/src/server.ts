@@ -28,7 +28,7 @@ connectDB(process.env.MONGO_URI);
 // 🔹 Rate limiter (5 minuten, max 100 requests per IP)
 const apiLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 100,
+  max: 200,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Te veel requests, probeer over 5 minuten opnieuw." },

@@ -154,66 +154,41 @@ export const getRecommendations = async (userId: string) => {
   console.log("🔥 getRecommendations called with userId:", userId);
 
   const user = await userRepo.getById(userId);
-
-  console.log("📦 User from DB:", user);
-
   if (!user) return [];
 
-
-  // 1. Favorites veilig extraheren
   const favoriteIds = (user.favorites || [])
-    .map((fav) => (typeof fav === "number" ? fav : fav.id))
-    .filter((id) => typeof id === "number" && !isNaN(id));
+    .map(fav => (typeof fav === "number" ? fav : fav.id))
+    .filter(id => typeof id === "number" && !isNaN(id));
 
-  // 2. Profiel → tekst
   const profile = user.profile;
-  console.log("RAW USER PROFILE FROM DB:", user.profile);
+  const profileText = profile &&
+    (profile.interests.length || profile.values.length || profile.goals.length)
+    ? [
+        profile.interests.length ? `Interesses: ${profile.interests.join(", ")}.` : "",
+        profile.values.length ? `Waarden: ${profile.values.join(", ")}.` : "",
+        profile.goals.length ? `Doelen: ${profile.goals.join(", ")}.` : "",
+      ].filter(Boolean).join(" ")
+    : "";
 
-  const hasProfileData =
-  profile &&
-  (profile.interests.length > 0 ||
-   profile.values.length > 0 ||
-   profile.goals.length > 0);
+  const hasProfile = profileText && profileText.trim().length > 0;
 
-    const profileText = hasProfileData
-      ? [
-          profile.interests.length
-            ? `Interesses: ${profile.interests.join(", ")}.`
-            : "",
-          profile.values.length
-            ? `Waarden: ${profile.values.join(", ")}.`
-            : "",
-          profile.goals.length
-            ? `Doelen: ${profile.goals.join(", ")}.`
-            : "",
-        ]
-          .filter(Boolean)
-          .join(" ")
-      : "";
-
-  console.log("🧠 PROFILE OBJECT:", profile);
-console.log("📝 PROFILE TEXT:", profileText);
-
-  // 3. Final safety check
-  // 👉 alleen stoppen als BEIDE leeg zijn
-  if (favoriteIds.length === 0 && !profileText) {
+  // 🔹 Stop alleen als beide leeg zijn
+  if (favoriteIds.length === 0 && !hasProfile) {
     return [];
   }
 
-  console.log("Sending to AI:", {
-    favorite_id: favoriteIds,
-    profile_text: profileText,
-  });
+  // 🔹 Maak payload alleen met bestaande data
+  const userPayload: any = {};
+  if (favoriteIds.length > 0) userPayload.favorite_id = favoriteIds;
+  if (hasProfile) userPayload.profile_text = profileText;
+
+  console.log("Sending to AI:", userPayload);
 
   try {
-      const aiResult = await recommendWithAI({
-    user: {
-      favorite_id: favoriteIds.length > 0 ? favoriteIds : [],
-      profile_text: profileText || "",
-    },
-    top_n: 5,
-  });
-
+    const aiResult = await recommendWithAI({
+      user: userPayload,
+      top_n: 5,
+    });
 
     const vkms = await Promise.all(
       aiResult.recommendations.map(async (r: any) => {
@@ -235,6 +210,7 @@ console.log("📝 PROFILE TEXT:", profileText);
     return [];
   }
 };
+
 
 
 export const updateProfile = async (
