@@ -45,9 +45,9 @@ export const getAllVkms = async (req: AuthRequest, res: Response) => {
     );
 
     res.json({
-      ...result,
+      ...result.vkms,
       meta: {
-        ...result,
+        total: result.total,
         serviceMode: isService
       }
     });

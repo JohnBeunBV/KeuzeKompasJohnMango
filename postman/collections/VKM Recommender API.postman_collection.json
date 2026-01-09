@@ -5,20 +5,36 @@
 		"description": "Collection to test the VKM Hybrid Recommender FastAPI service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "42631642",
-		"_collection_link": "https://none00-1048.postman.co/workspace/0fba53e1-f32f-4fce-a5a0-985edbe913c3/collection/42631642-ac7b9c31-4593-4270-b83c-687f0b77af3f?action=share&source=collection_link&creator=42631642"
+		"_collection_link": "https://none00-1048.postman.co/workspace/JohnMango~0fba53e1-f32f-4fce-a5a0-985edbe913c3/collection/42631642-ac7b9c31-4593-4270-b83c-687f0b77af3f?action=share&source=collection_link&creator=42631642"
 	},
 	"item": [
 		{
 			"name": "Health",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Health returns 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Health has status: ok\", () => {\r",
+							"    pm.expect(json).to.have.property(\"status\", \"ok\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
-				"header": [
-					{
-						"key": "X-API-KEY",
-						"value": "{{api_key}}",
-						"type": "text"
-					}
-				],
+				"header": [],
 				"url": {
 					"raw": "{{pyhton_api}}/health",
 					"host": [
@@ -33,15 +49,29 @@
 		},
 		{
 			"name": "Model Status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Model status returns 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Model status returns JSON object\", () => {\r",
+							"    pm.expect(pm.response.json()).to.be.an(\"object\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
-				"header": [
-					{
-						"key": "X-API-KEY",
-						"value": "{{api_key}}",
-						"type": "text"
-					}
-				],
+				"header": [],
 				"url": {
 					"raw": "{{pyhton_api}}/model/status",
 					"host": [
@@ -57,6 +87,26 @@
 		},
 		{
 			"name": "Start Training (no modules)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Training request accepted\", () => {\r",
+							"    pm.expect([200, 202]).to.include(pm.response.code);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Training response is JSON\", () => {\r",
+							"    pm.response.json();\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -87,6 +137,33 @@
 		},
 		{
 			"name": "Recommend (simple)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Recommend returns 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"const json = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Recommendations is an array\", () => {\r",
+							"    pm.expect(json).to.have.property(\"recommendations\");\r",
+							"    pm.expect(json.recommendations).to.be.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Top_n respected\", () => {\r",
+							"    pm.expect(json.recommendations.length).to.be.at.most(5);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -118,6 +195,28 @@
 		},
 		{
 			"name": "Recommend with Explanation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const json = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Recommendations exist\", () => {\r",
+							"    pm.expect(json.recommendations).to.be.an(\"array\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Explanations are present\", () => {\r",
+							"    pm.expect(json.recommendations[0]).to.have.property(\"explanation\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -132,7 +231,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"user\": {\n    \"user_id\": 101,\n    \"favorite_id\": [],\n    \"profile_text\": \"Ik hou van AI en data\"\n  },\n  \"top_n\": 5\n}"
+					"raw": "{\n  \"user\": {\n    \"user_id\": 101,\n    \"favorite_id\": [275, 371],\n    \"profile_text\": \"Ik hou van AI en data\"\n  },\n  \"top_n\": 5\n}"
 				},
 				"url": {
 					"raw": "{{pyhton_api}}/recommend/recommend-explain",
@@ -149,6 +248,23 @@
 		},
 		{
 			"name": "Evaluate User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const json = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Evaluation metrics present\", () => {\r",
+							"    pm.expect(json).to.be.an(\"object\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -163,7 +279,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"user_id\": ,\n  \"k\": 5\n}"
+					"raw": "{\n  \"user_id\": 183,\n  \"k\": 5\n}"
 				},
 				"url": {
 					"raw": "{{pyhton_api}}/evaluate/",
@@ -180,6 +296,26 @@
 		},
 		{
 			"name": "Plot PCA (image)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"PCA plot returns image or binary\", () => {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.match(/image|octet-stream/);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"PCA response body is not empty\", () => {\r",
+							"    pm.expect(pm.response.responseSize).to.be.above(0);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -208,6 +344,61 @@
 				}
 			},
 			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					"const reqName = pm.info.requestName;\r",
+					"const status = pm.response.code;\r",
+					"const maxTime = Number(pm.environment.get(\"maxResponseTimeMs\") || 1500);\r",
+					"\r",
+					"// ---- Basic response sanity ----\r",
+					"pm.test(`[${reqName}] Status code is returned`, () => {\r",
+					"    pm.expect(status).to.be.a(\"number\");\r",
+					"});\r",
+					"\r",
+					"// ---- Response time ----\r",
+					"pm.test(`[${reqName}] Response time < ${maxTime}ms`, () => {\r",
+					"    pm.expect(pm.response.responseTime).to.be.below(maxTime);\r",
+					"});\r",
+					"\r",
+					"// ---- Auth behavior (only if API key IS sent) ----\r",
+					"// const hasApiKeyHeader = pm.request.headers.has(\"X-API-KEY\");\r",
+					"\r",
+					"// if (hasApiKeyHeader) {\r",
+					"//     pm.test(`[${reqName}] Authenticated request is not rejected`, () => {\r",
+					"//         pm.expect([200, 201, 202, 400, 404]).to.include(status);\r",
+					"//     });\r",
+					"// }\r",
+					"\r",
+					"// ---- JSON integrity (only if response should be JSON) ----\r",
+					"const contentType = pm.response.headers.get(\"Content-Type\") || \"\";\r",
+					"\r",
+					"if (contentType.includes(\"application/json\")) {\r",
+					"    pm.test(`[${reqName}] Response is valid JSON`, () => {\r",
+					"        pm.response.json();\r",
+					"    });\r",
+					"}\r",
+					""
+				]
+			}
 		}
 	]
 }
