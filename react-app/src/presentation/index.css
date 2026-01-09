@@ -486,6 +486,16 @@ html {
   background: linear-gradient(135deg, #ffc107, #ff6f00);
   transform: scale(1.05);
 }
+.login-button-microsoft:disabled {
+    border: none;
+    font-weight: 600;
+    padding: 0.9rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
 
 .error-message {
   color: #d32f2f;

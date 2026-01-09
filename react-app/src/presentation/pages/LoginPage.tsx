@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {useAppDispatch} from "../../application/store/hooks";
 import {loginSuccess} from "../../application/Slices/authSlice";
 import apiClient from "../../infrastructure/ApiClient";
-import {initMsal, msalInstance} from "../../auth/microsoftAuth";
+import {initMsal, isMicrosoftOAuthEnabled, msalInstance} from "../../auth/microsoftAuth";
 import "../index.css";
 
 const LoginPage: React.FC = () => {
@@ -94,8 +94,10 @@ const LoginPage: React.FC = () => {
                     </button>
                     <button
                         type="button"
-                        className="login-button microsoft"
+                        className="login-button-microsoft"
                         onClick={handleMicrosoftLogin}
+                        disabled={!isMicrosoftOAuthEnabled}
+                        title={!isMicrosoftOAuthEnabled ? "OAuth niet geconfigureerd" : ""}
                     >
                         Inloggen met Microsoft
                     </button>
