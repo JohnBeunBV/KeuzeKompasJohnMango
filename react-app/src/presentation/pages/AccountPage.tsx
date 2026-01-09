@@ -388,7 +388,7 @@ const handleDelete = async () => {
           {loading ? (
             <Spinner animation="border" role="status" className="d-block mx-auto mt-3" />
           ) : userData.favorites.length === 0 ? (
-            <p className="text-white mt-3">Hier komen uw favorieten te staan!</p>
+            <p className="text-white mt-3">Hier komen je favorieten te staan.</p>
           ) : (
             <div className="favorites-list">
               {userData.favorites.map((fav) => (
