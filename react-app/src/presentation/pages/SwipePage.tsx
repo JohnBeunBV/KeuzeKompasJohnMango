@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import type { Vkm } from "@domain/models/vkm.model";
 import { useNavigate } from "react-router-dom";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
-import Popover from "react-bootstrap/Popover";
+import Modal from "react-bootstrap/Modal";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
@@ -28,6 +27,13 @@ export default function SwipePage() {
   const [startX, setStartX] = useState(0);
 
   const SWIPE_THRESHOLD = 120;
+
+  const [showIntroModal, setShowIntroModal] = useState(false);
+
+  useEffect(() => {
+    // also show intro modal when the page opens
+    setShowIntroModal(true);
+  }, []);
 
   /* =====================================================
      Auth check
@@ -141,13 +147,34 @@ export default function SwipePage() {
     vkm ? pexelsImages[vkm.id] || "/john-mango.png" : "/john-mango.png";
 
   /* =====================================================
-     Swipe logic
+      Favorites toevoegen
   ===================================================== */
-  const commitSwipe = () => {
-    setIndex((prev) => prev + 1);
-    setX(0);
+  const addToFavorites = async (vkmId: number) => {
+  if (!token) return;
+
+  try {
+    await axios.post(
+      `${API_BASE_URL}/auth/users/favorites/${vkmId}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch (err) {
+    console.error("Kon niet toevoegen aan favorites:", err);
+  }
   };
 
+  /* =====================================================
+     Swipe logic
+  ===================================================== */
+  const commitSwipe = async (direction: "left" | "right") => {
+    if (direction === "right") {
+      await addToFavorites(currentVkm.id);
+    }
+
+    setIndex((prev) => prev + 1);
+    setX(0);
+
+  };
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     setStartX(e.clientX);
     setDragging(true);
@@ -160,24 +187,14 @@ export default function SwipePage() {
 
   const onPointerUp = () => {
     setDragging(false);
-    if (Math.abs(x) > SWIPE_THRESHOLD) commitSwipe();
-    else setX(0);
+    
+    if (Math.abs(x) > SWIPE_THRESHOLD) {
+      commitSwipe(x > 0 ? "right" : "left");
+    } else {
+      setX(0);
+    }
   };
-
-  /* =====================================================
-     Popover uitleg
-  ===================================================== */
-  const swipeHelpPopover = (
-    <Popover id="swipe-help-popover">
-      <Popover.Header as="h3">Hoe werkt swipen?</Popover.Header>
-      <Popover.Body>
-        <strong>Swipe naar rechts of klik op ♥</strong> om een module te liken
-        <br />
-        <br />
-        <strong>Swipe naar links of klik op X</strong> om een module te disliken
-      </Popover.Body>
-    </Popover>
-  );
+  /* Popover removed — ? button now opens the intro modal */
 
   /* =====================================================
      Card layout 
@@ -210,6 +227,25 @@ export default function SwipePage() {
   ===================================================== */
   return (
     <div className="swipe-page">
+      <Modal show={showIntroModal} onHide={() => setShowIntroModal(false)} centered className="intro-modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Welkom bij de Swiper</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Je kunt hier door aanbevelingen swipen. 
+          <br />
+          <br />
+          <strong>Swipe naar rechts of klik op ♥</strong> om een module te liken
+          <br />
+          <strong>Swipe naar links of klik op X</strong> om een module te disliken
+          <br />
+          <br />
+          
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="btn btn-primary" onClick={() => setShowIntroModal(false)}>Begrepen</button>
+        </Modal.Footer>
+      </Modal>
       <div className="swipe-wrapper">
 
         <div className="card-stack">
@@ -236,20 +272,19 @@ export default function SwipePage() {
         </div>
 
         <div className="swipe-actions">
-          <button className="swipe-btn brand" onClick={commitSwipe}>
+          <button
+            className="swipe-btn brand"
+            onClick={() => commitSwipe("left")}
+          >
             X
           </button>
 
-          <OverlayTrigger
-            trigger="click"
-            placement="top"
-            overlay={swipeHelpPopover}
-            rootClose
-          >
-            <button className="swipe-btn brand">?</button>
-          </OverlayTrigger>
+          <button className="swipe-btn brand" aria-label="Swipe help" onClick={() => setShowIntroModal(true)}>?</button>
 
-          <button className="swipe-btn brand" onClick={commitSwipe}>
+          <button
+            className="swipe-btn brand"
+            onClick={() => commitSwipe("right")}
+          >
             ♥
           </button>
         </div>
