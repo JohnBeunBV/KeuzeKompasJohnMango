@@ -24,7 +24,6 @@ export class UserMongoRepository implements UserRepository {
     async update(id: string, updates: Partial<User>): Promise<User | null> {
         const user = await UserModel.findById(id);
         if (!user) return null;
-
         // Merge updates, maar behoud bestaande nested objects zoals profile
         if (updates.profile) {
             user.profile = user.profile || {interests: [], values: [], goals: []};
@@ -33,11 +32,8 @@ export class UserMongoRepository implements UserRepository {
             if (updates.profile.goals) user.profile.goals = updates.profile.goals;
             delete updates.profile; // verwijder zodat we niet overschrijven
         }
-
         Object.assign(user, updates); // rest van de velden
         await user.save();
-
-
         return {...user.toObject(), _id: user._id.toString()};
     }
 
@@ -46,7 +42,6 @@ export class UserMongoRepository implements UserRepository {
             "oauth.provider": provider,
             "oauth.providerId": providerId
         }).lean();
-
         if (!user) return null;
         return {...user, _id: user._id.toString()};
     }
@@ -56,7 +51,6 @@ export class UserMongoRepository implements UserRepository {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new Error("Invalid ID");
         }
-
         await UserModel.findByIdAndDelete(id);
     }
 
@@ -91,13 +85,10 @@ export class UserMongoRepository implements UserRepository {
     }): Promise<User> {
         const user = await UserModel.findById(userId);
         if (!user) throw new Error("User not found");
-
         user.profile = user.profile || {interests: [], values: [], goals: []};
-
         if (profile.interests) user.profile.interests = profile.interests;
         if (profile.values) user.profile.values = profile.values;
         if (profile.goals) user.profile.goals = profile.goals;
-
         await user.save();
         return {...user.toObject(), _id: user._id.toString()};
     }
