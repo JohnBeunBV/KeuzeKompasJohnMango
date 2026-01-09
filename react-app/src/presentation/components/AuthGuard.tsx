@@ -17,20 +17,27 @@ const AuthGuard = ({
         (state) => state.auth
     );
 
+    // Not authenticated → 401
     if (requireLogin && !isAuthenticated) {
         return (
             <Navigate
-                to="/login"
+                to="/error?status=401"
                 replace
                 state={{ from: location }}
             />
         );
     }
 
+    // Authenticated but missing required role → 403
     if (roles.length > 0) {
         const hasRole = roles.some((r) => userRoles.includes(r));
         if (!hasRole) {
-            return <Navigate to="/error" replace />;
+            return (
+                <Navigate
+                    to="/error?status=403"
+                    replace
+                />
+            );
         }
     }
 
