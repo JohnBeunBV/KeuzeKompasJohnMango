@@ -1,7 +1,7 @@
 import React from "react";
-import { Outlet, useNavigate, Link } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../application/store/hooks";
-import { logout } from "../../application/Slices/authSlice";
+import {Outlet, useNavigate, Link} from "react-router-dom";
+import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
+import {logout} from "../../application/Slices/authSlice";
 import "../index.css";
 import "../accountpage.css";
 
@@ -9,7 +9,7 @@ const Layout: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+    const {isAuthenticated, user} = useAppSelector((state) => state.auth);
 
     const roles = user?.roles ?? [];
     const userName = user?.username ?? user?.email ?? null;
@@ -24,7 +24,7 @@ const Layout: React.FC = () => {
             <header className="navbar layout-navbar">
                 <div className="nav-left">
                     <div className="logo-wrapper" onClick={() => navigate("/")}>
-                        <img src="/john-mango.png" alt="John Mango" className="nav-logo-image" />
+                        <img src="/john-mango.png" alt="John Mango" className="nav-logo-image"/>
                         <span className="logo-text">John Mango</span>
                     </div>
 
@@ -34,9 +34,9 @@ const Layout: React.FC = () => {
                         <Link to="/swipe" className="nav-link">Swipe</Link>
                         <Link to="/about" className="nav-link">About</Link>
 
-            <Link to="/studentenprofiel" className="nav-link">
-              Studentenprofiel
-            </Link>
+                        <Link to="/studentenprofiel" className="nav-link">
+                            Studentenprofiel
+                        </Link>
                         {roles.includes("teacher") && (
                             <Link to="/teacher" className="nav-link role-link teacher">
                                 Teacher
@@ -84,7 +84,7 @@ const Layout: React.FC = () => {
             </header>
 
             <main className="container my-4">
-                <Outlet />
+                <Outlet/>
             </main>
 
             <footer className="footer text-center p-3">

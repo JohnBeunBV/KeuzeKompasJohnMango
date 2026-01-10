@@ -177,8 +177,8 @@ def build_model_from_dataframe(
     nlp_nl, nlp_en = _get_spacy_models()
 
     df = df.copy()
-    if "id" not in df.columns:
-        raise ValueError("Dataset MUST contain a real 'id' column.")
+    if "_id" not in df.columns:
+        raise ValueError("Dataset MUST contain a real '_id' column.")
 
     TAG_CANDIDATES = ["tags_list", "module_tags_str", "tags"]
     tag_col = next((c for c in TAG_CANDIDATES if c in df.columns), None)
@@ -211,15 +211,15 @@ def build_model_from_dataframe(
     module_vectors_pca = pca.fit_transform(module_vectors)
 
     # synthetic interactions
-    all_ids = df["id"].tolist()
+    all_ids = df["_id"].tolist()
     ratings = []
     for user_id in range(num_dummy_users):
         low_credit = (
-            df[df.get("studycredit", 0) == 15].sample(min(2, len(df)), replace=True)["id"].tolist()
+            df[df.get("studycredit", 0) == 15].sample(min(2, len(df)), replace=True)["_id"].tolist()
             if "studycredit" in df.columns else []
         )
-        hard_modules = df[df.get("estimated_difficulty", 0) >= df.get("estimated_difficulty", 0).quantile(0.75)].sample(min(2, len(df)), replace=True)["id"].tolist() if "estimated_difficulty" in df.columns else []
-        popular_modules = df[df.get("popularity_score", 0) >= df.get("popularity_score", 0).quantile(0.75)].sample(min(2, len(df)), replace=True)["id"].tolist() if "popularity_score" in df.columns else []
+        hard_modules = df[df.get("estimated_difficulty", 0) >= df.get("estimated_difficulty", 0).quantile(0.75)].sample(min(2, len(df)), replace=True)["_id"].tolist() if "estimated_difficulty" in df.columns else []
+        popular_modules = df[df.get("popularity_score", 0) >= df.get("popularity_score", 0).quantile(0.75)].sample(min(2, len(df)), replace=True)["_id"].tolist() if "popularity_score" in df.columns else []
         favs = list(set(low_credit + hard_modules + popular_modules))
         if len(favs) < 3:
             favs += random.sample(all_ids, 3 - len(favs))
@@ -273,8 +273,8 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
     item_map_inv = model_bundle.get("item_map_inv", {})
     interaction_matrix = model_bundle.get("interaction_matrix")
 
-    fav_ids = [fid for fid in user_row.get("favorite_id", []) if fid in df["id"].values]
-    fav_indices = df[df["id"].isin(fav_ids)].index.tolist()
+    fav_ids = [fid for fid in user_row.get("favorite_id", []) if fid in df["_id"].values]
+    fav_indices = df[df["_id"].isin(fav_ids)].index.tolist()
 
     if fav_indices:
         fav_vectors = module_vectors_pca[fav_indices]
@@ -301,7 +301,7 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
         uidx = user_map[user_row.get("user_id")]
         rec_ids, rec_scores = als_model.recommend(userid=uidx, user_items=interaction_matrix.T, N=len(item_map_inv), filter_already_liked_items=False)
         score_map = {item_map_inv[i]: s for i, s in zip(rec_ids, rec_scores)}
-        cf_raw = np.array([score_map.get(mid, 0.0) for mid in df["id"]])
+        cf_raw = np.array([score_map.get(mid, 0.0) for mid in df["_id"]])
 
     cf_scaled = (cf_raw - cf_raw.min()) / max(1e-9, cf_raw.max() - cf_raw.min())
 
@@ -314,10 +314,10 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
 
     rows = []
     for idx, row in df.iterrows():
-        if row["id"] in fav_ids:
+        if row["_id"] in fav_ids:
             continue
         rows.append({
-            "id": row["id"],
+            "_id": row["_id"],
             "name": row.get("name", ""),
             "shortdescription": row.get("shortdescription", ""),
             "content_sim_scaled": float(content_sim_scaled[idx]),
@@ -328,7 +328,7 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
         })
 
     rec_df = pd.DataFrame(rows).sort_values("final_score", ascending=False).head(top_n)
-    fav_table = df.loc[fav_indices][["id", "name", "shortdescription", "tags_list"]]
+    fav_table = df.loc[fav_indices][["_id", "name", "shortdescription", "tags_list"]]
     return fav_table, rec_df
 
 
@@ -346,11 +346,11 @@ def evaluate_user_from_model(model_bundle: Dict[str, Any], user_id: int, k: int 
     sim_profile_threshold = 0.05
 
     fav_table, rec_df = recommend_from_model(model_bundle, user_row, top_n=k)
-    recommended_ids = rec_df["id"].tolist()
+    recommended_ids = rec_df["_id"].tolist()
 
     sims_fav = None
     if fav_ids:
-        fav_indices = df[df["id"].isin(fav_ids)].index.tolist()
+        fav_indices = df[df["_id"].isin(fav_ids)].index.tolist()
         fav_vec = module_vectors_pca[fav_indices].mean(axis=0).reshape(1, -1)
         sims_fav = cosine_similarity(normalize(fav_vec), normalize(module_vectors_pca))[0]
 
@@ -370,8 +370,8 @@ def evaluate_user_from_model(model_bundle: Dict[str, Any], user_id: int, k: int 
         relevant_mask = np.zeros(len(df), dtype=bool)
 
     if fav_ids:
-        relevant_mask[df["id"].isin(fav_ids)] = False
-    relevant_ids = df.loc[relevant_mask, "id"].tolist()
+        relevant_mask[df["_id"].isin(fav_ids)] = False
+    relevant_ids = df.loc[relevant_mask, "_id"].tolist()
 
     hits = len(set(recommended_ids[:k]) & set(relevant_ids))
     precision = hits / k

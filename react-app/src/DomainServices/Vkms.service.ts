@@ -37,3 +37,7 @@ export const getVkms = async ({
     const response = await apiClient.get<VkmsResponse>(`/vkms?${params.toString()}`);
     return response.data;
 };
+export const getVkmById = async (id: string): Promise<Vkm> => {
+    const response = await apiClient.get<Vkm>(`/vkms/${id}`);
+    return response.data;
+};

@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import {Routes, Route} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
@@ -18,25 +18,32 @@ import AdminPage from "./presentation/pages/AdminPage";
 import TeacherPage from "./presentation/pages/TeacherPage";
 
 
-
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Layout />}>
-                <Route path="/studentenprofiel" element={<AIModelInputPage />} />
+            <Route path="/" element={<Layout/>}>
 
                 {/* Public */}
-                <Route index element={<HomePage />} />
-                <Route path="about" element={<AboutPage />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="register" element={<RegisterPage />} />
+                <Route index element={<HomePage/>}/>
+                <Route path="about" element={<AboutPage/>}/>
+                <Route path="login" element={<LoginPage/>}/>
+                <Route path="register" element={<RegisterPage/>}/>
 
                 {/* Auth required */}
                 <Route
                     path="account"
                     element={
                         <AuthGuard>
-                            <AccountPage />
+                            <AccountPage/>
+                        </AuthGuard>
+                    }
+                />
+
+                <Route
+                    path="studentenprofiel"
+                    element={
+                        <AuthGuard>
+                            <AIModelInputPage/>
                         </AuthGuard>
                     }
                 />
@@ -45,7 +52,7 @@ function App() {
                     path="vkms"
                     element={
                         <AuthGuard>
-                            <VkmsPage />
+                            <VkmsPage/>
                         </AuthGuard>
                     }
                 />
@@ -54,7 +61,7 @@ function App() {
                     path="vkms/:id"
                     element={
                         <AuthGuard>
-                            <VkmsDetailPage />
+                            <VkmsDetailPage/>
                         </AuthGuard>
                     }
                 />
@@ -63,7 +70,7 @@ function App() {
                     path="swipe"
                     element={
                         <AuthGuard>
-                            <SwipePage />
+                            <SwipePage/>
                         </AuthGuard>
                     }
                 />
@@ -73,7 +80,7 @@ function App() {
                     path="teacher"
                     element={
                         <AuthGuard roles={["teacher"]}>
-                            <TeacherPage />
+                            <TeacherPage/>
                         </AuthGuard>
                     }
                 />
@@ -82,13 +89,13 @@ function App() {
                     path="admin"
                     element={
                         <AuthGuard roles={["admin"]}>
-                            <AdminPage />
+                            <AdminPage/>
                         </AuthGuard>
                     }
                 />
 
-                <Route path="unauthorized" element={<ErrorPage />} />
-                <Route path="*" element={<ErrorPage />} />
+                <Route path="unauthorized" element={<ErrorPage/>}/>
+                <Route path="*" element={<ErrorPage/>}/>
             </Route>
         </Routes>
     );

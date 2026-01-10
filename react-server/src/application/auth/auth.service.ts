@@ -1,9 +1,9 @@
-import { UserRepository } from "../../domain/repositories/UserRepository";
-import { User, StudentProfile } from "../../domain/models/user.model";
-import { UserMongoRepository } from "../../infrastructure/repositories/UsermongoRepository";
-import { VkmsMongoRepository } from "../../infrastructure/repositories/VkmsmongoRepository";
-import { VkmsRepository } from "../../domain/repositories/VkmsRepository";
-import { recommendWithAI } from "../../infrastructure/ai/ai.client";
+import {UserRepository} from "../../domain/repositories/UserRepository";
+import {User, StudentProfile} from "../../domain/models/user.model";
+import {UserMongoRepository} from "../../infrastructure/repositories/UsermongoRepository";
+import {VkmsMongoRepository} from "../../infrastructure/repositories/VkmsmongoRepository";
+import {VkmsRepository} from "../../domain/repositories/VkmsRepository";
+import {recommendWithAI} from "../../infrastructure/ai/ai.client";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import * as validator from "validator";
@@ -134,7 +134,6 @@ export const loginWithMicrosoft = async (idToken: string) => {
 };
 
 
-
 export const register = async (username: string, email: string, password: string) => {
     validateUserInput(username, email, password);
 
@@ -183,25 +182,9 @@ export const login = async (email: string, password: string) => {
 };
 
 export const getMe = async (userId: string) => {
-  const user = await userRepo.getById(userId);
-  if (!user) throw new Error("User niet gevonden");
-  
-  // Haal alle VKMs volledig op
-  const favoriteVkms = await Promise.all(
-    (user.favorites || [])
-      .map(fav => typeof fav === "number" ? fav : fav.id)
-      .map(id => vkmRepo.getById(id))
-  );
-
-    // Haal alle VKMs volledig op
-    const favoriteVkms = await Promise.all(
-        (user.favorites || []).map(id => vkmRepo.getById(id))
-    );
-
-    return {
-        ...user,
-        favorites: favoriteVkms.filter(v => v !== null)
-    };
+    const user = await userRepo.getById(userId);
+    if (!user) throw new Error("User niet gevonden");
+    return user;
 };
 
 export const updateMe = async (userId: string, username?: string, email?: string, password?: string) => {
@@ -221,121 +204,104 @@ export const deleteMe = async (userId: string) => {
     await userRepo.delete(userId);
 };
 
-export const addFavorite = async (userId: string, vkmId: number) => {
+export const addFavorite = async (userId: string, vkmId: string) => {
     const vkm = await vkmRepo.getById(vkmId);
     if (!vkm) throw new Error("VKM bestaat niet");
 
     const updatedUser = await userRepo.addFavorite(userId, vkmId);
 
-  const favoriteVkms = await Promise.all(
-    (updatedUser.favorites || [])
-      .map(fav => typeof fav === "number" ? fav : fav.id)
-      .map(id => vkmRepo.getById(id))
-  );
-
-    return {...updatedUser, favorites: favoriteVkms.filter(v => v !== null)};
+    return {...updatedUser};
 };
 
-export const removeFavorite = async (userId: string, vkmId: number) => {
+export const removeFavorite = async (userId: string, vkmId: string) => {
     const vkm = await vkmRepo.getById(vkmId);
     if (!vkm) throw new Error("VKM bestaat niet");
 
     const updatedUser = await userRepo.removeFavorite(userId, vkmId);
 
-  const favoriteVkms = await Promise.all(
-    (updatedUser.favorites || [])
-      .map(fav => typeof fav === "number" ? fav : fav.id)
-      .map(id => vkmRepo.getById(id))
-  );
-
-    return {...updatedUser, favorites: favoriteVkms.filter(v => v !== null)};
+    return {...updatedUser};
 };
 
 export const getFavorites = async (userId: string) => {
     const user = await userRepo.getById(userId);
     if (!user) throw new Error("User not found");
-
-  const favoriteVkms = await Promise.all(
-    (user.favorites || [])
-      .map(fav => typeof fav === "number" ? fav : fav.id)
-      .map(id => vkmRepo.getById(id))
-  );
-
-    return favoriteVkms.filter(v => v !== null);
+    return userRepo.getFavorites(userId);
 };
+
+import {Types} from "mongoose";
+import {compareSync} from "bcrypt";
 
 export const getRecommendations = async (userId: string) => {
     const user = await userRepo.getById(userId);
     if (!user) throw new Error("User not found");
 
-    if (!user.favorites || user.favorites.length === 0) return [];
-  // 2. Extract IDs safely
-  // Ensures we handle both [1, 2] and [{id:1}, {id:2}] formats
-  const favoriteIds = user.favorites
-    .map((fav) => (typeof fav === "number" ? fav : fav.id))
-    .filter((id) => typeof id === "number" && !isNaN(id));
+    // favorites are populated VKM docs now
+    if (!user.favorites || user.favorites.length === 0) {
+        return [];
+    }
 
-  // Double check we have IDs left
-  if (favoriteIds.length === 0) return [];
+    // Extract ObjectIds as strings for AI service
+    const favoriteIds = user.favorites
+        .map((vkm: any) => vkm._id?.toString())
+        .filter((id: string) => Types.ObjectId.isValid(id));
 
-  console.log("Sending to AI:", { favorite_id: favoriteIds});
+    if (favoriteIds.length === 0) return [];
 
-  try {
-    const aiResult = await recommendWithAI({
-      user: {
-        favorite_id: favoriteIds,
-      },
-      top_n: 5,
-    });
+    try {
+        const aiResult = await recommendWithAI({
+            user: {
+                favorite_ids: favoriteIds,
+            },
+            top_n: 5,
+        });
 
-    const vkms = await Promise.all(
-      aiResult.recommendations.map(async (r: any) => {
-        const vkm = await vkmRepo.getById(r.id);
-        if (!vkm) return null;
+        // AI now returns ObjectIds as well
+        const vkms = await Promise.all(
+            aiResult.recommendations.map(async (recommendation: any) => {
+                if (!Types.ObjectId.isValid(recommendation._id)) return null;
 
-        return {
-          ...vkm,
-          // Python sends 0.0-1.0 or 0-100?
-          // If python sends 0.85, this makes it 85.
-          // If python sends 85, this makes it 8500. Check your Python output! 
-          // Assuming Python 0-1 based on your 'weights' dict:
-          score: Math.round(r.score * 100), 
-          explanation: r.explanation,
-          details: r.details,
-        };
-      })
-    );
+                const vkm = await vkmRepo.getById(recommendation._id);
+                if (!vkm) return null;
+                return {
+                    ...vkm,
+                    meta: {
+                        score: Math.round(recommendation.score * 100), // assumes 0–1 from Python
+                        explanation: recommendation.explanation,
+                        details: recommendation.details,
+                    }
+                };
+            })
+        );
 
-    return vkms.filter(Boolean);
-  } catch (err: any) {
-    console.error("AI Service Error:", err.message);
-    // Return empty array instead of crashing so frontend still loads
-    return []; 
-  }
+        return vkms.filter(Boolean);
+    } catch (err: any) {
+        console.error("AI Service Error:", err.message);
+        return [];
+    }
 };
+
 
 export const updateProfile = async (
-  userId: string,
-  profile: { interests?: string[]; values?: string[]; goals?: string[] }
+    userId: string,
+    profile: { interests?: string[]; values?: string[]; goals?: string[] }
 ) => {
-  const safeProfile: StudentProfile = {
-    interests: profile.interests || [],
-    values: profile.values || [],
-    goals: profile.goals || []
-  };
+    const safeProfile: StudentProfile = {
+        interests: profile.interests || [],
+        values: profile.values || [],
+        goals: profile.goals || []
+    };
 
-  const updatedUser = await userRepo.update(userId, { profile: safeProfile });
-  if (!updatedUser) throw new Error("User niet gevonden");
+    const updatedUser = await userRepo.update(userId, {profile: safeProfile});
+    if (!updatedUser) throw new Error("User niet gevonden");
 
-  return updatedUser;
+    return updatedUser;
 };
-
 
 
 export const getProfile = async (userId: string) => {
-  const user = await userRepo.getById(userId);
-  if (!user) throw new Error("User niet gevonden");
+    const user = await userRepo.getById(userId);
+    if (!user) throw new Error("User niet gevonden");
 
-  return user.profile || { interests: [], values: [], goals: [] };
+    return user.profile || {interests: [], values: [], goals: []};
 };
 

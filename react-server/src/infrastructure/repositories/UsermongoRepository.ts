@@ -1,14 +1,15 @@
 // infrastructure/repositories/UsermongoRepository.ts
-import { UserModel } from "../modelsinf/userinf.model";
-import { UserRepository } from "../../domain/repositories/UserRepository";
-import { User } from "../../domain/models/user.model";
-import { Types } from "mongoose";
+import {UserModel} from "../modelsinf/userinf.model";
+import {UserRepository} from "../../domain/repositories/UserRepository";
+import {User} from "../../domain/models/user.model";
+import mongoose, {Types} from "mongoose";
+import {Vkm} from "../../domain/models/vkm.model";
 
 export class UserMongoRepository implements UserRepository {
     async getById(id: string): Promise<User | null> {
-        const user = await UserModel.findById({_id: id}).lean();
+        const user = await UserModel.findById({_id: id}).populate("favorites");
         if (!user) return null;
-        return {...user, _id: user._id.toString()};
+        return user;
     }
 
     async getByEmail(email: string): Promise<User | null> {
@@ -56,28 +57,58 @@ export class UserMongoRepository implements UserRepository {
     }
 
 
-    async addFavorite(userId: string, vkmId: number): Promise<User> {
-        const user = await UserModel.findById(userId);
+    async addFavorite(userId: string, vkmObjectId: string): Promise<User> {
+        if (!Types.ObjectId.isValid(vkmObjectId)) {
+            throw new Error("Invalid VKM id");
+        }
+
+        const user = await UserModel.findByIdAndUpdate(
+            userId,
+            {
+                $addToSet: {
+                    favorites: new Types.ObjectId(vkmObjectId),
+                },
+            },
+            {new: true}
+        ).populate("favorites");
+
         if (!user) throw new Error("User not found");
-        if (!user.favorites) user.favorites = [];
-        if (!user.favorites.includes(vkmId)) user.favorites.push(vkmId);
-        await user.save();
+
         return {...user.toObject(), _id: user._id.toString()};
     }
 
-    async removeFavorite(userId: string, vkmId: number): Promise<User> {
-        const user = await UserModel.findById(userId);
+
+    async removeFavorite(userId: string, vkmObjectId: string): Promise<User> {
+        if (!Types.ObjectId.isValid(vkmObjectId)) {
+            throw new Error("Invalid VKM id");
+        }
+
+        const user = await UserModel.findByIdAndUpdate(
+            userId,
+            {
+                $pull: {
+                    favorites: new Types.ObjectId(vkmObjectId),
+                },
+            },
+            {new: true}
+        ).populate("favorites");
+
         if (!user) throw new Error("User not found");
-        user.favorites = user.favorites?.filter((id: number) => id !== vkmId);
-        await user.save();
+
         return {...user.toObject(), _id: user._id.toString()};
     }
 
-    async getFavorites(userId: string): Promise<number[]> {
-        const user = await UserModel.findById(userId).lean();
+
+    async getFavorites(userId: string): Promise<Vkm[]> {
+        const user = await UserModel.findById(userId)
+            .populate("favorites")
+            .lean();
+
         if (!user) throw new Error("User not found");
+
         return user.favorites || [];
     }
+
 
     async updateProfile(userId: string, profile: {
         interests?: string[];

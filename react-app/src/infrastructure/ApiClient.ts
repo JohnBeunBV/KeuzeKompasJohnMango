@@ -6,7 +6,7 @@ export const setAuthToken = (token: string | null) => {
     authToken = token;
 };
 
-// ⚠️ Let erop dat VITE_ prefix nodig is voor frontend env variables
+// Let erop dat VITE_ prefix nodig is voor frontend env variables
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const apiClient = axios.create({

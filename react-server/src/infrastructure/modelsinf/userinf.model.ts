@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import {Schema, Document, model} from "mongoose";
 import {User} from "../../domain/models/user.model";
 
-export type UserDocument = User & mongoose.Document;
+export type UserDocument = User & Document;
 
-const UserSchema = new mongoose.Schema<UserDocument>({
+const UserSchema = new Schema<UserDocument>({
     username: {type: String, required: true, unique: true},
 
     email: {type: String, required: true, unique: true},
@@ -32,7 +32,12 @@ const UserSchema = new mongoose.Schema<UserDocument>({
         default: ["student"]
     },
 
-    favorites: {type: [Number], default: []},
+    favorites: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Vkm",
+        },
+    ],
     profile: {
         interests: {type: [String], default: []},
         values: {type: [String], default: []},
@@ -41,4 +46,4 @@ const UserSchema = new mongoose.Schema<UserDocument>({
 });
 
 
-export const UserModel = mongoose.model<UserDocument>("User", UserSchema, "users");
+export const UserModel = model<UserDocument>("User", UserSchema, "users");

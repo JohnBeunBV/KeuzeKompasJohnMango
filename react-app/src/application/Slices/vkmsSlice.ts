@@ -1,11 +1,12 @@
 // src/features/vkms/vkmsSlice.ts
 import {createSlice, createAsyncThunk} from "@reduxjs/toolkit";
 import type {Vkm} from "@domain/models/vkm.model";
-import {getVkms} from "../../DomainServices/Vkms.service";
+import {getVkmById, getVkms} from "../../DomainServices/Vkms.service";
 import type {VkmsResponse, VkmsQuery} from "../../DomainServices/Vkms.service";
 
 interface VkmsState {
     data: Vkm[];
+    selected: Vkm | null;
     total: number;
     totalPages: number;
     status: "idle" | "loading" | "succeeded" | "failed";
@@ -14,6 +15,7 @@ interface VkmsState {
 
 const initialState: VkmsState = {
     data: [],
+    selected: null,
     total: 0,
     totalPages: 1,
     status: "idle",
@@ -32,6 +34,13 @@ export const fetchVkms = createAsyncThunk<
 
     return {...result, limit};
 });
+export const fetchVkmById = createAsyncThunk<Vkm, string>(
+    "vkms/fetchVkmById",
+    async (id) => {
+        return await getVkmById(id);
+    }
+);
+
 
 const vkmsSlice = createSlice({
     name: "vkms",
@@ -56,6 +65,19 @@ const vkmsSlice = createSlice({
             .addCase(fetchVkms.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.error.message || "Kon data niet laden";
+            })
+            .addCase(fetchVkmById.pending, (state) => {
+                state.status = "loading";
+                state.error = null;
+                state.selected = null;
+            })
+            .addCase(fetchVkmById.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.selected = action.payload;
+            })
+            .addCase(fetchVkmById.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.error.message || "Kon Vkm niet laden";
             });
     },
 });

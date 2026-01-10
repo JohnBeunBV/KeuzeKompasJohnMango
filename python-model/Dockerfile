@@ -24,8 +24,8 @@ RUN python -m spacy download nl_core_news_sm \
 COPY . .
 
 # ---- Drop root ----
-RUN useradd -m appuser
-USER appuser
+#RUN useradd -m appuser
+#USER appuser
 
 EXPOSE 8000
 

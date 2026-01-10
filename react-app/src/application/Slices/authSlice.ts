@@ -1,11 +1,19 @@
-import { createSlice} from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import type {PayloadAction} from "@reduxjs/toolkit";
+import type {Vkm} from "@domain/models/vkm.model.ts";
+import apiClient, {setAuthToken} from "../../infrastructure/ApiClient";
 
 export interface AuthUser {
     id: string;
     username: string;
     email: string;
     roles: string[];
+    profile: {
+        interests: string[];
+        values: string[];
+        goals: string[];
+    };
+    favorites: Vkm[]
 }
 
 type AuthErrorReason = "missing_token" | "expired_token" | "corrupt_state" | null;
@@ -17,6 +25,17 @@ interface AuthState {
     authError: AuthErrorReason;
 }
 
+export const fetchUser = createAsyncThunk<AuthUser>(
+    "auth/fetchUser",
+    async (_, {rejectWithValue}) => {
+        try {
+            const res = await apiClient.get("/auth/me");
+            return res.data as AuthUser;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data?.error || err.message);
+        }
+    }
+);
 
 const loadInitialAuthState = (): AuthState => {
     const token = localStorage.getItem("token");
@@ -66,6 +85,9 @@ const authSlice = createSlice({
 
             localStorage.setItem("token", action.payload.token);
             localStorage.setItem("user", JSON.stringify(action.payload.user));
+
+            // Also update apiClient token
+            setAuthToken(action.payload.token);
         },
 
         logout: (state) => {
@@ -76,9 +98,32 @@ const authSlice = createSlice({
 
             localStorage.removeItem("token");
             localStorage.removeItem("user");
+
+            setAuthToken(null);
         },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchUser.pending, (state) => {
+                state.authError = null;
+            })
+            .addCase(fetchUser.fulfilled, (state, action: PayloadAction<AuthUser>) => {
+                state.user = action.payload;
+                state.isAuthenticated = true;
+                state.authError = null;
+
+                localStorage.setItem("user", JSON.stringify(action.payload));
+            })
+            .addCase(fetchUser.rejected, (state, action) => {
+                state.user = null;
+                state.isAuthenticated = false;
+                state.authError = action.payload as AuthErrorReason || "corrupt_state";
+
+                localStorage.removeItem("user");
+            });
     },
 });
 
-export const { loginSuccess, logout } = authSlice.actions;
+
+export const {loginSuccess, logout} = authSlice.actions;
 export default authSlice.reducer;

@@ -132,7 +132,7 @@ const VkmsPage: React.FC = () => {
             {/* Kaarten */}
             <Row>
                 {data.map((vkm: Vkm, index: number) => (
-                    <Col md={4} key={vkm.id} className="mb-4 d-flex">
+                    <Col md={4} key={vkm._id} className="mb-4 d-flex">
                         <div className="vkm-card-wrapper" style={{animationDelay: `${index * 100}ms`}}>
                             <div className="vkm-card card h-100 d-flex flex-column">
                                 {pexelsLoading ? (
@@ -163,7 +163,7 @@ const VkmsPage: React.FC = () => {
                                     <hr/>
                                     <p className="card-text text-muted mt-auto">Locatie: {vkm.location}</p>
                                     <div className="mt-3">
-                                        <Link to={`/vkms/${vkm.id}`} state={{imageUrl: pexelsImages[index]}}>
+                                        <Link to={`/vkms/${vkm._id}`} state={{imageUrl: pexelsImages[index]}}>
                                             <Button className="btn-detail">Bekijk details</Button>
                                         </Link>
                                     </div>

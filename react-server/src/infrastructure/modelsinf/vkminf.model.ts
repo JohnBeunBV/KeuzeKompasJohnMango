@@ -4,7 +4,6 @@ import {Vkm} from "../../domain/models/vkm.model";
 export type VkmDocument = Vkm & mongoose.Document;
 
 const VkmSchema = new mongoose.Schema<VkmDocument>({
-    id: {type: Number, required: true},
     name: {type: String, required: true},
     shortdescription: {type: String, required: true},
     description: {type: String, required: true},
