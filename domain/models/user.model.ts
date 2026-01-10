@@ -1,8 +1,26 @@
+import type {Vkm} from "./vkm.model";
+
+export type AuthMethod = "local" | "oauth";
+
+export interface OAuthInfo {
+  provider: "microsoft";
+  providerId: string; // Microsoft user id (sub / oid)
+}
+
+export interface StudentProfile {
+  interests: string[];
+  values: string[];
+  goals: string[];
+}
+
 export interface User {
-    _id?: string; // optioneel want bij creatie bestaat het nog niet
+  _id?: string;
   username: string;
   email: string;
-  token?: string;
-  password: string;
-  favorites?: number[];
+  password?: string; // optional for OAuth users
+  authMethod: AuthMethod;
+  oauth?: OAuthInfo;
+  roles: ("admin" | "teacher" | "student")[];
+  favorites?: Vkm[];
+  profile?: StudentProfile;
 }

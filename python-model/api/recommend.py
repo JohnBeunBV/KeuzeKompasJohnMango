@@ -31,7 +31,7 @@ def recommend_explain(payload: Dict[str, Any]):
         explanation = build_explanation(row, weights)
 
         recommendations.append({
-            "id": int(row.id),
+            "_id": row._id,
             "name": row.get("name", ""),
             "score": explanation["final_score"],
             "explanation": explanation["summary"],
@@ -57,4 +57,4 @@ def recommend(payload: Dict[str, Any]):
 
     fav_table, rec_df = recommend_from_model(model, user, top_n)
     # return simple list
-    return {"recommendations": rec_df[["id","final_score"]].rename(columns={"final_score":"score"}).to_dict(orient="records")}
+    return {"recommendations": rec_df[["_id","final_score"]].rename(columns={"final_score":"score"}).to_dict(orient="records")}

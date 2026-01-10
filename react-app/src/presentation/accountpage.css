@@ -1,0 +1,149 @@
+.expand-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+}
+
+.explanation-box {
+  border-top: 1px solid #444;
+  padding-top: 8px;
+  font-size: 0.9rem;
+}
+
+.xai-hover-box {
+  position: absolute;
+  top: 28px;
+  /* adjust depending on button size */
+  left: 0;
+  width: 700px;
+  max-width: 90vw;
+  background-color: #111;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding: 10px;
+  transform: translateX(-42%);
+}
+
+.xai-hover-box2 {
+  position: fixed;
+  top: 28px;
+  /* adjust depending on button size */
+  left: 0;
+  width: 700px;
+  max-width: 90vw;
+  background-color: #111;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  padding: 10px;
+  transform: translateX(-55%);
+}
+
+.xai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.xai-title {
+  font-weight: bold;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.xai-section {
+  margin-bottom: 8px;
+}
+
+.xai-bar {
+  background-color: #333;
+  height: 6px;
+  border-radius: 3px;
+  margin: 2px 0;
+  overflow: hidden;
+}
+
+.xai-fill {
+  height: 100%;
+  background-color: #0d6efd;
+}
+
+.recommendations-column-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Space between the rows */
+  margin-top: 20px;
+}
+
+/* Individual Row Style */
+.terminal-recommendation-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #444;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.terminal-recommendation-item:hover {
+  border-color: #ffc43b;
+  background: rgba(255, 196, 59, 0.05);
+}
+
+/* Header inside the row */
+.recommendation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+}
+
+.header-info h4 {
+  font-size: 1.1rem;
+  color: #ffc43b;
+  margin-bottom: 4px;
+}
+
+.match-score {
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* Arrow Button Styling */
+.expand-arrow-btn {
+  background: none;
+  border: none;
+  color: #ffc43b;
+  padding: 5px;
+  transition: transform 0.3s ease;
+}
+
+.expand-arrow-btn.rotated {
+  transform: rotate(180deg);
+}
+
+/* Hidden Content Styling */
+.explanation-content {
+  padding: 0 20px 20px 20px;
+  color: #ddd;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.explanation-divider {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 0 0 15px 0;
+}

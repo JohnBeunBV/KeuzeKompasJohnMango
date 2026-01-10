@@ -14,6 +14,8 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL}
         VITE_PEXELS_KEY: ${VITE_PEXELS_KEY}
+        VITE_MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID}
+        VITE_MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID}
     environment:
       NODE_ENV: production
     ports:
@@ -26,7 +28,14 @@ services:
       MONGO_URI: ${MONGO_URI}
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
+      MODEL_API_URL: ${MODEL_API_URL}
       PYTHON_API_KEY: ${PYTHON_API_KEY}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD}
+      SEED_ADMIN_USERNAME: ${SEED_ADMIN_USERNAME}
+      SEED_ADMIN_ROLE: ${SEED_ADMIN_ROLE}
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID}
+      MICROSOFT_TENANT_ID: ${MICROSOFT_TENANT_ID}
     ports:
       - "${BACKEND_PORT:-5000}:5000"
   model-api:
@@ -40,37 +49,4 @@ services:
     ports:
       - ${MODEL_API_PORT:-8000}:8000
 
-  
-# The commented out section below is an example of how to define a PostgreSQL
-# database that your application can use. `depends_on` tells Docker Compose to
-# start the database before your application. The `db-data` volume persists the
-# database data between container restarts. The `db-password` secret is used
-# to set the database password. You must create `db/password.txt` and add
-# a password of your choosing to it before running `docker-compose up`.
-#     depends_on:
-#       db:
-#         condition: service_healthy
-#   db:
-#     image: postgres
-#     restart: always
-#     user: postgres
-#     secrets:
-#       - db-password
-#     volumes:
-#       - db-data:/var/lib/postgresql/data
-#     environment:
-#       - POSTGRES_DB=example
-#       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-#     expose:
-#       - 5432
-#     healthcheck:
-#       test: [ "CMD", "pg_isready" ]
-#       interval: 10s
-#       timeout: 5s
-#       retries: 5
-# volumes:
-#   db-data:
-# secrets:
-#   db-password:
-#     file: db/password.txt
 

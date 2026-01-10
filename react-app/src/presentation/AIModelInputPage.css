@@ -1,0 +1,155 @@
+/* ===========================
+   AI Model Input Page
+=========================== */
+
+.ai-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.ai-intro {
+    margin-bottom: 10px;
+}
+
+.ai-subtext {
+    margin-top: 0;
+    color: #555;
+}
+
+/* Form layout */
+.ai-form {
+    display: grid;
+    gap: 20px;
+}
+
+.ai-field {
+    display: grid;
+    gap: 8px;
+}
+
+.ai-select {
+    min-height: 140px;
+    padding: 8px;
+    border-radius: 8px;
+    border: 2px solid #FFD54F;
+    font-size: 0.95rem;
+}
+
+.ai-select:focus {
+    outline: none;
+    border-color: #FF8F00;
+    box-shadow: 0 0 6px rgba(255, 143, 0, 0.4);
+    /* color: #FF8F00; */
+}
+
+/* Errors */
+.ai-error {
+    color: #b00020;
+    font-size: 13px;
+}
+
+/* CTA block */
+.ai-cta {
+    margin-top: 24px;
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+
+    display: flex;
+    justify-content: space-between;
+    /* tekst links, knop rechts */
+    align-items: center;
+
+    max-width: 100%;
+    /* full width van container */
+    box-sizing: border-box;
+}
+
+
+.ai-cta-sub {
+    font-size: 14px;
+    color: #555;
+}
+
+.ai-cta-actions {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Save button */
+.ai-save-btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ai-save-btn.enabled {
+    background: linear-gradient(135deg, #FFD54F, #FF8F00);
+}
+
+.ai-save-btn.enabled:hover {
+    background: linear-gradient(135deg, #FFC107, #FF6F00);
+    transform: scale(1.05);
+}
+
+.ai-save-btn.disabled {
+    background: #ffd1a8;
+    cursor: not-allowed;
+}
+
+/* Confirmation box */
+.ai-confirmation {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f6fff2;
+    border: 1px solid #cce6b8;
+    border-radius: 6px;
+}
+
+.ai-confirmation h3 {
+    margin-top: 0;
+    color: #2e7d32;
+}
+
+.ai-confirmation ul {
+    padding-left: 18px;
+}
+
+.ai-current-profile {
+    margin: 24px 0;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.ai-current-profile h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+.ai-current-profile ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+.ai-current-profile li {
+    margin-bottom: 4px;
+}
+
+.ai-current-hint {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.ai-select option:checked {
+    background-color: #ff9100b3;
+    color: white;
+}
