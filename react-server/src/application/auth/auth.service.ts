@@ -239,18 +239,20 @@ export const getRecommendations = async (userId: string) => {
     if (!user.favorites || user.favorites.length === 0) {
         return [];
     }
-
+    console.log("User Favorites to ai:");
     // Extract ObjectIds as strings for AI service
     const favoriteIds = user.favorites
-        .map((vkm: any) => vkm._id?.toString())
-        .filter((id: string) => Types.ObjectId.isValid(id));
-
+        .map((vkm: any) => vkm._id)
+        .filter((id: any) => Types.ObjectId.isValid(id))
+        .map((id: Types.ObjectId) => id.toString());
+    console.log(favoriteIds);
+    // console.log(user.favorites);
     if (favoriteIds.length === 0) return [];
 
     try {
         const aiResult = await recommendWithAI({
             user: {
-                favorite_ids: favoriteIds,
+                favorite_id: favoriteIds,
             },
             top_n: 5,
         });

@@ -9,6 +9,7 @@ import type {Vkm} from "@domain/models/vkm.model";
 import "../index.css";
 import "../vkmspage.css";
 import AccountDrawer from "../components/AccountDrawer";
+import {fetchUser} from "../../application/Slices/authSlice.ts";
 
 const VkmsPage: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -17,6 +18,7 @@ const VkmsPage: React.FC = () => {
     const {data, status, error, totalPages} = useAppSelector(
         (state) => state.vkms
     );
+    const {isAuthenticated} = useAppSelector(state => state.auth);
 
 
     const [page, setPage] = useState(1);
@@ -24,7 +26,7 @@ const VkmsPage: React.FC = () => {
     const [locationInput, setLocationInput] = useState("");
     const [creditsInput, setCreditsInput] = useState("");
     const [filters, setFilters] = useState({search: "", location: "", credits: ""});
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const [pexelsImages, setPexelsImages] = useState<string[]>([]);
     const [pexelsLoading, setPexelsLoading] = useState(true);
@@ -32,9 +34,12 @@ const VkmsPage: React.FC = () => {
 
     // 🔹 Fetch VKMs
     useEffect(() => {
-        dispatch(fetchVkms({ page, limit: 12, ...filters }));
+        dispatch(fetchVkms({page, limit: 12, ...filters}));
     }, [dispatch, page, filters]);
 
+    useEffect(() => {
+        dispatch(fetchUser());
+    }, [dispatch]);
 
     // 🔹 Fetch Pexels afbeeldingen met loading-state
     useEffect(() => {
@@ -89,7 +94,7 @@ const VkmsPage: React.FC = () => {
         return pages;
     };
 
-    if (status === "loading") return <Spinner animation="border" className="mt-5"/>;
+    if (status === "loading" || !isAuthenticated) return <Spinner animation="border" className="mt-5"/>;
 
     return (
         <Container className="mt-4 vkms-page">
@@ -189,37 +194,40 @@ const VkmsPage: React.FC = () => {
                             >
               ...
             </span>
-          ) : (
-            <Button
-              key={p}
-              variant={p === page ? "warning" : "light"}
-              className="mx-1"
-              onClick={() => setPage(p as number)}
-            >
-              {p}
-            </Button>
-          )
-        )}
-      </div>
-      <div className={`side-drawer ${isDrawerOpen ? "open" : ""}`}>
-        <div className="side-drawer-panel">
+                        ) : (
+                            <Button
+                                key={p}
+                                variant={p === page ? "warning" : "light"}
+                                className="mx-1"
+                                onClick={() => setPage(p as number)}
+                            >
+                                {p}
+                            </Button>
+                        )
+                )}
+            </div>
+            <div className={`side-drawer ${isDrawerOpen ? "open" : ""}`}>
+                <div className="side-drawer-panel">
 
-          <button
-            className="side-drawer-toggle"
-            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-            aria-label="Toggle side panel"
-          >
-            <span className="toggle-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-          </button>
+                    <button
+                        className="side-drawer-toggle"
+                        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                        aria-label="Toggle side panel"
+                    >
+                        <span className="toggle-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                                            xmlns="http://www.w3.org/2000/svg"><path
+                            d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round"></path></svg></span>
+                    </button>
 
-          <div className="side-drawer-content">
-            <AccountDrawer />
-          </div>
+                    <div className="side-drawer-content">
+                        <AccountDrawer/>
+                    </div>
 
-        </div>
-      </div>
-    </Container>
-  );
+                </div>
+            </div>
+        </Container>
+    );
 };
 
 export default VkmsPage;
