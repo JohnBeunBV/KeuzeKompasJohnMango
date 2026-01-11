@@ -13,9 +13,14 @@ export const getAllVkms = async (
 ) => {
   const skip = (page - 1) * limit;
 
-  // 🔹 Veilig filter object
+  // filter object
   const filter: any = {};
-  if (search) filter.name = { $regex: search, $options: "i" };
+  if (search) {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { module_tags: { $regex: search, $options: "i" } }
+    ];
+  }
   if (location) filter.location = location;
   if (credits) {
     const creditNumber = Number(credits);

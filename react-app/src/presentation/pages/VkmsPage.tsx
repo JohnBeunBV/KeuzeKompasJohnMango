@@ -6,9 +6,6 @@ import type { RootState, AppDispatch } from "../../application/store/store";
 import { fetchVkms } from "../../application/Slices/vkmsSlice";
 import { login } from "../../application/Slices/authSlice";
 import type { Vkm } from "@domain/models/vkm.model";
-// import "../index.css";
-// import "../vkmspage.css";
-import AccountDrawer from "../components/AccountDrawer";
 import VkmFilter from "../components/VkmFilter";
 
 const VkmsPage: React.FC = () => {
@@ -27,8 +24,6 @@ const VkmsPage: React.FC = () => {
   const [pexelsImages, setPexelsImages] = useState<string[]>([]);
   const [pexelsLoading, setPexelsLoading] = useState(true);
   const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // 🔹 Sync Redux auth met localStorage
   useEffect(() => {
@@ -190,23 +185,6 @@ const VkmsPage: React.FC = () => {
                   </Button>
               )
           )}
-        </div>
-        <div className={`side-drawer ${isDrawerOpen ? "open" : ""}`}>
-          <div className="side-drawer-panel">
-
-            <button
-                className="side-drawer-toggle"
-                onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                aria-label="Toggle side panel"
-            >
-              <span className="toggle-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-            </button>
-
-            <div className="side-drawer-content">
-              <AccountDrawer />
-            </div>
-
-          </div>
         </div>
       </Container>
   );

@@ -51,15 +51,11 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
         const searchValue = searchInput.trim();
         if (!searchValue) return;
 
-        let index = 1;
-        let key = `search${index}`;
-        const newFilters = { ...filters };
-        while (newFilters[key]) {
-            index++;
-            key = `search${index}`;
-        }
+        const newFilters = {
+            ...filters,
+            search: searchValue,
+        };
 
-        newFilters[key] = searchValue;
         setFilters(newFilters);
         onFilterChange(newFilters);
         setSearchInput("");
@@ -128,7 +124,7 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
                         type="text"
                         name="search"
                         placeholder="Zoeken op naam of tag..."
-                        value={searchInput} // 🔹 bind aan tijdelijke input
+                        value={searchInput}
                         onChange={handleChange}
                         style={{ maxWidth: "400px" }}
                     />

@@ -108,21 +108,17 @@ const VkmsDetailPage: React.FC = () => {
 
   // 🔹 Tag klik: voeg toe aan active filters en ga terug naar VkmsPage
   const handleTagClick = (tag: string) => {
-    const savedFilters: Record<string, string> = JSON.parse(
-        localStorage.getItem("activeVkmFilters") || "{}"
-    );
+    const newFilters = {
+      search: tag,
+    };
 
-    let index = 1;
-    let key = `search${index}`;
-    while (savedFilters[key]) {
-      index++;
-      key = `search${index}`;
-    }
+    localStorage.setItem("activeVkmFilters", JSON.stringify(newFilters));
 
-    savedFilters[key] = tag;
-    localStorage.setItem("activeVkmFilters", JSON.stringify(savedFilters));
-
-    navigate("/vkms", { state: { tagSearch: tag } });
+    navigate("/vkms", {
+      state: {
+        fromTag: true,
+      },
+    });
   };
 
   if (loading) {
