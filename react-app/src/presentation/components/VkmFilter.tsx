@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Form, Button, Row, Col, Card, Badge } from "react-bootstrap";
+import React, {useState, useEffect, useRef} from "react";
+import {Form, Button, Row, Col, Card, Badge} from "react-bootstrap";
 
 interface VkmFilterProps {
     onFilterChange: (filters: Record<string, string>) => void;
     initialFilters?: Record<string, string>;
 }
 
-export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFilterProps) {
+export default function VkmFilter({onFilterChange, initialFilters = {}}: VkmFilterProps) {
     const [filters, setFilters] = useState<Record<string, string>>({});
     const [open, setOpen] = useState(false);
     const [searchInput, setSearchInput] = useState("");
@@ -22,7 +22,7 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
 // Load filters from localStorage on mount only
     useEffect(() => {
         const saved = JSON.parse(localStorage.getItem("activeVkmFilters") || "{}");
-        const merged = { ...saved, ...initialFilters };
+        const merged = {...saved, ...initialFilters};
         setFilters(merged);
 
         isInitialMount.current = false;
@@ -37,15 +37,21 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
     }, [filters]);
 
     function handleChange(e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement | HTMLTextAreaElement>) {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         if (name === "search") {
             setSearchInput(value);
         } else {
-            const newFilters = { ...filters, [name]: value };
+            const newFilters = {...filters};
+            if (value === "") {
+                delete newFilters[name];
+            } else {
+                newFilters[name] = value;
+            }
             setFilters(newFilters);
             onFilterChange(newFilters);
         }
     }
+
 
     function addSearchFilter() {
         const searchValue = searchInput.trim();
@@ -68,7 +74,7 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
     }
 
     function removeFilter(key: string) {
-        const updated = { ...filters };
+        const updated = {...filters};
         delete updated[key];
         setFilters(updated);
         onFilterChange(updated);
@@ -89,7 +95,7 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
                                     bg="light"
                                     text="dark"
                                     className="d-flex align-items-center gap-2"
-                                    style={{ fontSize: "0.9rem", padding: "0.5rem 0.75rem" }}
+                                    style={{fontSize: "0.9rem", padding: "0.5rem 0.75rem"}}
                                 >
                                     <span>{value}</span>
                                     <button
@@ -111,7 +117,7 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
                                 </Badge>
                             ))}
                         </div>
-                        <hr className="my-3" />
+                        <hr className="my-3"/>
                     </>
                 )}
 
@@ -126,7 +132,7 @@ export default function VkmFilter({ onFilterChange, initialFilters = {} }: VkmFi
                         placeholder="Zoeken op naam of tag..."
                         value={searchInput}
                         onChange={handleChange}
-                        style={{ maxWidth: "400px" }}
+                        style={{maxWidth: "400px"}}
                     />
 
                     <Button className="btn-header" onClick={addSearchFilter}>

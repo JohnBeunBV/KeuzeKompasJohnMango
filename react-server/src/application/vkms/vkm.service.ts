@@ -13,36 +13,21 @@ export const getAllVkms = async (
 ) => {
     const skip = (page - 1) * limit;
 
-  // filter object
-  const filter: any = {};
-  if (search) {
-    filter.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { module_tags: { $regex: search, $options: "i" } }
-    ];
-  }
-  if (location) {
-        filter.location = { $regex: `^${location}$`, $options: "i" };
-    }
-
-    if (credits) {
-    const creditNumber = Number(credits);
-    if (!isNaN(creditNumber)) filter.studycredit = creditNumber;
-  }
-
+    // filter object
+    const filter: any = {};
     if (search) {
-        filter.name = {$regex: search, $options: "i"};
+        filter.$or = [
+            {name: {$regex: search, $options: "i"}},
+            {module_tags: {$regex: search, $options: "i"}}
+        ];
     }
-
     if (location) {
-        filter.location = location;
+        filter.location = {$regex: `^${location}$`, $options: "i"};
     }
 
     if (credits) {
         const creditNumber = Number(credits);
-        if (!isNaN(creditNumber)) {
-            filter.studycredit = creditNumber;
-        }
+        if (!isNaN(creditNumber)) filter.studycredit = creditNumber;
     }
 
     return vkmRepo.getAll(filter, skip, limit);
