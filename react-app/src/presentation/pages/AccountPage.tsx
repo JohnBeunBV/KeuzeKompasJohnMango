@@ -121,10 +121,6 @@ const AccountPage: React.FC = () => {
 
   // 🔹 Haal aanbevelingen op
   useEffect(() => {
-    if (!userData.favorites.length) {
-      setLoadingRecs(false);
-      return;
-    }
 
     const fetchRecommendations = async () => {
       try {
