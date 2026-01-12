@@ -19,7 +19,6 @@ const VkmsPage: React.FC = () => {
     const {data, status, error, totalPages} = useAppSelector(
         (state) => state.vkms
     );
-    // const {isAuthenticated} = useAppSelector(state => state.auth);
     const [filters, setFilters] = useState<Record<string, string>>(() => {
         return JSON.parse(localStorage.getItem("activeVkmFilters") || "{}");
     });
@@ -28,7 +27,7 @@ const VkmsPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-    const [pexelsImages, setPexelsImages] = useState<string[]>([]);
+    const [pexelsImages, setPexelsImages] = useState<Record<string, string>>({});
     const [pexelsLoading, setPexelsLoading] = useState(true);
     const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
 
@@ -43,23 +42,43 @@ const VkmsPage: React.FC = () => {
 
     // 🔹 Fetch Pexels afbeeldingen met loading-state
     useEffect(() => {
-        const fetchPexelsImages = async () => {
-            setPexelsLoading(true);
-            try {
-                const res = await fetch(
-                    `https://api.pexels.com/v1/search?query=nature&orientation=landscape&per_page=12&page=${page}`,
-                    {headers: {Authorization: PEXELS_API_KEY}}
-                );
-                const data = await res.json();
-                setPexelsImages(data.photos.map((p: any) => p.src.medium));
-            } catch {
-                setPexelsImages([]);
-            } finally {
-                setPexelsLoading(false);
-            }
+        const fetchImages = async () => {
+            const promises = data.map(async (vkm) => {
+                const cacheKey = `vkm-image-${vkm._id}`;
+                const cached = localStorage.getItem(cacheKey);
+
+                if (cached) return {_id: vkm._id, img: cached};
+
+                try {
+                    const res = await fetch(
+                        `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+                            vkm.name
+                        )}&orientation=landscape&per_page=1`,
+                        {headers: {Authorization: PEXELS_API_KEY}}
+                    );
+                    const json = await res.json();
+                    const img = json.photos?.[0]?.src?.medium || "/john-mango.png";
+
+                    localStorage.setItem(cacheKey, img);
+                    return {_id: vkm._id, img};
+                } catch {
+                    return {_id: vkm._id, img: "/john-mango.png"};
+                }
+            });
+
+            const results = await Promise.all(promises);
+
+            setPexelsImages((prev) => {
+                const updated = {...prev};
+                results.forEach(({_id, img}) => {
+                    updated[_id] = img;
+                });
+                return updated;
+            });
         };
-        fetchPexelsImages();
-    }, [page, PEXELS_API_KEY]);
+
+        if (data.length) fetchImages().then(r => setPexelsLoading(false));
+    }, [data, PEXELS_API_KEY]);
 
     // 🔹 Redirect bij VKM-fetch errors
     useEffect(() => {
@@ -82,6 +101,7 @@ const VkmsPage: React.FC = () => {
         return pages;
     };
 
+    if (status === "loading") return <Spinner animation="border" className="mt-5" />;
 
     return (
         <Container className="mt-4 vkms-page">
@@ -102,48 +122,73 @@ const VkmsPage: React.FC = () => {
 
             {/* Kaarten */}
             <Row>
-                {data.map((vkm: Vkm, index: number) => (
-                    <Col md={4} key={vkm._id} className="mb-4 d-flex">
-                        <div className="vkm-card-wrapper" style={{animationDelay: `${index * 100}ms`}}>
-                            <div className="vkm-card card h-100 d-flex flex-column">
-                                {pexelsLoading ? (
-                                    <div
-                                        style={{
-                                            height: "180px",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            backgroundColor: "#333",
-                                        }}
-                                    >
-                                        <Spinner animation="border" variant="light"/>
-                                    </div>
-                                ) : (
-                                    <img
-                                        src={pexelsImages[index] || "/images/default-vkm.png"}
-                                        alt={vkm.name}
-                                        style={{height: "180px", objectFit: "cover"}}
-                                        className="card-img-top"
-                                    />
-                                )}
-                                <div className="card-body d-flex flex-column">
-                                    <h5 className="card-title">
-                                        {vkm.name} <small className="text-muted">({vkm.studycredit})</small>
-                                    </h5>
-                                    <p className="card-text mb-2">{vkm.shortdescription}</p>
-                                    <hr/>
-                                    <p className="card-text text-muted mt-auto">Locatie: {vkm.location}</p>
-                                    <div className="mt-3">
-                                        <Link to={`/vkms/${vkm._id}`} state={{imageUrl: pexelsImages[index]}}>
-                                            <Button className="btn-detail">Bekijk details</Button>
-                                        </Link>
+                {data.map((vkm: Vkm, index: number) => {
+                    const id = String(vkm._id);
+
+                    return (
+                        <Col md={4} key={id} className="mb-4 d-flex">
+                            <div
+                                className="vkm-card-wrapper"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                                <div className="vkm-card card h-100 d-flex flex-column">
+                                    {pexelsLoading ? (
+                                        <div
+                                            style={{
+                                                height: "180px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                backgroundColor: "#333",
+                                            }}
+                                        >
+                                            <Spinner animation="border" variant="light" />
+                                        </div>
+                                    ) : (
+                                        <img
+                                            src={pexelsImages[id] ?? "/images/default-vkm.png"}
+                                            alt={vkm.name}
+                                            style={{ height: "180px", objectFit: "cover" }}
+                                            className="card-img-top"
+                                        />
+                                    )}
+
+                                    <div className="card-body d-flex flex-column">
+                                        <h5 className="card-title">
+                                            {vkm.name}{" "}
+                                            <small className="text-muted">
+                                                ({vkm.studycredit})
+                                            </small>
+                                        </h5>
+
+                                        <p className="card-text mb-2">
+                                            {vkm.shortdescription}
+                                        </p>
+
+                                        <hr />
+
+                                        <p className="card-text text-muted mt-auto">
+                                            Locatie: {vkm.location}
+                                        </p>
+
+                                        <div className="mt-3">
+                                            <Link
+                                                to={`/vkms/${id}`}
+                                                state={{ imageUrl: pexelsImages[id] }}
+                                            >
+                                                <Button className="btn-detail">
+                                                    Bekijk details
+                                                </Button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </Col>
-                ))}
+                        </Col>
+                    );
+                })}
             </Row>
+
 
 
             {/* Pagination */}

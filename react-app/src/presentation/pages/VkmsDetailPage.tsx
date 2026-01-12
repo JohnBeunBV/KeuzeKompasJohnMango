@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
-import {useParams, useLocation} from "react-router-dom";
-import {Container, Row, Col} from "react-bootstrap";
+import {useParams, useLocation, useNavigate} from "react-router-dom";
+import {Container, Row, Col, Spinner} from "react-bootstrap";
 import "../index.css";
 import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
 import apiClient from "../../infrastructure/ApiClient";
@@ -11,13 +11,14 @@ import {fetchVkmById} from "../../application/Slices/vkmsSlice";
 const VkmsDetailPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
     const location = useLocation();
 
-    const {user} = useAppSelector((s) => s.auth);
+    const {isAuthenticated, user} = useAppSelector((s) => s.auth);
 
     const vkm = useAppSelector((state) => state.vkms.selected);
     const isFavorite = !!user?.favorites.find((f) => f._id === id);
-  const [loading, setLoading] = useState(true);
 
 
     const [imageUrl, setImageUrl] = useState<string>(
@@ -84,29 +85,29 @@ const VkmsDetailPage: React.FC = () => {
         fetchPexelsImage();
     }, [vkm, location.state]);
 
-  // 🔹 Tag klik: voeg toe aan active filters en ga terug naar VkmsPage
-  const handleTagClick = (tag: string) => {
-    const newFilters = {
-      search: tag,
+    // 🔹 Tag klik: voeg toe aan active filters en ga terug naar VkmsPage
+    const handleTagClick = (tag: string) => {
+        const newFilters = {
+            search: tag,
+        };
+
+        localStorage.setItem("activeVkmFilters", JSON.stringify(newFilters));
+
+        navigate("/vkms", {
+            state: {
+                fromTag: true,
+            },
+        });
     };
 
-    localStorage.setItem("activeVkmFilters", JSON.stringify(newFilters));
-
-    navigate("/vkms", {
-      state: {
-        fromTag: true,
-      },
-    });
-  };
-
-  if (loading) {
-    return (
-        <Container className="text-center mt-5">
-          <Spinner animation="border" role="status" />
-          <p>Laden...</p>
-        </Container>
-    );
-  }
+    if (!isAuthenticated) {
+        return (
+            <Container className="text-center mt-5">
+                <Spinner animation="border" role="status"/>
+                <p>Laden...</p>
+            </Container>
+        );
+    }
 
     const handleToggleFavorite = async () => {
         const method = isFavorite ? apiClient.delete : apiClient.post;
@@ -193,7 +194,12 @@ const VkmsDetailPage: React.FC = () => {
                         <hr/>
                         <div className="tags-container">
                             {parseTags(vkm.module_tags).map((tag, index) => (
-                                <span key={index} className="tag-chip">
+                                <span
+                                    key={index}
+                                    className="tag-chip"
+                                    style={{cursor: "pointer"}}
+                                    onClick={() => handleTagClick(tag)}
+                                >
                   <span className="tag-icon">#</span> {tag}
                 </span>
                             ))}
