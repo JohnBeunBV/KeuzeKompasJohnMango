@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [react-server, react-app, python-model]
+        service: [react-server, react-app]
 
     defaults:
       run:
@@ -69,7 +69,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [react-server, react-app, python-model]
+        service: [react-server, react-app]
 
     defaults:
       run:
@@ -99,7 +99,7 @@ jobs:
 
     strategy:
       matrix:
-        service: [react-server, react-app, python-model]
+        service: [react-server, react-app]
 
     steps:
       - name: Checkout repository
