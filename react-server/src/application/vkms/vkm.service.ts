@@ -21,8 +21,11 @@ export const getAllVkms = async (
       { module_tags: { $regex: search, $options: "i" } }
     ];
   }
-  if (location) filter.location = location;
-  if (credits) {
+  if (location) {
+        filter.location = { $regex: `^${location}$`, $options: "i" };
+    }
+
+    if (credits) {
     const creditNumber = Number(credits);
     if (!isNaN(creditNumber)) filter.studycredit = creditNumber;
   }
