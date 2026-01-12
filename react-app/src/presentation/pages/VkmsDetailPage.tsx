@@ -17,6 +17,7 @@ const VkmsDetailPage: React.FC = () => {
 
     const vkm = useAppSelector((state) => state.vkms.selected);
     const isFavorite = !!user?.favorites.find((f) => f._id === id);
+  const [loading, setLoading] = useState(true);
 
 
     const [imageUrl, setImageUrl] = useState<string>(
@@ -83,6 +84,29 @@ const VkmsDetailPage: React.FC = () => {
         fetchPexelsImage();
     }, [vkm, location.state]);
 
+  // 🔹 Tag klik: voeg toe aan active filters en ga terug naar VkmsPage
+  const handleTagClick = (tag: string) => {
+    const newFilters = {
+      search: tag,
+    };
+
+    localStorage.setItem("activeVkmFilters", JSON.stringify(newFilters));
+
+    navigate("/vkms", {
+      state: {
+        fromTag: true,
+      },
+    });
+  };
+
+  if (loading) {
+    return (
+        <Container className="text-center mt-5">
+          <Spinner animation="border" role="status" />
+          <p>Laden...</p>
+        </Container>
+    );
+  }
 
     const handleToggleFavorite = async () => {
         const method = isFavorite ? apiClient.delete : apiClient.post;
@@ -181,6 +205,7 @@ const VkmsDetailPage: React.FC = () => {
     );
 };
 
+// 🔹 Parse tags uit string of array
 function parseTags(input: string | string[] | undefined): string[] {
     if (!input) return [];
     const str = Array.isArray(input) ? input.join(",") : input;

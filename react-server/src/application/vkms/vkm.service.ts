@@ -13,7 +13,22 @@ export const getAllVkms = async (
 ) => {
     const skip = (page - 1) * limit;
 
-    const filter: any = {};
+  // filter object
+  const filter: any = {};
+  if (search) {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { module_tags: { $regex: search, $options: "i" } }
+    ];
+  }
+  if (location) {
+        filter.location = { $regex: `^${location}$`, $options: "i" };
+    }
+
+    if (credits) {
+    const creditNumber = Number(credits);
+    if (!isNaN(creditNumber)) filter.studycredit = creditNumber;
+  }
 
     if (search) {
         filter.name = {$regex: search, $options: "i"};
