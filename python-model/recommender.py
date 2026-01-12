@@ -184,18 +184,21 @@ def build_explanation(row, weights):
 
     reasons.append(pop_text)
 
-    # --- Collaborative filtering ---
-    if row.cf_score_scaled > 0.7:
-        cf_text = "Gebruikers met vergelijkbare interesses waarderen deze module sterk."
-        signals["collaborative"] = row.cf_score_scaled
-        reasons.append(cf_text)
-    elif row.cf_score_scaled > 0.4:
-        cf_text = "Gebruikers met vergelijkbare interesses vinden deze module doorgaans interessant."
-        signals["collaborative"] = row.cf_score_scaled
-        reasons.append(cf_text)
-    elif row.cf_score_scaled > 0.0:
-        cf_text = "Gebruikers met vergelijkbare interesses kiezen deze module af en toe."
-        reasons.append(cf_text)
+    # # --- Collaborative filtering ---
+    # if row.cf_score_scaled > 0.7:
+    #     cf_text = "Gebruikers met vergelijkbare interesses waarderen deze module sterk."
+    #     signals["collaborative"] = row.cf_score_scaled
+    #     reasons.append(cf_text)
+    # elif row.cf_score_scaled > 0.4:
+    #     cf_text = "Gebruikers met vergelijkbare interesses vinden deze module doorgaans interessant."
+    #     signals["collaborative"] = row.cf_score_scaled
+    #     reasons.append(cf_text)
+    # elif row.cf_score_scaled > 0.01:
+    #     cf_text = "Gebruikers met vergelijkbare interesses kiezen deze module af en toe."
+    #     reasons.append(cf_text)
+    # elif row.cf_score_scaled == 0.0:
+    #     cf_text = "Er is onvoldoende gebruikersdata om een collaboratieve aanbeveling te maken."
+    #     reasons.append(cf_text)
 
     # --- Fallback ---
     if not reasons:
