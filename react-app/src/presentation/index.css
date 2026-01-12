@@ -1,491 +1,522 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color:white;
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: white;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 
 html, body {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 
 html {
-  overflow-y: scroll;
+    overflow-y: scroll;
 }
 
 .container {
-  margin-left: auto;
-  margin-right: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+    font-size: 3.2em;
+    line-height: 1.1;
 }
-
 
 
 .navbar,
 .footer {
-  background: linear-gradient(#ff8f00); /* mango-achtig */
-  color: white;
+    background: linear-gradient(#ff8f00); /* mango-achtig */
+    color: white;
 }
 
 .navbar a,
 .footer a {
-  color: white;
-  text-decoration: none;
+    color: white;
+    text-decoration: none;
 }
 
 .navbar a:hover,
 .footer a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 html {
-  overflow-y: scroll; /* Zorgt dat scrollbar altijd zichtbaar is */
+    overflow-y: scroll; /* Zorgt dat scrollbar altijd zichtbaar is */
 }
 
 /* Webkit scrollbar styling */
 ::-webkit-scrollbar {
-  width: 12px;
+    width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+    background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #FFD54F, #FF8F00);
-  border-radius: 6px;
+    background: linear-gradient(180deg, #FFD54F, #FF8F00);
+    border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #FFC107, #FF6F00);
+    background: linear-gradient(180deg, #FFC107, #FF6F00);
 }
 
 /* Firefox scrollbar styling */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #FF8F00 #f1f1f1;
+    scrollbar-width: thin;
+    scrollbar-color: #FF8F00 #f1f1f1;
 }
+
 /* ============================
    Layout & Navbar Styling
 ============================ */
 .layout-navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.8rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(255, 143, 0, 0.35);
-  background-color: #ff8f00; /* or any navbar bg color */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(255, 143, 0, 0.35);
+    background-color: #ff8f00; /* or any navbar bg color */
 }
 
 /* Logo + John Mango image */
 .logo-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
 }
 
 .nav-logo-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .logo-text {
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: white;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: white;
 }
 
 /* Nav Links */
 .nav-left {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
 }
 
 .nav-links {
-  display: flex;
-  gap: 1.2rem;
+    display: flex;
+    gap: 1.2rem;
 }
 
 .nav-link {
-  color: white;
-  font-weight: 500;
-  text-decoration: none;
-  transition: opacity 0.2s ease;
+    color: white;
+    font-weight: 500;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
 }
 
 .nav-link:hover {
-  opacity: 0.85;
-  text-decoration: underline;
+    opacity: 0.85;
+    text-decoration: underline;
 }
 
 /* User info rechts */
 .nav-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .welcome-text {
-  font-weight: 500;
-  color: white;
+    font-weight: 500;
+    color: white;
 }
 
 .user-name-link {
-  font-weight: 600;
-  text-decoration: underline;
-  cursor: pointer;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 /* Buttons */
 .nav-btn {
-  background: white;
-  color: #ff8f00;
-  font-weight: 600;
-  border: none;
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    background: white;
+    color: #ff8f00;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .nav-btn:hover {
-  background: #fff3e0;
-  transform: scale(1.05);
+    background: #fff3e0;
+    transform: scale(1.05);
 }
 
 .nav-btn.logout {
-  background: linear-gradient(135deg, #ff6f00, #ff00b7);
-  color: white;
+    background: linear-gradient(135deg, #ff6f00, #ff00b7);
+    color: white;
 }
 
 .nav-btn.logout:hover {
-  background: linear-gradient(135deg, #ffc107, #ff6f00);
-  transform: scale(1.05);
+    background: linear-gradient(135deg, #ffc107, #ff6f00);
+    transform: scale(1.05);
 }
 
 /* Footer */
 .footer {
-  background-color: #f7f7f7;
-  color: #333;
+    background-color: #f7f7f7;
+    color: #333;
 }
-
 
 
 /* ============================
    Mango color scheme
 ============================ */
-.vkm-detail h3, 
-.vkm-detail h4, 
+.vkm-detail h3,
+.vkm-detail h4,
 .vkm-detail strong {
-  color: #FF8F00; /* oranje accent */
+    color: #FF8F00; /* oranje accent */
 }
 
 /* Left info box */
 .info-box {
-  border: 2px solid #FFD54F;
-  border-radius: 10px;
-  padding: 1rem;
-  background: #ffffff;
-  box-shadow: 0 4px 10px rgba(255, 143, 0, 0.2);
+    border: 2px solid #FFD54F;
+    border-radius: 10px;
+    padding: 1rem;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(255, 143, 0, 0.2);
 }
 
 /* Right content box */
 .content-box {
-  border: 2px solid #FFB300;
-  border-radius: 10px;
-  padding: 1.5rem;
-  background: #ffffff;
-  box-shadow: 0 4px 15px rgba(255, 143, 0, 0.25);
+    border: 2px solid #FFB300;
+    border-radius: 10px;
+    padding: 1.5rem;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(255, 143, 0, 0.25);
 }
 
 /* Gradient headers */
 .vkm-detail h3 {
-  background: linear-gradient(90deg, #FFD54F, #FF8F00);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 700;
+    background: linear-gradient(90deg, #FFD54F, #FF8F00);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
 }
 
 /* Subtle hover effect */
 .info-box:hover, .content-box:hover {
-  transform: translateY(-3px);
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(255, 143, 0, 0.35);
+    transform: translateY(-3px);
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(255, 143, 0, 0.35);
 }
 
 /* Container zodat chips netjes wrappen */
 .tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 /* Mango chips */
 .tag-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.4rem 0.8rem;
-  background: linear-gradient(135deg, #FFD54F, #FF8F00);
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: 20px;
-  cursor: default;
-  box-shadow: 0 2px 5px rgba(255, 143, 0, 0.3);
-  transition: all 0.3s ease;
-  
-  /* animatie start */
-  opacity: 0;
-  transform: scale(0.8) translateY(10px);
-  animation: chipPop 0.4s forwards;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.8rem;
+    background: linear-gradient(135deg, #FFD54F, #FF8F00);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: default;
+    box-shadow: 0 2px 5px rgba(255, 143, 0, 0.3);
+    transition: all 0.3s ease;
+
+    /* animatie start */
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    animation: chipPop 0.4s forwards;
 }
 
 /* Kleine icon vooraan */
 .tag-icon {
-  margin-right: 6px;
-  font-weight: bold;
-  font-size: 1rem;
-  opacity: 0.9;
+    margin-right: 6px;
+    font-weight: bold;
+    font-size: 1rem;
+    opacity: 0.9;
 }
 
 /* Hover effect */
 .tag-chip:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.6);
-  background: linear-gradient(135deg, #FFC107, #FF6F00);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 143, 0, 0.6);
+    background: linear-gradient(135deg, #FFC107, #FF6F00);
 }
 
 /* Keyframes voor entry */
 @keyframes chipPop {
-  0% {
-    opacity: 0;
-    transform: scale(0.8) translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 /* Staggered animatie (1 voor 1 infaden/pop in) */
-.tag-chip:nth-child(1) { animation-delay: 0.05s; }
-.tag-chip:nth-child(2) { animation-delay: 0.1s; }
-.tag-chip:nth-child(3) { animation-delay: 0.15s; }
-.tag-chip:nth-child(4) { animation-delay: 0.2s; }
-.tag-chip:nth-child(5) { animation-delay: 0.25s; }
+.tag-chip:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.tag-chip:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.tag-chip:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.tag-chip:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.tag-chip:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
 /* als je meer tags kan hebben, gewoon verder kopiëren */
 
 /* Algemene styling */
 .vkms-page {
-  padding: 20px;
+    padding: 20px;
 }
 
 .page-title {
-  font-size: 2.8em;
-  font-weight: bold;
-  color: #FF8F00;
-  text-align: center;
-  margin-bottom: 30px;
+    font-size: 2.8em;
+    font-weight: bold;
+    color: #FF8F00;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 /* VKM card basis */
 .vkm-card {
+    border: 2px solid #FFB74D; /* mango-ish border */
+    border-radius: 14px;
+    padding: 1rem;
+    background: #ffffff;
+    box-shadow: 0 6px 16px rgba(255, 183, 77, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* wrapper voor fade-in */
+.vkm-card-wrapper {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s forwards;
+    display: flex; /* zodat de card flex kan fillen */
+    width: 100%;
+}
+
+/* hover effect met mango glow */
+.vkm-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(255, 152, 0, 0.55),
+    0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* fade-in keyframes */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vkm-card h4 {
+    color: #FF8F00;
+    font-weight: 700;
+}
+
+.vkm-description {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.vkm-filter-card {
   border: 2px solid #FFB74D; /* mango-ish border */
   border-radius: 14px;
   padding: 1rem;
   background: #ffffff;
   box-shadow: 0 6px 16px rgba(255, 183, 77, 0.25),
-              0 2px 4px rgba(0, 0, 0, 0.1);
+  0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* wrapper voor fade-in */
-.vkm-card-wrapper {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.6s forwards;
-  display: flex;      /* zodat de card flex kan fillen */
-  width: 100%;
-}
-
-/* hover effect met mango glow */
-.vkm-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(255, 152, 0, 0.55),
-              0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* fade-in keyframes */
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.vkm-card h4 {
-  color: #FF8F00;
-  font-weight: 700;
-}
-
-.vkm-description {
-  font-size: 0.95rem;
-  color: #555;
-  margin-bottom: 15px;
 }
 
 /* Knop styling */
 .btn-detail {
-  background: linear-gradient(135deg, #FFD54F, #FF8F00);
-  border: none;
-  color: white;
-  font-weight: bold;
-  padding: 8px 16px;
-  border-radius: 25px;
-  transition: background 0.3s ease, transform 0.2s ease;
+    background: linear-gradient(135deg, #FFD54F, #FF8F00);
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 25px;
+    transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .btn-detail:hover {
-  background: linear-gradient(135deg, #FFC107, #FF6F00);
-  transform: scale(1.05);
+    background: linear-gradient(135deg, #FFC107, #FF6F00);
+    transform: scale(1.05);
 }
 
 .card-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem; /* ruimte tussen kaarten */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* ruimte tussen kaarten */
 }
 
 .card {
-  flex: 1 1 600px; /* alle kaarten krijgen dezelfde breedte & hoogte */
-  display: flex;
-  flex-direction: column;
+    flex: 1 1 600px; /* alle kaarten krijgen dezelfde breedte & hoogte */
+    display: flex;
+    flex-direction: column;
 }
 
 .login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;               /* Volledige breedte van viewport */
-  min-height: 100vh;          /* Zelfde hoogte behouden */
-  margin: 0;                  /* Geen ruimte rondom */
-  padding: 0;                 /* Geen binnenruimte */
-  background: linear-gradient(135deg, #ff7700, #ffd54f, #ffb300, #ff8f00, #ff7700, #ff16dc);
-  background-size: 300% 300%;
-  background-position: center;
-  animation: gradientFlow 8s ease infinite;
-  box-sizing: border-box;     /* Zorgt dat alles netjes uitlijnt */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* Volledige breedte van viewport */
+    min-height: 100vh; /* Zelfde hoogte behouden */
+    margin: 0; /* Geen ruimte rondom */
+    padding: 0; /* Geen binnenruimte */
+    background: linear-gradient(135deg, #ff7700, #ffd54f, #ffb300, #ff8f00, #ff7700, #ff16dc);
+    background-size: 300% 300%;
+    background-position: center;
+    animation: gradientFlow 8s ease infinite;
+    box-sizing: border-box; /* Zorgt dat alles netjes uitlijnt */
 }
 
 @keyframes gradientFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .login-card,
 .register-card {
-  background: white;
-  padding: 2.5rem 3rem;
-  border-radius: 18px;
-  box-shadow: 0 10px 25px rgba(255, 143, 0, 0.35);
-  max-width: 580px;
-  width: 90%;
-  text-align: center;
-  transform: scale(0.98);
-  transition: all 0.3s ease;
+    background: white;
+    padding: 2.5rem 3rem;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(255, 143, 0, 0.35);
+    max-width: 580px;
+    width: 90%;
+    text-align: center;
+    transform: scale(0.98);
+    transition: all 0.3s ease;
 }
 
 .login-card:hover,
 .register-card:hover {
-  transform: scale(1);
-  box-shadow: 0 12px 30px rgba(255, 143, 0, 0.45);
+    transform: scale(1);
+    box-shadow: 0 12px 30px rgba(255, 143, 0, 0.45);
 }
 
 .login-title,
 .register-title {
-  background: linear-gradient(90deg, #ffc43b, #ff8f00);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 800;
-  font-size: 1.9rem;
-  margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, #ffc43b, #ff8f00);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    font-size: 1.9rem;
+    margin-bottom: 0.5rem;
 }
 
 .login-subtitle,
 .register-subtitle {
-  color: #666;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
 }
 
 .login-form,
 .register-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .login-input,
 .register-input {
-  padding: 0.8rem 1rem;
-  border: 2px solid #ffd54f;
-  border-radius: 10px;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.3s ease;
-  background: #ffffff;
-  box-shadow: 0 2px 5px rgba(255, 143, 0, 0.2);
-  color: #333;
+    padding: 0.8rem 1rem;
+    border: 2px solid #ffd54f;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    box-shadow: 0 2px 5px rgba(255, 143, 0, 0.2);
+    color: #333;
 }
 
 .login-input:focus,
 .register-input:focus {
-  border-color: #ff8f00;
-  box-shadow: 0 0 5px rgba(255, 143, 0, 0.4);
+    border-color: #ff8f00;
+    box-shadow: 0 0 5px rgba(255, 143, 0, 0.4);
 }
 
 .login-button,
 .register-button {
-  background: linear-gradient(135deg, #ffd54f, #ff8f00);
-  border: none;
-  color: white;
-  font-weight: 600;
-  padding: 0.9rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffd54f, #ff8f00);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.9rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .login-button:hover,
 .register-button:hover {
-  background: linear-gradient(135deg, #ffc107, #ff6f00);
-  transform: scale(1.05);
+    background: linear-gradient(135deg, #ffc107, #ff6f00);
+    transform: scale(1.05);
 }
+
 .login-button-microsoft:disabled {
     border: none;
     font-weight: 600;
@@ -497,431 +528,445 @@ html {
     cursor: not-allowed;
 }
 
+.login-button-microsoft {
+    background: linear-gradient(135deg, #ffd54f, #ff8f00);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.9rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
 .error-message {
-  color: #d32f2f;
-  background: #ffeaea;
-  border: 1px solid #ef9a9a;
-  padding: 0.5rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
+    color: #d32f2f;
+    background: #ffeaea;
+    border: 1px solid #ef9a9a;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
 }
 
 .login-footer,
 .register-footer {
-  margin-top: 1.5rem;
-  color: #444;
-  font-size: 0.9rem;
+    margin-top: 1.5rem;
+    color: #444;
+    font-size: 0.9rem;
 }
 
 .register-link {
-  color: #ff8f00;
-  font-weight: 600;
-  cursor: pointer;
+    color: #ff8f00;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .register-link:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
+
 /* ==============================
    VKM Filters - Mango Theme
 ============================== */
 
 /* Input velden */
 .vkms-page .form-control {
-  background: #fff8e1;
-  border: 2px solid #FFD54F;
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  color: #333;
-  box-shadow: 0 4px 10px rgba(255, 152, 0, 0.2);
-  transition: all 0.3s ease;
+    background: #fff8e1;
+    border: 2px solid #FFD54F;
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    color: #333;
+    box-shadow: 0 4px 10px rgba(255, 152, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 .vkms-page .form-control:focus {
-  border-color: #FF8F00;
-  box-shadow: 0 0 8px rgba(255, 143, 0, 0.4);
-  outline: none;
-  background: #fffde7;
+    border-color: #FF8F00;
+    box-shadow: 0 0 8px rgba(255, 143, 0, 0.4);
+    outline: none;
+    background: #fffde7;
 }
 
 /* Dropdown/select velden */
 .vkms-page .form-select {
-  background: #fff8e1;
-  border: 2px solid #FFD54F;
-  border-radius: 12px;
-  padding: 0.55rem 1rem;
-  font-size: 1rem;
-  color: #333;
-  box-shadow: 0 4px 10px rgba(255, 152, 0, 0.2);
-  transition: all 0.3s ease;
+    background: #fff8e1;
+    border: 2px solid #FFD54F;
+    border-radius: 12px;
+    padding: 0.55rem 1rem;
+    font-size: 1rem;
+    color: #333;
+    box-shadow: 0 4px 10px rgba(255, 152, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 .vkms-page .form-select:focus {
-  border-color: #FF8F00;
-  box-shadow: 0 0 8px rgba(255, 143, 0, 0.4);
-  outline: none;
-  background: #fffde7;
+    border-color: #FF8F00;
+    box-shadow: 0 0 8px rgba(255, 143, 0, 0.4);
+    outline: none;
+    background: #fffde7;
 }
 
 /* Knoppen */
 .btn-search {
-  background: linear-gradient(135deg, #FFD54F, #FF8F00);
-  color: white;
-  font-weight: 600;
-  padding: 0.7rem 1.5rem;
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3);
-  transition: all 0.3s ease;
-  cursor: pointer;
+    background: linear-gradient(135deg, #FFD54F, #FF8F00);
+    color: white;
+    font-weight: 600;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .btn-search:hover {
-  background: linear-gradient(135deg, #FFC107, #FF6F00);
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 18px rgba(255, 143, 0, 0.45);
+    background: linear-gradient(135deg, #FFC107, #FF6F00);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(255, 143, 0, 0.45);
 }
 
 .btn-search:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 3px 8px rgba(255, 143, 0, 0.25);
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 3px 8px rgba(255, 143, 0, 0.25);
 }
 
 .btn-secondary {
-  background: #eeeeee;
-  color: #FF8F00;
-  font-weight: 600;
-  padding: 0.7rem 1.5rem;
-  border: 2px solid #FF8F00;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.2);
-  transition: all 0.3s ease;
-  cursor: pointer;
+    background: #eeeeee;
+    color: #FF8F00;
+    font-weight: 600;
+    padding: 0.7rem 1.5rem;
+    border: 2px solid #FF8F00;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 143, 0, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .btn-secondary:hover {
-  background: #FFECB3;
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 6px 18px rgba(255, 143, 0, 0.35);
+    background: #FFECB3;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 18px rgba(255, 143, 0, 0.35);
 }
 
 .btn-secondary:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 3px 8px rgba(255, 143, 0, 0.2);
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 3px 8px rgba(255, 143, 0, 0.2);
 }
 
 /* ===== Terminal Mango Theme ===== */
 .terminal-container {
-  min-height: 100vh;
-  background: #121212;
-  font-family: "JetBrains Mono", monospace;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 2rem;
-  box-sizing: border-box;
+    min-height: 100vh;
+    background: #121212;
+    font-family: "JetBrains Mono", monospace;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+    box-sizing: border-box;
 }
 
 /* Flex container voor account en favorieten */
 .account-flex-container {
-  display: flex;
-  flex-wrap: wrap; /* kleinere schermen: onder elkaar */
-  gap: 2rem;
-  width: 100%;
-  justify-content: center;
+    display: flex;
+    flex-wrap: wrap; /* kleinere schermen: onder elkaar */
+    gap: 2rem;
+    width: 100%;
+    justify-content: center;
 }
 
 /* Linker paneel: account configurator */
 .account-card {
-  background: #1e1e1e;
-  border: 2px solid #ffb300;
-  border-radius: 14px;
-  box-shadow: 0 0 25px rgba(255, 143, 0, 0.3);
-  flex: 1 1 350px; /* minimale breedte 350px, groeit mee */
-  max-width: 600px;
-  color: #fff3e0;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+    background: #1e1e1e;
+    border: 2px solid #ffb300;
+    border-radius: 14px;
+    box-shadow: 0 0 25px rgba(255, 143, 0, 0.3);
+    flex: 1 1 350px; /* minimale breedte 350px, groeit mee */
+    max-width: 600px;
+    color: #fff3e0;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 /* Rechter paneel: favorieten + aanbevelingen */
 .favorites-card {
-  background: #1e1e1e;
-  border: 2px solid #ffb300;
-  border-radius: 14px;
-  box-shadow: 0 0 20px rgba(255, 143, 0, 0.3);
-  padding: 2rem;
-  flex: 1 1 350px;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem; /* ruimte tussen favorieten en aanbevelingen */
+    background: #1e1e1e;
+    border: 2px solid #ffb300;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(255, 143, 0, 0.3);
+    padding: 2rem;
+    flex: 1 1 350px;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* ruimte tussen favorieten en aanbevelingen */
 }
 
 
 /* Titles */
 .terminal-title {
-  color: #ffc43b;
-  font-weight: 800;
-  text-shadow: 0 0 8px rgba(255, 143, 0, 0.6);
+    color: #ffc43b;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(255, 143, 0, 0.6);
 }
 
 .terminal-subtext {
-  color: #aaa;
-  font-size: 0.95rem;
+    color: #aaa;
+    font-size: 0.95rem;
 }
 
 /* Inputs */
 .terminal-input {
-  background: #2b2b2b !important;
-  border: 1px solid #ff8f00 !important;
-  color: #fff3e0 !important;
-  font-family: "JetBrains Mono", monospace;
+    background: #2b2b2b !important;
+    border: 1px solid #ff8f00 !important;
+    color: #fff3e0 !important;
+    font-family: "JetBrains Mono", monospace;
 }
 
 .terminal-input:focus {
-  box-shadow: 0 0 8px #ff8f00 !important;
-  outline: none;
+    box-shadow: 0 0 8px #ff8f00 !important;
+    outline: none;
 }
+
 /* Input tekstkleur */
 .account-card .terminal-input {
-  color: #ffffff !important; /* gewone tekst */
-  background: #2b2b2b !important; /* optioneel, als je de achtergrond wilt behouden */
+    color: #ffffff !important; /* gewone tekst */
+    background: #2b2b2b !important; /* optioneel, als je de achtergrond wilt behouden */
 }
 
 /* Placeholder tekstkleur */
 .account-card .terminal-input::placeholder {
-  color: #ccc !important; /* lichte kleur voor placeholder */
-  opacity: 1; /* zorgt dat het zichtbaar genoeg is */
+    color: #ccc !important; /* lichte kleur voor placeholder */
+    opacity: 1; /* zorgt dat het zichtbaar genoeg is */
 }
 
 /* Focus state */
 .account-card .terminal-input:focus {
-  color: #ffffff !important;
-  box-shadow: 0 0 8px #ff8f00 !important;
-  outline: none;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px #ff8f00 !important;
+    outline: none;
 }
 
 /* Buttons */
 .btn-warning {
-  background: linear-gradient(135deg, #ffd54f, #ff8f00);
-  border: none;
-  font-weight: 600;
+    background: linear-gradient(135deg, #ffd54f, #ff8f00);
+    border: none;
+    font-weight: 600;
 }
 
 .btn-warning:hover {
-  background: linear-gradient(135deg, #ffc107, #ff6f00);
+    background: linear-gradient(135deg, #ffc107, #ff6f00);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #ff7043, #d32f2f);
-  border: none;
+    background: linear-gradient(135deg, #ff7043, #d32f2f);
+    border: none;
 }
 
 .btn-danger:hover {
-  background: linear-gradient(135deg, #ff5252, #b71c1c);
+    background: linear-gradient(135deg, #ff5252, #b71c1c);
 }
 
 /* ===== Favorieten lijst ===== */
 .favorites-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .favorite-item {
-  background: linear-gradient(135deg, #ffd54f, #ff8f00);
-  color: #1e1e1e;
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3);
+    background: linear-gradient(135deg, #ffd54f, #ff8f00);
+    color: #1e1e1e;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3);
 }
 
 .favorite-item:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(255, 143, 0, 0.5);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(255, 143, 0, 0.5);
 }
 
 /* ===== Aanbevolen VKM's ===== */
 .card-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .terminal-vkm-card {
-  background: #1e1e1e;
-  border: 2px solid #ffb300;
-  border-radius: 12px;
-  padding: 1rem;
-  flex: 1 1 200px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #ffc43b;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.25);
+    background: #1e1e1e;
+    border: 2px solid #ffb300;
+    border-radius: 12px;
+    padding: 1rem;
+    flex: 1 1 200px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #ffc43b;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(255, 143, 0, 0.25);
 }
 
 .terminal-vkm-card h4 {
-  font-weight: 700;
-  margin-bottom: 0.3rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
 }
 
 .terminal-vkm-card p {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #fff3e0;
+    margin: 0;
+    font-size: 0.95rem;
+    color: #fff3e0;
 }
 
 .terminal-vkm-card:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 8px 20px rgba(255, 143, 0, 0.45);
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(255, 143, 0, 0.45);
 }
 
 /* HR styling */
 .favorites-card hr {
-  border: 1px solid #ff8f00;
-  margin: 1rem 0;
+    border: 1px solid #ff8f00;
+    margin: 1rem 0;
 }
 
 
 /* Fancy gradient button tweaks */
 .btn-warning {
-  background: linear-gradient(135deg, #ffd54f, #ff8f00);
-  border: none;
-  font-weight: 600;
+    background: linear-gradient(135deg, #ffd54f, #ff8f00);
+    border: none;
+    font-weight: 600;
 }
 
 .btn-warning:hover {
-  background: linear-gradient(135deg, #ffc107, #ff6f00);
+    background: linear-gradient(135deg, #ffc107, #ff6f00);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #ff7043, #d32f2f);
-  border: none;
+    background: linear-gradient(135deg, #ff7043, #d32f2f);
+    border: none;
 }
 
 .btn-danger:hover {
-  background: linear-gradient(135deg, #ff5252, #b71c1c);
+    background: linear-gradient(135deg, #ff5252, #b71c1c);
 }
 
 /* ===== Homepage Mango Theme (Animated) ===== */
 .homepage-header {
-  position: relative;
-  overflow: hidden;
-  color: #fff3e0;
-  border-radius: 16px;
-  box-shadow: 0 8px 25px rgba(255, 143, 0, 0.5);
-  padding: 3rem 2rem;
-  text-align: center;
+    position: relative;
+    overflow: hidden;
+    color: #fff3e0;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(255, 143, 0, 0.5);
+    padding: 3rem 2rem;
+    text-align: center;
 
-  /* Dynamische mango-gradient */
-  background: linear-gradient(
-    -45deg,
-    #fe382a,
-    #ff9100,
-    #ff6a00,
-    #ff23ab
-    
-  );
-  background-size: 400% 400%;
-  animation: mangoWave 10s ease infinite;
+    /* Dynamische mango-gradient */
+    background: linear-gradient(
+            -45deg,
+            #fe382a,
+            #ff9100,
+            #ff6a00,
+            #ff23ab
+    );
+    background-size: 400% 400%;
+    animation: mangoWave 10s ease infinite;
 }
 
 @keyframes mangoWave {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .homepage-header h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  text-shadow: 2px 2px 8px rgba(255, 143, 0, 0.5);
-  margin-bottom: 1rem;
+    font-size: 3rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 8px rgba(255, 143, 0, 0.5);
+    margin-bottom: 1rem;
 }
 
 .homepage-header p.lead {
-  font-size: 1.25rem;
-  margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 
 .btn-header2 {
-  background: linear-gradient(135deg, #ffffff, #ffffff);
-  color: orange;
-  font-weight: 700;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.5);
-  border: none;
-  transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff, #ffffff);
+    color: orange;
+    font-weight: 700;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 143, 0, 0.5);
+    border: none;
+    transition: all 0.3s ease;
 }
+
 .btn-header2:hover {
-  background: linear-gradient(135deg, #ffecb3, #fff3e0);
-  transform: scale(1.05);
-  color: #ff8f00;
-  box-shadow: 0 6px 16px rgba(255, 111, 0, 0.6);
+    background: linear-gradient(135deg, #ffecb3, #fff3e0);
+    transform: scale(1.05);
+    color: #ff8f00;
+    box-shadow: 0 6px 16px rgba(255, 111, 0, 0.6);
 }
 
 .btn-header:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(255, 111, 0, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 111, 0, 0.6);
 }
+
 /* Carousel Styling */
 /* Carousel Images */
 .homepage-carousel .carousel-image {
-  height: 450px;
-  object-fit: cover;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(255, 143, 0, 0.4);
+    height: 450px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(255, 143, 0, 0.4);
 }
 
 /* Caption overlay */
 .homepage-carousel .carousel-caption {
-  background: rgba(255, 196, 59, 0.85); /* mango-ish geel/oranje */
-  color: #1e1e1e;
-  padding: 1.5rem 2rem;
-  border-radius: 12px;
-  text-align: center;
-  max-width: 70%;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 20%;
-  box-shadow: 0 6px 16px rgba(255, 143, 0, 0.45);
-  transition: all 0.3s ease;
+    background: rgba(255, 196, 59, 0.85); /* mango-ish geel/oranje */
+    color: #1e1e1e;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 70%;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 20%;
+    box-shadow: 0 6px 16px rgba(255, 143, 0, 0.45);
+    transition: all 0.3s ease;
 }
 
 .homepage-carousel .carousel-caption h3 {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #FF6F00;
-  text-shadow: 1px 1px 6px rgba(255, 143, 0, 0.6);
+    font-size: 2rem;
+    font-weight: 800;
+    color: #FF6F00;
+    text-shadow: 1px 1px 6px rgba(255, 143, 0, 0.6);
 }
 
 .homepage-carousel .carousel-caption p {
-  font-size: 1.1rem;
-  color: #1e1e1e;
-  margin-top: 0.5rem;
+    font-size: 1.1rem;
+    color: #1e1e1e;
+    margin-top: 0.5rem;
 }
 
 /* ============================
@@ -929,88 +974,89 @@ html {
    ============================ */
 /* Zorg dat Row niet alle kolommen even hoog maakt */
 .row.g-4.justify-content-center {
-  align-items: flex-start !important;
+    align-items: flex-start !important;
 }
+
 .feature-card {
-  background: #ffffff;
-  border: 2px solid #FFD54F;
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 6px 20px rgba(255, 143, 0, 0.3);
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  cursor: pointer;
-  width: 95%;
-  max-width: 420px;
-  text-align: center;
+    background: #ffffff;
+    border: 2px solid #FFD54F;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 20px rgba(255, 143, 0, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    cursor: pointer;
+    width: 95%;
+    max-width: 420px;
+    text-align: center;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 28px rgba(255, 143, 0, 0.5);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(255, 143, 0, 0.5);
 }
 
 .feature-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #FF8F00;
-  margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #FF8F00;
+    margin-bottom: 0.5rem;
 }
 
 .feature-card p {
-  color: #333;
-  font-size: 1rem;
+    color: #333;
+    font-size: 1rem;
 }
 
 /* Toggle knop */
 .feature-toggle {
-  margin-top: 1rem;
-  background: linear-gradient(135deg, #FFD54F, #FF8F00);
-  border: none;
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
-  font-weight: 600;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    margin-top: 1rem;
+    background: linear-gradient(135deg, #FFD54F, #FF8F00);
+    border: none;
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .feature-toggle:hover {
-  background: linear-gradient(135deg, #FFC107, #FF6F00);
-  transform: scale(1.05);
+    background: linear-gradient(135deg, #FFC107, #FF6F00);
+    transform: scale(1.05);
 }
 
 /* Uitklapbaar deel */
 .feature-details {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, padding 0.4s ease;
-  margin-top: 0;
-  color: #555;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    margin-top: 0;
+    color: #555;
 }
 
 .feature-details.open {
-  max-height: 200px; /* voldoende hoogte voor content */
-  padding-top: 1rem;
+    max-height: 200px; /* voldoende hoogte voor content */
+    padding-top: 1rem;
 }
 
 /* ============================
    Responsiviteit
    ============================ */
 @media (max-width: 768px) {
-  .homepage-header h1 {
-    font-size: 2.2rem;
-  }
+    .homepage-header h1 {
+        font-size: 2.2rem;
+    }
 
-  .feature-card {
-    max-width: 100%;
-  }
+    .feature-card {
+        max-width: 100%;
+    }
 
-  .carousel-caption {
-    font-size: 0.9rem;
-  }
+    .carousel-caption {
+        font-size: 0.9rem;
+    }
 }
 
 /* .about-header (we gebruiken de homepage  header nu voor de about page)
@@ -1026,138 +1072,146 @@ html {
 } */
 
 @keyframes mangoFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .feature-section {
-  margin-top: 3rem;
-  text-align: center;
+    margin-top: 3rem;
+    text-align: center;
 }
 
 .feature-cards {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 1.5rem;
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
 }
+
 .feature-card.express {
-  background: #e8f5ff;
-  border: 2px solid #64b5f6;
+    background: #e8f5ff;
+    border: 2px solid #64b5f6;
 }
 
 .feature-card.nestjs {
-  background: #fff3e0;
-  border: 2px solid #ffb74d;
+    background: #fff3e0;
+    border: 2px solid #ffb74d;
 }
 
 
 .feature-card {
-  width: 320px;
-  padding: 1.5rem;
-  border-radius: 16px;
-  color: #333;
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.2);
-  transition: all 0.3s ease;
+    width: 320px;
+    padding: 1.5rem;
+    border-radius: 16px;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(255, 143, 0, 0.2);
+    transition: all 0.3s ease;
 }
 
 .feature-card.react {
-  background: #fff9e6;
-  border: 2px solid #ffcc80;
+    background: #fff9e6;
+    border: 2px solid #ffcc80;
 }
 
 .feature-card.angular {
-  background: #fff3f0;
-  border: 2px solid #ef9a9a;
+    background: #fff3f0;
+    border: 2px solid #ef9a9a;
 }
 
 .feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(255, 143, 0, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255, 143, 0, 0.3);
 }
 
 .framework-conclusion {
-  margin-top: 2rem;
-  font-weight: 500;
-  max-width: 800px;
-  margin-inline: auto;
+    margin-top: 2rem;
+    font-weight: 500;
+    max-width: 800px;
+    margin-inline: auto;
 }
 
 .epics-section {
-  margin-top: 4rem;
+    margin-top: 4rem;
 }
 
 .epics-container {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start; /* belangrijk zodat cards niet elkaar beïnvloeden */
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start; /* belangrijk zodat cards niet elkaar beïnvloeden */
 }
 
 .epic-card {
-  flex: 1 1 30%;
-  background: #fffef5;
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(255, 143, 0, 0.15);
-  padding: 1.5rem;
-  min-width: 300px;
-  display: flex;
-  flex-direction: column; /* content onder elkaar */
-  transition: all 0.3s ease; /* soepel uitklappen */
-  overflow: hidden;          /* voorkomt dat content buiten de card valt */
+    flex: 1 1 30%;
+    background: #fffef5;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(255, 143, 0, 0.15);
+    padding: 1.5rem;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column; /* content onder elkaar */
+    transition: all 0.3s ease; /* soepel uitklappen */
+    overflow: hidden; /* voorkomt dat content buiten de card valt */
 }
 
 .epic-header {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .epic-header:hover {
-  color: #ff8f00;
+    color: #ff8f00;
 }
 
 .user-stories {
-  margin-top: 1rem;
-  display: block; /* elke card bepaalt zelf zijn hoogte */
+    margin-top: 1rem;
+    display: block; /* elke card bepaalt zelf zijn hoogte */
 }
 
 .user-stories details {
-  margin-top: 0.5rem;
-  background: #fff8e1;
-  border-radius: 8px;
-  padding: 0.8rem;
+    margin-top: 0.5rem;
+    background: #fff8e1;
+    border-radius: 8px;
+    padding: 0.8rem;
 }
 
 .user-stories summary {
-  cursor: pointer;
-  font-weight: 600;
+    cursor: pointer;
+    font-weight: 600;
 }
 
 
 .btn-header {
-  background: linear-gradient(135deg, #ff6f00, #ff00b7);
-  color: white;
-  font-weight: 700;
-  padding: 0.8rem 1.5rem;
-  border-radius: 12px;
-  border: none;
-  transition: 0.3s;
+    background: linear-gradient(135deg, #ff6f00, #ff00b7);
+    color: white;
+    font-weight: 700;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    transition: 0.3s;
 }
 
 .btn-header:hover {
-  transform: scale(1.05);
+    transform: scale(1.05);
 }
+
 .shortdescription-wrapper {
-  display: flex;
-  justify-content: space-between; /* tekst links, image rechts */
-  align-items: flex-start;        /* top-align */
-  gap: 1rem;
+    display: flex;
+    justify-content: space-between; /* tekst links, image rechts */
+    align-items: flex-start; /* top-align */
+    gap: 1rem;
 }
 
 .shortdescription-text {
-  flex: 1; /* tekst neemt beschikbare ruimte */
+    flex: 1; /* tekst neemt beschikbare ruimte */
 }
 
 .john-mango-image {
@@ -1166,17 +1220,18 @@ html {
   border-radius: 8px;
   object-fit: cover;
 }
+
 .nav-link.role-link.admin {
-  color: #ffffff;
-  font-weight: 600;
+    color: #ffffff;
+    font-weight: 600;
 }
 
 .nav-link.role-link.teacher {
-  color: #ffffff;
-  font-weight: 600;
+    color: #ffffff;
+    font-weight: 600;
 }
 
 .nav-link.role-link.admin:hover,
 .nav-link.role-link.teacher:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }

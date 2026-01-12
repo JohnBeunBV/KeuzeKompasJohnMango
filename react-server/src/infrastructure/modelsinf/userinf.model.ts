@@ -4,7 +4,7 @@ import {User} from "../../domain/models/user.model";
 export type UserDocument = User & Document;
 
 const UserSchema = new Schema<UserDocument>({
-    username: {type: String, required: true, unique: true},
+    username: {type: String, required: true},
 
     email: {type: String, required: true, unique: true},
 

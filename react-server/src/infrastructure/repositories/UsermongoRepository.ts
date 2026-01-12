@@ -13,7 +13,7 @@ export class UserMongoRepository implements UserRepository {
     }
 
     async getByEmail(email: string): Promise<User | null> {
-        const user = await UserModel.findOne({email: email}).lean();
+        const user = await UserModel.findOne({email: {$eq: email}}).lean();
         if (!user) return null;
         return {...user, _id: user._id.toString()};
     }
@@ -53,7 +53,7 @@ export class UserMongoRepository implements UserRepository {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new Error("Invalid ID");
         }
-        await UserModel.findByIdAndDelete(id);
+        await UserModel.findByIdAndDelete({$eq: id});
     }
 
 

@@ -22,7 +22,7 @@ export const initMsal = async () => {
     }
 };
 export const isMicrosoftOAuthEnabled = Boolean(
-    import.meta.env.VITE_MS_CLIENT_ID &&
-    import.meta.env.VITE_MS_TENANT_ID
+    import.meta.env.VITE_MICROSOFT_CLIENT_ID &&
+    import.meta.env.VITE_MICROSOFT_TENANT_ID
 );
 

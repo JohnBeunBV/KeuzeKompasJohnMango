@@ -37,7 +37,8 @@ def recommend_explain(payload: Dict[str, Any]):
             "explanation": explanation["summary"],
             "details": {
                 "signals": explanation["signals"],
-                "weights": explanation["weights_used"]
+                "weights": explanation["weights_used"],
+                "score_breakdown": explanation["score_breakdown"]
             }
         })
 

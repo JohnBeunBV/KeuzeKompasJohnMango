@@ -23,7 +23,7 @@ COPY . .
 
 # Create production env file and build
 RUN printf "VITE_API_URL=%s\nVITE_PEXELS_KEY=%s\nVITE_MICROSOFT_CLIENT_ID=%s\nVITE_MICROSOFT_TENANT_ID=%s\n" \
-    "$VITE_API_URL" "$VITE_PEXELS_KEY" "$VITE_MICROSOFT_CLIENT_ID" "VITE_MICROSOFT_TENANT_ID"> .env.production \
+    "$VITE_API_URL" "$VITE_PEXELS_KEY" "$VITE_MICROSOFT_CLIENT_ID" "$VITE_MICROSOFT_TENANT_ID"> .env.production \
     && npm run build
 
 # Production stage

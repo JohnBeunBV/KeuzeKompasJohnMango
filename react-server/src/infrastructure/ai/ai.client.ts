@@ -10,9 +10,8 @@ const AI_BASE_URL = MODEL_API_URL || `http://localhost:${MODEL_API_PORT}`;
 
 type RecommendPayload = {
     user: {
-        favorite_ids?: string[];
+        favorite_id?: string[];
         profile_text?: string;
-        tags?: string[];
     };
     top_n?: number;
 };

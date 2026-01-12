@@ -139,31 +139,84 @@ def build_explanation(row, weights):
     reasons = []
     signals = {}
 
-    if row.content_sim_scaled > 0.6:
-        reasons.append("Sterke inhoudelijke overeenkomst met eerdere favorieten")
+    # --- Content similarity (favorites) ---
+    if row.content_sim_scaled == 0.0:
+        content_text = "Je hebt (nog) geen of te weinig favorieten opgegeven om een sterke inhoudelijke vergelijking te maken."
+    elif row.content_sim_scaled >= 0.7:
+        content_text = "Deze module lijkt sterk op jouw favoriete modules."
         signals["content_match"] = row.content_sim_scaled
+    elif row.content_sim_scaled >= 0.4:
+        content_text = "Deze module vertoont duidelijke overeenkomsten met jouw favoriete modules."
+        signals["content_match"] = row.content_sim_scaled
+    elif row.content_sim_scaled >= 0.01:
+        content_text = "Deze module heeft enkele inhoudelijke overeenkomsten met jouw favoriete modules."
+        signals["content_match"] = row.content_sim_scaled
+    else:
+        content_text = "Op basis van je favorieten is er weinig inhoudelijke overeenkomst."
 
-    if row.profile_sim_scaled > 0.4:
-        reasons.append("Sluit goed aan bij je profiel en interesses")
+    if row.content_sim_scaled > 0:
+        reasons.append(content_text)
+
+    # --- Profile similarity ---
+    if row.profile_sim_scaled == 0.0:
+        profile_text = "Je profiel bevat weinig of geen interesses, waardoor de profielmatch beperkt is."
+    elif row.profile_sim_scaled >= 0.65:
+        profile_text = "Deze module sluit zeer goed aan bij de interesses die je in je profiel hebt opgegeven."
+        signals["profile_match"] = row.profile_sim_scaled
+    elif row.profile_sim_scaled >= 0.40:
+        profile_text = "Deze module sluit redelijk aan bij je profielinteresses."
+        signals["profile_match"] = row.profile_sim_scaled
+    elif row.profile_sim_scaled >= 0.01:
+        profile_text = "Deze module sluit beperkt aan bij je profielinteresses."
         signals["profile_match"] = row.profile_sim_scaled
 
+    if row.profile_sim_scaled > 0:
+        reasons.append(profile_text)
+
+    # --- Popularity ---
     if row.popularity_norm > 0.6:
-        reasons.append("Veel gekozen door andere gebruikers")
+        pop_text = "Deze module wordt vaak gekozen door andere gebruikers."
         signals["popularity"] = row.popularity_norm
+    elif row.popularity_norm > 0.3:
+        pop_text = "Deze module heeft een gemiddelde populariteit onder gebruikers."
+    else:
+        pop_text = "Deze module wordt minder vaak gekozen, maar kan inhoudelijk alsnog goed passen."
 
-    if row.cf_score_scaled > 0.4:
-        reasons.append("Aanbevolen op basis van vergelijkbare gebruikers")
-        signals["collaborative"] = row.cf_score_scaled
+    reasons.append(pop_text)
 
+    # # --- Collaborative filtering ---
+    # if row.cf_score_scaled > 0.7:
+    #     cf_text = "Gebruikers met vergelijkbare interesses waarderen deze module sterk."
+    #     signals["collaborative"] = row.cf_score_scaled
+    #     reasons.append(cf_text)
+    # elif row.cf_score_scaled > 0.4:
+    #     cf_text = "Gebruikers met vergelijkbare interesses vinden deze module doorgaans interessant."
+    #     signals["collaborative"] = row.cf_score_scaled
+    #     reasons.append(cf_text)
+    # elif row.cf_score_scaled > 0.01:
+    #     cf_text = "Gebruikers met vergelijkbare interesses kiezen deze module af en toe."
+    #     reasons.append(cf_text)
+    # elif row.cf_score_scaled == 0.0:
+    #     cf_text = "Er is onvoldoende gebruikersdata om een collaboratieve aanbeveling te maken."
+    #     reasons.append(cf_text)
+
+    # --- Fallback ---
     if not reasons:
-        reasons.append("Algemene aanbeveling op basis van gecombineerde factoren")
+        reasons.append("Deze aanbeveling is gebaseerd op een combinatie van algemene inhoudelijke kenmerken.")
 
     return {
         "summary": " • ".join(reasons),
         "signals": signals,
         "weights_used": weights,
-        "final_score": float(row.final_score)
+        "final_score": float(row.final_score),
+        "score_breakdown": {
+            "content_similarity": float(row.content_sim_scaled),
+            "profile_similarity": float(row.profile_sim_scaled),
+            "popularity": float(row.popularity_norm),
+            "collaborative": float(row.cf_score_scaled),
+        }
     }
+
 
 
 def build_model_from_dataframe(
@@ -264,7 +317,15 @@ def build_model_from_dataframe(
     return model_bundle
 
 
-def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any], top_n: int =5, w_content=0.45, w_pop=0.05, w_cf=0.0, w_profile=0.5):
+def recommend_from_model(
+    model_bundle: Dict[str, Any],
+    user_row: Dict[str, Any],
+    top_n: int = 5,
+    w_content: float = 0.45,
+    w_pop: float = 0.05,
+    w_cf: float = 0.0,
+    w_profile: float = 0.5,
+):
     df = model_bundle["df"]
     module_vectors_pca = model_bundle["module_vectors_pca"]
     module_tfidf_dense = model_bundle["module_tfidf_dense"]
@@ -276,42 +337,66 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
     fav_ids = [fid for fid in user_row.get("favorite_id", []) if fid in df["_id"].values]
     fav_indices = df[df["_id"].isin(fav_ids)].index.tolist()
 
+    # Profile tekst
+    has_profile = bool(user_row.get("profile_text", "").strip())
+
+    # Als geen favorites en geen profieltekst → return lege recommendations
+    if not fav_indices and not has_profile:
+        return pd.DataFrame(columns=["id", "name", "shortdescription", "tags_list"]), pd.DataFrame()
+
+    # --- Content similarity (optioneel, alleen als favorites aanwezig zijn) ---
     if fav_indices:
         fav_vectors = module_vectors_pca[fav_indices]
         user_vec = fav_vectors.mean(axis=0).reshape(1, -1)
+        sims = cosine_similarity(normalize(user_vec), normalize(module_vectors_pca))[0]
+        content_sim_scaled = (sims - sims.min()) / max(1e-9, sims.max() - sims.min())
     else:
-        user_vec = module_vectors_pca.mean(axis=0).reshape(1, -1)
+        content_sim_scaled = np.zeros(len(df))
 
-    sims = cosine_similarity(normalize(user_vec), normalize(module_vectors_pca))[0]
-    content_sim_scaled = (sims - sims.min()) / max(1e-9, sims.max() - sims.min())
-
+    # --- Profile similarity (optioneel, alleen als profieltekst aanwezig is) ---
     profile_scaled = np.zeros(len(df))
-    if user_row.get("profile_text", "").strip() and len(model_bundle.get("users_demo", [])):
-        uidx_series = model_bundle["users_demo"][model_bundle["users_demo"]["user_id"] == user_row.get("user_id")].index
-        if len(uidx_series):
-            uidx = uidx_series[0]
-            profile_vec = model_bundle["user_profile_tfidf"][uidx].reshape(1, -1)
-            profile_sims = cosine_similarity(profile_vec, module_tfidf_dense)[0]
-            profile_scaled = (profile_sims - profile_sims.min()) / max(1e-9, profile_sims.max() - profile_sims.min())
+    if has_profile:
+        vectorizer = model_bundle["vectorizer"]
+        nlp_nl, nlp_en = _get_spacy_models()
+        profile_text_clean = preprocess_text(user_row["profile_text"], nlp_nl, nlp_en)
+        profile_vec = vectorizer.transform([profile_text_clean]).toarray()
+        profile_sims = cosine_similarity(profile_vec, module_tfidf_dense)[0]
+        profile_scaled = (profile_sims - profile_sims.min()) / max(1e-9, profile_sims.max() - profile_sims.min())
 
+    # --- Popularity ---
     popularity_norm = df["popularity_score"] / (df["popularity_score"].max() + 1e-9) if "popularity_score" in df.columns else np.zeros(len(df))
 
+    # --- Collaborative filtering (optioneel, alleen als favorites aanwezig zijn) ---
     cf_raw = np.zeros(len(df))
-    if user_row.get("user_id") in user_map and als_model is not None and interaction_matrix is not None:
-        uidx = user_map[user_row.get("user_id")]
-        rec_ids, rec_scores = als_model.recommend(userid=uidx, user_items=interaction_matrix.T, N=len(item_map_inv), filter_already_liked_items=False)
+    if fav_indices and user_row.get("user_id") in user_map and als_model is not None and interaction_matrix is not None:
+        uidx = user_map[user_row["user_id"]]
+        rec_ids, rec_scores = als_model.recommend(
+            userid=uidx, user_items=interaction_matrix.T, N=len(item_map_inv), filter_already_liked_items=False
+        )
         score_map = {item_map_inv[i]: s for i, s in zip(rec_ids, rec_scores)}
         cf_raw = np.array([score_map.get(mid, 0.0) for mid in df["_id"]])
 
     cf_scaled = (cf_raw - cf_raw.min()) / max(1e-9, cf_raw.max() - cf_raw.min())
 
-    hybrid_final = (
-        w_content * content_sim_scaled +
-        w_pop * popularity_norm +
-        w_cf * cf_scaled +
-        w_profile * profile_scaled
-    )
+    # --- Dynamische weging afhankelijk van aanwezige signalen ---
+    active_weights = {
+        "content": w_content if fav_indices else 0,
+        "profile": w_profile if has_profile else 0,
+        "popularity": w_pop if "popularity_score" in df.columns else 0,
+        "collaborative": w_cf if fav_indices else 0
+    }
+    weight_sum = sum(active_weights.values())
+    if weight_sum == 0:  # edge-case safeguard
+        weight_sum = 1
 
+    hybrid_final = (
+        active_weights["content"] * content_sim_scaled +
+        active_weights["profile"] * profile_scaled +
+        active_weights["popularity"] * popularity_norm +
+        active_weights["collaborative"] * cf_scaled
+    ) / weight_sum
+
+    # --- Bouw recommendation rows ---
     rows = []
     for idx, row in df.iterrows():
         if row["_id"] in fav_ids:
@@ -322,14 +407,36 @@ def recommend_from_model(model_bundle: Dict[str, Any], user_row: Dict[str, Any],
             "shortdescription": row.get("shortdescription", ""),
             "content_sim_scaled": float(content_sim_scaled[idx]),
             "profile_sim_scaled": float(profile_scaled[idx]),
-            "popularity_norm": float(popularity_norm[idx]) if hasattr(popularity_norm, '__len__') else float(popularity_norm[idx]),
+            "popularity_norm": float(popularity_norm[idx]) if hasattr(popularity_norm, "__len__") else float(popularity_norm[idx]),
             "cf_score_scaled": float(cf_scaled[idx]),
             "final_score": float(hybrid_final[idx])
         })
 
     rec_df = pd.DataFrame(rows).sort_values("final_score", ascending=False).head(top_n)
     fav_table = df.loc[fav_indices][["_id", "name", "shortdescription", "tags_list"]]
+
+    # 🔹 DEBUG PER TOP-N RECOMMENDATION
+    print(
+        "PROFILE DEBUG:",
+        "has_profile_text=", has_profile,
+        "fav_present=", bool(fav_indices),
+        "profile_mean=", float(profile_scaled.mean()),
+        "profile_max=", float(profile_scaled.max()),
+        "final_mean=", float(hybrid_final.mean())
+    )
+    print("\nTOP RECOMMENDATIONS SCORES:")
+    for idx, row in rec_df.iterrows():
+        print(f"Module: {row['name']} | "
+              f"fav_indices: {fav_indices} | "
+              f"Content/Fav: {row['content_sim_scaled']:.3f} | "
+              f"Profile: {row['profile_sim_scaled']:.3f} | "
+              f"Pop: {row['popularity_norm']:.3f} | "
+              f"CF: {row['cf_score_scaled']:.3f} | "
+              f"Final: {row['final_score']:.3f}")
+
     return fav_table, rec_df
+
+
 
 
 def evaluate_user_from_model(model_bundle: Dict[str, Any], user_id: int, k: int =5, sim_threshold: float =0.35):
@@ -342,6 +449,8 @@ def evaluate_user_from_model(model_bundle: Dict[str, Any], user_id: int, k: int 
 
     user_row = users_demo[users_demo["user_id"]==user_id].iloc[0]
     fav_ids = user_row["favorite_id"] or []
+    fav_ids = [fid for fid in fav_ids if fid in df["id"].values]
+    fav_indices = df[df["id"].isin(fav_ids)].index.tolist()
 
     sim_profile_threshold = 0.05
 
