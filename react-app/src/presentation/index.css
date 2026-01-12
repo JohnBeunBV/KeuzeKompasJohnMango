@@ -1215,10 +1215,10 @@ html {
 }
 
 .john-mango-image {
-    width: 420px; /* pas aan voor gewenste grootte */
-    height: auto;
-    border-radius: 8px;
-    object-fit: cover;
+  width: 420px;   /* pas aan voor gewenste grootte */
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
 }
 
 .nav-link.role-link.admin {

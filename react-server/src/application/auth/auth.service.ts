@@ -248,6 +248,7 @@ export const getRecommendations = async (userId: string) => {
     console.log(favoriteIds);
     // console.log(user.favorites);
     if (favoriteIds.length === 0) return [];
+  if (hasProfile) userPayload.profile_text = profileText;
 
     try {
         const aiResult = await recommendWithAI({
