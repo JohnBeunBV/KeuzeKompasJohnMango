@@ -12,7 +12,6 @@ type RecommendPayload = {
     user: {
         favorite_id?: string[];
         profile_text?: string;
-        tags?: string[];
     };
     top_n?: number;
 };

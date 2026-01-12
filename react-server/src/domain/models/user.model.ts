@@ -13,7 +13,6 @@ export interface StudentProfile {
     goals: string[];
 }
 
-import { Vkm } from "./vkm.model";
 export interface User {
     _id?: string;
     username: string;
@@ -31,6 +30,7 @@ export interface PublicUser {
     username: string;
     email: string;
     favorites: Vkm[];
+    roles: ("admin" | "teacher" | "student")[];
     profile: {
         interests: string[];
         values: string[];
@@ -43,6 +43,7 @@ export function toPublicUser(user: User): PublicUser {
         username: user.username,
         email: user.email,
         favorites: user.favorites ?? [],
+        roles: user.roles ?? [],
         profile: {
             interests: user.profile?.interests ?? [],
             values: user.profile?.values ?? [],

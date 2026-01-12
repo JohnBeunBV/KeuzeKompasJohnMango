@@ -235,25 +235,50 @@ export const getRecommendations = async (userId: string) => {
     const user = await userRepo.getById(userId);
     if (!user) throw new Error("User not found");
 
-    // favorites are populated VKM docs now
-    if (!user.favorites || user.favorites.length === 0) {
+    const favoriteIds = Array.isArray(user.favorites)
+        ? user.favorites
+            .map((vkm: any) => vkm?._id)
+            .filter((id: any) => Types.ObjectId.isValid(id))
+            .map((id: Types.ObjectId) => id.toString())
+        : [];
+
+    const hasFavorites = favoriteIds.length > 0;
+
+    const profile = user.profile;
+    const profileText =
+        profile &&
+        (
+            profile.interests?.length ||
+            profile.values?.length ||
+            profile.goals?.length
+        )
+            ? [
+                profile.interests?.length
+                    ? `Interesses: ${profile.interests.join(", ")}.`
+                    : "",
+                profile.values?.length
+                    ? `Waarden: ${profile.values.join(", ")}.`
+                    : "",
+                profile.goals?.length
+                    ? `Doelen: ${profile.goals.join(", ")}.`
+                    : "",
+            ].filter(Boolean).join(" ")
+            : "";
+
+
+    const hasProfile = profileText.trim().length > 0;
+
+    // 🔹 Stop alleen als beide leeg zijn
+    if (!hasFavorites && !hasProfile) {
         return [];
     }
-    console.log("User Favorites to ai:");
-    // Extract ObjectIds as strings for AI service
-    const favoriteIds = user.favorites
-        .map((vkm: any) => vkm._id)
-        .filter((id: any) => Types.ObjectId.isValid(id))
-        .map((id: Types.ObjectId) => id.toString());
-    console.log(favoriteIds);
-    // console.log(user.favorites);
-    if (favoriteIds.length === 0) return [];
-  if (hasProfile) userPayload.profile_text = profileText;
+
 
     try {
         const aiResult = await recommendWithAI({
             user: {
                 favorite_id: favoriteIds,
+                profile_text: profileText,
             },
             top_n: 5,
         });
