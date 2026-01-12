@@ -24,3 +24,28 @@ export interface User {
     profile?: StudentProfile;
     favorites?: Vkm[];
 }
+
+export interface PublicUser {
+    id: string;
+    username: string;
+    email: string;
+    favorites: Vkm[];
+    profile: {
+        interests: string[];
+        values: string[];
+        goals: string[];
+    };
+}
+export function toPublicUser(user: User): PublicUser {
+    return {
+        id: user._id!,
+        username: user.username,
+        email: user.email,
+        favorites: user.favorites ?? [],
+        profile: {
+            interests: user.profile?.interests ?? [],
+            values: user.profile?.values ?? [],
+            goals: user.profile?.goals ?? []
+        }
+    };
+}

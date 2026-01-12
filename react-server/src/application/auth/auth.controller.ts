@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import * as authService from "./auth.service";
 import {AuthRequest} from "../../middleware/auth.middleware";
+import {toPublicUser, User} from "../../domain/models/user.model";
 import {Types} from "mongoose";
 
 // Helper
@@ -24,8 +25,11 @@ export const register = async (req: Request, res: Response) => {
         return res.status(400).json({error: "Vul alle velden in."});
 
     try {
-        const user = await authService.register(username, email, password);
-        res.status(201).json({message: "Registratie succesvol", user});
+        const user: User = await authService.register(username, email, password);
+        res.status(201).json({
+            message: "Registratie succesvol",
+            user: toPublicUser(user)
+        });
     } catch (err: any) {
         res.status(400).json({error: err.message});
     }
@@ -61,7 +65,7 @@ export const loginMicrosoft = async (req: Request, res: Response) => {
 export const getMe = async (req: AuthRequest, res: Response) => {
     try {
         const user = await authService.getMe(getUserIdFromRequest(req));
-        res.json(user);
+        res.json(toPublicUser(user));
     } catch (err: any) {
         res.status(400).json({error: err.message});
     }
@@ -70,8 +74,18 @@ export const getMe = async (req: AuthRequest, res: Response) => {
 export const updateMe = async (req: AuthRequest, res: Response) => {
     const {username, email, password} = req.body;
     try {
-        const updatedUser = await authService.updateMe(getUserIdFromRequest(req), username, email, password);
-        res.json({message: "Gegevens bijgewerkt!", user: updatedUser});
+        const updatedUser = await authService.updateMe(
+            getUserIdFromRequest(req),
+            username,
+            email,
+            password
+        );
+
+        res.json({
+            message: "Gegevens bijgewerkt!",
+            user: toPublicUser(updatedUser)
+        });
+
     } catch (err: any) {
         res.status(400).json({error: err.message});
     }
@@ -96,10 +110,11 @@ export const addFavorite = async (req: AuthRequest, res: Response) => {
 
     try {
         const updatedUser = await authService.addFavorite(userId, vkmId);
+        const publicUser = toPublicUser(updatedUser);
 
         res.json({
             message: "VKM toegevoegd aan favorites",
-            favorites: updatedUser.favorites,
+            favorites: publicUser.favorites,
         });
     } catch (err: any) {
         res.status(400).json({error: err.message});
@@ -157,8 +172,16 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
         const userId = getUserIdFromRequest(req);
         const {interests, values, goals} = req.body;
 
-        const updatedUser = await authService.updateProfile(userId, {interests, values, goals});
-        res.json({message: "Profiel bijgewerkt!", profile: updatedUser.profile});
+        const updatedUser = await authService.updateProfile(
+            userId,
+            {interests, values, goals}
+        );
+
+        res.json({
+            message: "Profiel bijgewerkt!",
+            profile: toPublicUser(updatedUser).profile
+        });
+
     } catch (err: any) {
         res.status(400).json({error: err.message});
     }
