@@ -152,8 +152,12 @@ const Layout: React.FC = () => {
             )}
 
             {/* ================= MAIN ================= */}
-            <main className={`container my-4 ${isMobileNav ? "has-mobile-nav" : ""}`}>
-                <Outlet />
+            <main
+            className={`${
+                location.pathname === "/swipe" ? "" : "container"
+            } my-4 ${isMobileNav ? "has-mobile-nav" : ""}`}
+            >
+            <Outlet />
             </main>
 
             {/* ================= MOBILE BOTTOM NAV ================= */}

@@ -3,18 +3,65 @@
 ============================ */
 .swipe-page {
   display: flex;
-  justify-content: center;
-  margin-top: 60px;
-  padding-bottom: 100px; /* ruimte onder buttons */
+  flex-direction: column;
+  align-items: center;    /* Horizontal centering */
+}
+
+@media (min-width: 558px) {
+  .swipe-page {
+    mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
+  }
+}
+
+@media (max-width: 557px) {
+  .container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .swipe-page {
+    /* Kill any potential leftover mask rendering */
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    padding-top: 65px; 
+    /* Ensure the background color matches the body to hide edge artifacts */
+    background-color: white; 
+  }
+  
+  .swipe-wrapper {
+    /* On small mobile, sometimes overflow-x: hidden causes 
+       a tiny scrollbar-gap or line. This forces it to be clean. */
+    width: 100vw;
+    margin: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .card-stack {
+    /* Scale down slightly for very small phones */
+    width: 90vw; 
+    max-width: 340px;
+    height: 500px;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
 }
 
 /* ============================
    Wrapper
 ============================ */
 .swipe-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    overflow-x: hidden;
+    width: 100%;
+    /* FIX 2: Increased vertical padding (80px) 
+       This prevents corners from cutting off during rotation 
+    */
+    padding: 60px 0; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* ============================
@@ -22,8 +69,10 @@
 ============================ */
 .card-stack {
   position: relative;
+  /* Ensure the stack itself is treated as a block that can be centered */
   width: 380px;
   height: 570px; 
+  margin: 0 auto; 
 }
 
 /* ============================
@@ -36,6 +85,11 @@
   will-change: transform;
 }
 
+.swipe-card.swiping-out {
+  opacity: 0;
+  transition: transform 0.6s ease-in, opacity 0.4s ease-in !important;
+}
+
 /* Bovenste kaart */
 .swipe-card-top {
   z-index: 2;
@@ -44,10 +98,9 @@
 /* Onderste kaart */
 .swipe-card-under {
   z-index: 1;
-  transform: translateY(18px) scale(0.96);
-  opacity: 0.92;
-  pointer-events: none;
-  filter: saturate(0.95);
+  transform: translateY(10px) scale(0.95);
+  opacity: 0.6; /* Dim the next card slightly so focus is on top */
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 /* ============================
@@ -184,9 +237,7 @@
 }
 
 .intro-modal .modal-header {
-  border-bottom: none;
-  background: transparent;
-  padding: 1rem 1.25rem;
+    border-bottom: 1px solid #FFECB3;
 }
 
 .intro-modal .modal-title {
@@ -198,6 +249,11 @@
 .intro-modal .modal-body {
   padding: 1rem 1.25rem;
   color: #333;
+}
+
+.intro-modal .modal-body p {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
 }
 
 .intro-modal .modal-footer {
@@ -226,4 +282,3 @@
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none;     /* Edge */
 }
-
