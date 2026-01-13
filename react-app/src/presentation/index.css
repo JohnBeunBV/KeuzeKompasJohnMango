@@ -670,6 +670,12 @@ html {
     box-sizing: border-box;
 }
 
+@media (max-width: 557px) {
+    .terminal-container {
+        margin-top: 105px;
+    }
+}
+
 /* Flex container voor account en favorieten */
 .account-flex-container {
     display: flex;
