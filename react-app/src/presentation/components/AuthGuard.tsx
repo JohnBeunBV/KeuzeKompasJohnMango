@@ -1,5 +1,6 @@
 import {Navigate, useLocation} from "react-router-dom";
 import {useAppSelector} from "../../application/store/hooks";
+import type {JSX} from "react";
 
 interface AuthGuardProps {
     children: JSX.Element;
@@ -23,7 +24,7 @@ const AuthGuard = ({
                    }: AuthGuardProps) => {
     const location = useLocation();
 
-    const {token, isAuthenticated, user} = useAppSelector((state) => state.auth);
+    const {token, status, user} = useAppSelector((state) => state.auth);
 
     const userRoles = user?.roles ?? [];
     // Token expired → 401 but with reason
@@ -37,7 +38,7 @@ const AuthGuard = ({
         );
     }
     // Not logged in / missing token
-    if (requireLogin && !isAuthenticated) {
+    if (requireLogin && status === "idle") {
         return (
             <Navigate
                 to="/error?status=401&reason=missing_token"

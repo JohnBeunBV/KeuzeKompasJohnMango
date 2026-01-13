@@ -1,7 +1,28 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import type {PayloadAction} from "@reduxjs/toolkit";
 import type {Vkm} from "@domain/models/vkm.model.ts";
+
 import apiClient, {setAuthToken} from "../../infrastructure/ApiClient";
+
+export function normalizeAuthUser(raw: unknown): AuthUser {
+    const u = raw as Partial<AuthUser> & { [key: string]: unknown };
+
+    return {
+        id: String((u as any).id ?? (u as any)._id ?? ""),
+        username: typeof u.username === "string" ? u.username : "",
+        email: typeof u.email === "string" ? u.email : "",
+        roles: Array.isArray(u.roles) ? u.roles.filter(r => typeof r === "string") : [],
+        profile: {
+            interests: Array.isArray(u.profile?.interests) ? u.profile.interests : [],
+            values: Array.isArray(u.profile?.values) ? u.profile.values : [],
+            goals: Array.isArray(u.profile?.goals) ? u.profile.goals : [],
+        },
+        favorites: Array.isArray((u as any).favorites)
+            ? (u as any).favorites.filter(Boolean)
+            : [],
+    };
+}
+
 
 export interface AuthUser {
     id: string;
@@ -17,12 +38,14 @@ export interface AuthUser {
 }
 
 type AuthErrorReason = "missing_token" | "expired_token" | "corrupt_state" | null;
+type AuthStatus = "idle" | "loading" | "authenticated" | "unauthenticated";
 
 interface AuthState {
     token: string | null;
     user: AuthUser | null;
-    isAuthenticated: boolean;
+    status: AuthStatus;
     authError: AuthErrorReason;
+    isRefreshing: boolean;
 }
 
 export const fetchUser = createAsyncThunk<AuthUser>(
@@ -30,39 +53,46 @@ export const fetchUser = createAsyncThunk<AuthUser>(
     async (_, {rejectWithValue}) => {
         try {
             const res = await apiClient.get("/auth/me");
-            return res.data as AuthUser;
+            return normalizeAuthUser(res.data);
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || err.message);
+            return rejectWithValue(
+                err.response?.data?.error ?? "expired_token"
+            );
         }
     }
 );
 
+
 const loadInitialAuthState = (): AuthState => {
     const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
+    const userRaw = localStorage.getItem("user");
 
-    if (!token || !user) {
+    if (!token || !userRaw) {
         return {
             token: null,
             user: null,
-            isAuthenticated: false,
+            status: "idle",
             authError: "missing_token",
+            isRefreshing: false,
         };
     }
 
     try {
+        const parsed = JSON.parse(userRaw);
         return {
             token,
-            user: JSON.parse(user),
-            isAuthenticated: true,
+            user: normalizeAuthUser(parsed),
+            status: "authenticated",
             authError: null,
+            isRefreshing: false,
         };
     } catch {
         return {
             token: null,
             user: null,
-            isAuthenticated: false,
+            status: "unauthenticated",
             authError: "corrupt_state",
+            isRefreshing: false,
         };
     }
 };
@@ -80,7 +110,7 @@ const authSlice = createSlice({
         ) => {
             state.token = action.payload.token;
             state.user = action.payload.user;
-            state.isAuthenticated = true;
+            state.status = "authenticated";
             state.authError = null;
 
             localStorage.setItem("token", action.payload.token);
@@ -93,7 +123,7 @@ const authSlice = createSlice({
         logout: (state) => {
             state.token = null;
             state.user = null;
-            state.isAuthenticated = false;
+            state.status = "idle";
             state.authError = "missing_token";
 
             localStorage.removeItem("token");
@@ -105,22 +135,30 @@ const authSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchUser.pending, (state) => {
+                if (state.status !== "authenticated") {
+                    state.status = "loading";
+                }
+
+                state.isRefreshing = true;
                 state.authError = null;
             })
-            .addCase(fetchUser.fulfilled, (state, action: PayloadAction<AuthUser>) => {
+            .addCase(fetchUser.fulfilled, (state, action) => {
                 state.user = action.payload;
-                state.isAuthenticated = true;
+                state.status = "authenticated";
                 state.authError = null;
-
+                state.isRefreshing = false;
                 localStorage.setItem("user", JSON.stringify(action.payload));
             })
             .addCase(fetchUser.rejected, (state, action) => {
                 state.user = null;
-                state.isAuthenticated = false;
-                state.authError = action.payload as AuthErrorReason || "corrupt_state";
+                state.status = "unauthenticated";
+                state.isRefreshing = false;
+                state.authError =
+                    (action.payload as AuthErrorReason) ?? "corrupt_state";
 
                 localStorage.removeItem("user");
             });
+
     },
 });
 

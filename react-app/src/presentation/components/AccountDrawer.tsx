@@ -7,7 +7,7 @@ import {fetchUser} from "../../application/Slices/authSlice";
 import {useAppDispatch, useAppSelector} from "../../application/store/hooks.ts";
 
 interface AiRecommendation {
-    _id: number;
+    _id: string;
     name: string;
     meta: {
         score: number; // 0–100
@@ -17,24 +17,34 @@ interface AiRecommendation {
 
 const AccountDrawer: React.FC = () => {
 
-    const {user} = useAppSelector((s) => s.auth);
+
+    const {user, status} = useAppSelector(s => s.auth);
+    const favorites = Array.isArray(user?.favorites)
+        ? user.favorites
+        : [];
+    const [localFavorites, setLocalFavorites] = useState<typeof favorites>([]);
+
+
     const [recommendations, setRecommendations] = useState<AiRecommendation[]>([]);
-    const [expandedRec, setExpandedRec] = useState<number | null>(null);
+    const [expandedRec, setExpandedRec] = useState<string | null>(null);
     const [showXaiModal, setShowXaiModal] = useState(false);
     const [favoritesMessage, setFavoritesMessage] = useState<{ text: string; type: "success" | "danger" } | null>(null);
     const [showFavoritesMessage, setShowFavoritesMessage] = useState(false);
-    const [loading, setLoading] = useState(true);
     const [loadingRecs, setLoadingRecs] = useState(true);
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    // Fetch user data
     useEffect(() => {
-        dispatch(fetchUser());
-        refreshRecommendations()
-        setLoading(false);
-    }, [dispatch]);
+        if (status === "authenticated") {
+            refreshRecommendations();
+        }
+    }, [status]);
+    useEffect(() => {
+        if (favorites) {
+            setLocalFavorites(favorites);
+        }
+    }, [favorites]);
 
 
     // Auto-hide favorites message
@@ -63,19 +73,25 @@ const AccountDrawer: React.FC = () => {
         }
     };
     const handleRemoveFavorite = async (vkmId: string) => {
+        setLocalFavorites(prev => prev.filter(f => f._id !== vkmId));
+
         try {
             await apiClient.delete(`/auth/users/favorites/${vkmId}`);
-            setFavoritesMessage({text: "Module verwijderd.", type: "success"});
-            await refreshRecommendations();
-            dispatch(fetchUser());
+            setFavoritesMessage({ text: "Module verwijderd.", type: "success" });
+
+            dispatch(fetchUser()); // sync with backend
+            refreshRecommendations();
+
         } catch (err) {
-            console.error("Failed to remove favorite", err);
-            setFavoritesMessage({text: "Verwijderen mislukt.", type: "danger"});
+            setLocalFavorites(favorites);
+            setFavoritesMessage({ text: "Verwijderen mislukt.", type: "danger" });
+            console.error(err);
         }
     };
 
 
-    if (loading) return <Spinner animation="border" className="d-block mx-auto mt-3"/>;
+
+    if (!user) return <Spinner animation="border" className="d-block mx-auto mt-3"/>;
 
     return (
         <div className="favorites-card">
@@ -84,13 +100,14 @@ const AccountDrawer: React.FC = () => {
             <Fade in={showFavoritesMessage} mountOnEnter unmountOnExit>
                 <div>{favoritesMessage && <Alert variant={favoritesMessage.type}>{favoritesMessage.text}</Alert>}</div>
             </Fade>
-            {loading ? (
+
+            {!localFavorites ? (
                 <Spinner animation="border" role="status" className="d-block mx-auto mt-3"/>
-            ) : user?.favorites.length === 0 ? (
+            ) : localFavorites.length === 0 ? (
                 <p className="text-white mt-3">Hier komen uw favorieten te staan!</p>
             ) : (
                 <div className="favorites-list">
-                    {user?.favorites.map((fav) => (
+                    {localFavorites.map((fav) => (
                         <div key={fav._id} className="favorite-item">
                   <span onClick={() => navigate(`/vkms/${fav._id}`)}>
                     {fav.name}

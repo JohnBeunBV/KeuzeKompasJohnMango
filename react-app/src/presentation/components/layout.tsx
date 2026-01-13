@@ -9,7 +9,7 @@ const Layout: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    const {isAuthenticated, user} = useAppSelector((state) => state.auth);
+    const {status, user} = useAppSelector((state) => state.auth);
 
     const roles = user?.roles ?? [];
     const userName = user?.username ?? user?.email ?? null;
@@ -52,7 +52,7 @@ const Layout: React.FC = () => {
                 </div>
 
                 <div className="nav-right">
-                    {isAuthenticated && userName ? (
+                    {status === "authenticated" && userName ? (
                         <>
               <span className="welcome-text">
                 Welkom:&nbsp;

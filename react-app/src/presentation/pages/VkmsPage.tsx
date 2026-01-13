@@ -11,6 +11,7 @@ import "../vkmspage.css";
 import AccountDrawer from "../components/AccountDrawer";
 import {fetchUser} from "../../application/Slices/authSlice.ts";
 import VkmFilter from "../components/VkmFilter";
+import { AccountSection } from "../components/AccountSection.tsx";
 
 const VkmsPage: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -77,7 +78,7 @@ const VkmsPage: React.FC = () => {
             });
         };
 
-        if (data.length) fetchImages().then(r => setPexelsLoading(false));
+        if (data.length) fetchImages().then(() => setPexelsLoading(false));
     }, [data, PEXELS_API_KEY]);
 
     // 🔹 Redirect bij VKM-fetch errors
@@ -101,7 +102,7 @@ const VkmsPage: React.FC = () => {
         return pages;
     };
 
-    if (status === "loading") return <Spinner animation="border" className="mt-5" />;
+    if (status === "loading") return <Spinner animation="border" className="mt-5"/>;
 
     return (
         <Container className="mt-4 vkms-page">
@@ -129,7 +130,7 @@ const VkmsPage: React.FC = () => {
                         <Col md={4} key={id} className="mb-4 d-flex">
                             <div
                                 className="vkm-card-wrapper"
-                                style={{ animationDelay: `${index * 100}ms` }}
+                                style={{animationDelay: `${index * 100}ms`}}
                             >
                                 <div className="vkm-card card h-100 d-flex flex-column">
                                     {pexelsLoading ? (
@@ -142,13 +143,13 @@ const VkmsPage: React.FC = () => {
                                                 backgroundColor: "#333",
                                             }}
                                         >
-                                            <Spinner animation="border" variant="light" />
+                                            <Spinner animation="border" variant="light"/>
                                         </div>
                                     ) : (
                                         <img
                                             src={pexelsImages[id] ?? "/images/default-vkm.png"}
                                             alt={vkm.name}
-                                            style={{ height: "180px", objectFit: "cover" }}
+                                            style={{height: "180px", objectFit: "cover"}}
                                             className="card-img-top"
                                         />
                                     )}
@@ -165,7 +166,7 @@ const VkmsPage: React.FC = () => {
                                             {vkm.shortdescription}
                                         </p>
 
-                                        <hr />
+                                        <hr/>
 
                                         <p className="card-text text-muted mt-auto">
                                             Locatie: {vkm.location}
@@ -174,7 +175,7 @@ const VkmsPage: React.FC = () => {
                                         <div className="mt-3">
                                             <Link
                                                 to={`/vkms/${id}`}
-                                                state={{ imageUrl: pexelsImages[id] }}
+                                                state={{imageUrl: pexelsImages[id]}}
                                             >
                                                 <Button className="btn-detail">
                                                     Bekijk details
@@ -190,13 +191,12 @@ const VkmsPage: React.FC = () => {
             </Row>
 
 
-
             {/* Pagination */}
             <div className="d-flex justify-content-center mt-4">
-                {getPages().map((p, idx) =>
+                {getPages().map((p) =>
                         p === "..." ? (
                             <span
-                                key={idx}
+                                key={p}
                                 className="mx-2 text-muted"
                                 style={{cursor: "pointer"}}
                                 onClick={() => {
@@ -229,12 +229,15 @@ const VkmsPage: React.FC = () => {
                     >
                         <span className="toggle-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"
                                                             xmlns="http://www.w3.org/2000/svg"><path
-                            d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round"></path></svg></span>
+                            d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                            strokeLinejoin="round"></path></svg></span>
                     </button>
 
                     <div className="side-drawer-content">
-                        <AccountDrawer/>
+                        <AccountSection>
+                            <AccountDrawer />
+                        </AccountSection>
+
                     </div>
 
                 </div>
