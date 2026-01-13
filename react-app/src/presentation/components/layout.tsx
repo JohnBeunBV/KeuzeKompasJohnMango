@@ -25,7 +25,7 @@ const Layout: React.FC = () => {
     const [isMobileNav, setIsMobileNav] = useState(false);
 
     useEffect(() => {
-        const check = () => setIsMobileNav(window.innerWidth < 983);
+        const check = () => setIsMobileNav(window.innerWidth <= 1000);
         check();
         window.addEventListener("resize", check);
         return () => window.removeEventListener("resize", check);
@@ -70,34 +70,35 @@ const Layout: React.FC = () => {
                     </div>
 
                     <div className="nav-right">
-                        {isAuthenticated && userName ? (
-                            <>
-                                <span className="welcome-text">
-                                    Welkom:&nbsp;
-                                    <span
-                                        className="user-name-link"
-                                        onClick={() => navigate("/account")}
-                                    >
-                                        {userName}
-                                    </span>
-                                </span>
-                                <button className="nav-btn logout" onClick={handleLogout}>
-                                    Uitloggen
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <button className="nav-btn" onClick={() => navigate("/login")}>
-                                    Inloggen
-                                </button>
-                                <button
-                                    className="nav-btn register"
-                                    onClick={() => navigate("/register")}
-                                >
-                                    Registreren
-                                </button>
-                            </>
-                        )}
+                    {isAuthenticated && userName ? (
+                        <>
+                        <span className="welcome-text">
+                            Welkom,&nbsp;
+                            <span
+                            className="user-name-link"
+                            onClick={() => navigate("/account")}
+                            >
+                            {userName}
+                            </span>
+                            !
+                        </span>
+                        <button className="nav-btn logout" onClick={handleLogout}>
+                            Uitloggen
+                        </button>
+                        </>
+                    ) : (
+                        <>
+                        <button className="nav-btn" onClick={() => navigate("/login")}>
+                            Inloggen
+                        </button>
+                        <button
+                            className="nav-btn register"
+                            onClick={() => navigate("/register")}
+                        >
+                            Registreren
+                        </button>
+                        </>
+                    )}
                     </div>
                 </header>
             )}
@@ -119,12 +120,16 @@ const Layout: React.FC = () => {
                     <div className="nav-right">
                         {isAuthenticated && userName ? (
                             <>
-                                <button
-                                    className="nav-user-btn"
+                                <span className="welcome-text">
+                                    Welkom,&nbsp;
+                                    <span
+                                    className="user-name-link"
                                     onClick={() => navigate("/account")}
-                                >
-                                    Welkom: <strong>{userName}</strong>
-                                </button>
+                                    >
+                                    {userName}
+                                    </span>
+                                    !
+                                </span>
                                 <button className="nav-btn logout" onClick={handleLogout}>
                                     Uitloggen
                                 </button>
