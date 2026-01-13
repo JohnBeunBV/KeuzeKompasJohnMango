@@ -26,6 +26,8 @@ const AccountDrawer: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [loadingRecs, setLoadingRecs] = useState(true);
 
+    const isMobile = window.matchMedia("(max-width: 500px)").matches;
+
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
@@ -130,10 +132,11 @@ const AccountDrawer: React.FC = () => {
                     <h3 className="terminal-title mb-0">Aanbevolen VKM’s</h3>
 
                     <button
-                        className="info-btn"
-                        onMouseEnter={() => setShowXaiModal(true)}
-                        onMouseLeave={() => setShowXaiModal(false)}
-                        style={{background: "none", border: "none", padding: 0, cursor: "pointer"}}
+                    className="info-btn"
+                    onMouseEnter={() => !isMobile && setShowXaiModal(true)}
+                    onMouseLeave={() => !isMobile && setShowXaiModal(false)}
+                    onClick={() => isMobile && setShowXaiModal(true)}
+                    style={{background: "none", border: "none", padding: 0, cursor: "pointer"}}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -158,16 +161,31 @@ const AccountDrawer: React.FC = () => {
                     </button>
 
                     {showXaiModal && (
-                        <div
-                            className="xai-hover-box2"
-                            onMouseEnter={() => setShowXaiModal(true)}
-                            onMouseLeave={() => setShowXaiModal(false)}
-                        >
-                            <div className="xai-header">
-                                <span className="xai-title">Hoe komen deze aanbevelingen tot stand?</span>
-                            </div>
+                    <div
+                        className={isMobile ? "xai-mobile-overlay" : "xai-hover-box2"}
+                        onMouseEnter={() => !isMobile && setShowXaiModal(true)}
+                        onMouseLeave={() => !isMobile && setShowXaiModal(false)}
+                        onClick={() => isMobile && setShowXaiModal(false)}
+                    >
+                        {/* 👇 THIS IS THE CARD */}
+                        <div onClick={(e) => e.stopPropagation()}>
+                        <div className="xai-header">
+                            <span className="xai-title">
+                            Hoe komen deze aanbevelingen tot stand?
+                            </span>
 
-                            <div className="xai-body" style={{maxWidth: "700px"}}>
+                            {isMobile && (
+                            <button
+                                className="close-btn"
+                                onClick={() => setShowXaiModal(false)}
+                                aria-label="Sluiten"
+                            >
+                                ✕
+                            </button>
+                            )}
+                        </div>
+
+                        <div className="xai-body" style={{ maxWidth: "700px" }}>
                                 {/* Score explanations */}
                                 <div className="xai-score-explanations mb-3">
                                     <div className="xai-score-item">
@@ -218,6 +236,7 @@ const AccountDrawer: React.FC = () => {
                                 </div>
                             </div>
                         </div>
+                    </div>
                     )}
                 </div>
                 <button
