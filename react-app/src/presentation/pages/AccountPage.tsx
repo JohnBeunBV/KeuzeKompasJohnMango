@@ -393,19 +393,19 @@ const AccountPage: React.FC = () => {
                                         {/* Score explanations */}
                                         <div className="xai-score-explanations mb-3">
                                             <div className="xai-score-item">
-                                                <strong>90% en hoger:</strong> Sterke match met jouw interesses, sterk
+                                                <strong>96% en hoger:</strong> Sterke match met jouw interesses, sterk
                                                 aanbevolen.
                                             </div>
                                             <div className="xai-score-item">
-                                                <strong>75–90%:</strong> Overwegend matchend, maar het kan nuttig zijn
-                                                eerst wat extra te onderzoeken.
+                                                <strong>85–95%:</strong> Overwegend matchend, maar het kan nuttig zijn eerst wat
+                                                extra te onderzoeken.
                                             </div>
                                             <div className="xai-score-item">
-                                                <strong>50–75%:</strong> Gedeeltelijk vergelijkbaar; bespreek dit bij
-                                                voorkeur eerst met een studiecoach.
+                                                <strong>70–84%:</strong> Gedeeltelijk vergelijkbaar; bespreek dit bij voorkeur
+                                                eerst met een studiecoach.
                                             </div>
                                             <div className="xai-score-item">
-                                                <strong>Onder 50%:</strong> Niet aanbevolen om te kiezen.
+                                                <strong>Onder 70%:</strong> Niet aanbevolen om te kiezen.
                                             </div>
                                         </div>
 
