@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../application/store/hooks";
-import { logout } from "../../application/Slices/authSlice";
-import { Home, List, Heart, Info, Settings } from "lucide-react";
+import React, {useEffect, useState} from "react";
+import {Outlet, useNavigate, Link, useLocation} from "react-router-dom";
+import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
+import {logout} from "../../application/Slices/authSlice";
+import {Home, List, Heart, Info, Settings} from "lucide-react";
 
 import "../index.css";
 import "../accountpage.css";
@@ -61,37 +61,39 @@ const Layout: React.FC = () => {
                                     Teacher
                                 </Link>
                             )}
+                        </nav>
+                    </div>
 
-                <div className="nav-right">
-                    {status === "authenticated" && userName ? (
-                        <>
+                    <div className="nav-right">
+                        {status === "authenticated" && userName ? (
+                            <>
                         <span className="welcome-text">
                             Welkom,&nbsp;
                             <span
-                            className="user-name-link"
-                            onClick={() => navigate("/account")}
+                                className="user-name-link"
+                                onClick={() => navigate("/account")}
                             >
                             {userName}
                             </span>
                             !
                         </span>
-                        <button className="nav-btn logout" onClick={handleLogout}>
-                            Uitloggen
-                        </button>
-                        </>
-                    ) : (
-                        <>
-                        <button className="nav-btn" onClick={() => navigate("/login")}>
-                            Inloggen
-                        </button>
-                        <button
-                            className="nav-btn register"
-                            onClick={() => navigate("/register")}
-                        >
-                            Registreren
-                        </button>
-                        </>
-                    )}
+                                <button className="nav-btn logout" onClick={handleLogout}>
+                                    Uitloggen
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button className="nav-btn" onClick={() => navigate("/login")}>
+                                    Inloggen
+                                </button>
+                                <button
+                                    className="nav-btn register"
+                                    onClick={() => navigate("/register")}
+                                >
+                                    Registreren
+                                </button>
+                            </>
+                        )}
                     </div>
                 </header>
             )}
@@ -111,13 +113,13 @@ const Layout: React.FC = () => {
                     </div>
 
                     <div className="nav-right">
-                        {isAuthenticated && userName ? (
+                        {status === "authenticated" && userName ? (
                             <>
                                 <span className="welcome-text">
                                     Welkom,&nbsp;
                                     <span
-                                    className="user-name-link"
-                                    onClick={() => navigate("/account")}
+                                        className="user-name-link"
+                                        onClick={() => navigate("/account")}
                                     >
                                     {userName}
                                     </span>
@@ -146,42 +148,42 @@ const Layout: React.FC = () => {
 
             {/* ================= MAIN ================= */}
             <main
-            className={`${
-                location.pathname === "/swipe" ? "" : "container"
-            } my-4 ${isMobileNav ? "has-mobile-nav" : ""}`}
+                className={`${
+                    location.pathname === "/swipe" ? "" : "container"
+                } my-4 ${isMobileNav ? "has-mobile-nav" : ""}`}
             >
-            <Outlet />
+                <Outlet/>
             </main>
 
             {/* ================= MOBILE BOTTOM NAV ================= */}
             {isMobileNav && (
                 <nav className="mobile-bottom-nav">
                     <Link to="/" className={location.pathname === "/" ? "active" : ""}>
-                        <Home />
+                        <Home/>
                     </Link>
                     <Link
                         to="/vkms"
                         className={location.pathname.startsWith("/vkms") ? "active" : ""}
                     >
-                        <List />
+                        <List/>
                     </Link>
                     <Link
                         to="/swipe"
                         className={location.pathname === "/swipe" ? "active" : ""}
                     >
-                        <Heart />
+                        <Heart/>
                     </Link>
                     <Link
                         to="/about"
                         className={location.pathname === "/about" ? "active" : ""}
                     >
-                        <Info />
+                        <Info/>
                     </Link>
                     <Link
                         to="/studentenprofiel"
                         className={location.pathname.startsWith("/studentenprofiel") ? "active" : ""}
                     >
-                        <Settings />
+                        <Settings/>
                     </Link>
                 </nav>
             )}
