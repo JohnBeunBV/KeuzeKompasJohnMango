@@ -1,8 +1,4 @@
 @media (max-width: 556px) {
-  .homepage {
-    padding-top: 100px !important;
-  }
-
   .homepage-header {
     padding-left: 16px;
     padding-right: 16px;
@@ -146,5 +142,6 @@
   .homepage-header {
     padding-top: 6rem; /* adjust if you have a fixed navbar */
     padding-bottom: 3rem;
+    margin-top: 130px;
   }
 }

@@ -193,8 +193,8 @@ html {
 .footer {
     background-color: #f7f7f7;
     color: #333;
+    margin-top: 2rem;
 }
-
 
 /* ============================
    Mango color scheme
@@ -426,6 +426,21 @@ html {
     background-position: center;
     animation: gradientFlow 8s ease infinite;
     box-sizing: border-box; /* Zorgt dat alles netjes uitlijnt */
+}
+
+@media (max-width: 557px) {
+    .login-container {
+        min-height: 100svh; /* mobile-safe viewport height */
+        height: 100svh;
+        overflow: hidden; /* kill tiny scroll */
+    }
+}
+
+@media (max-width: 557px) {
+    body:has(.login-container) {
+        padding-bottom: 0 !important;
+        overflow: hidden;
+    }
 }
 
 @keyframes gradientFlow {

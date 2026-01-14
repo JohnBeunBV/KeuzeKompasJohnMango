@@ -10,8 +10,14 @@
 
 @media (max-width: 557px) {
     .ai-container {
-        padding-top: 90px;
+        padding-top: 130px;
     }
+}
+
+@media (max-width: 1000px) {
+  .desktop-only {
+    display: none;
+  }
 }
 
 .ai-intro {

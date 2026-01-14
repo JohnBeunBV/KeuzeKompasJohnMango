@@ -6,7 +6,7 @@ import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
 import apiClient from "../../infrastructure/ApiClient";
 import {fetchUser} from "../../application/Slices/authSlice";
 import {fetchVkmById} from "../../application/Slices/vkmsSlice";
-
+import "../vkmsdetailpage.css"
 
 const VkmsDetailPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
