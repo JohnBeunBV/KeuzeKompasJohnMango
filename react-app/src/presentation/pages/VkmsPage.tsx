@@ -2,7 +2,6 @@
 import React, {useEffect, useState} from "react";
 import {Container, Row, Col, Spinner, Button} from "react-bootstrap";
 import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
-
 import {Link, useNavigate} from "react-router-dom";
 import {fetchVkms} from "../../application/Slices/vkmsSlice";
 import type {Vkm} from "@domain/models/vkm.model";
@@ -31,6 +30,29 @@ const VkmsPage: React.FC = () => {
     const [pexelsImages, setPexelsImages] = useState<Record<string, string>>({});
     const [pexelsLoading, setPexelsLoading] = useState(true);
     const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
+
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 500);
+
+    // 🔹 Handle window resize for responsiveness
+    useEffect(() => {
+      const handleResize = () => setIsMobile(window.innerWidth <= 500);
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    // Disable scrolling when drawer is open on mobile
+    useEffect(() => {
+      if (isDrawerOpen && isMobile) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }, [isDrawerOpen, isMobile]);
+
 
     // 🔹 Fetch VKMs
     useEffect(() => {
@@ -78,7 +100,7 @@ const VkmsPage: React.FC = () => {
             });
         };
 
-        if (data.length) fetchImages().then(() => setPexelsLoading(false));
+        if (data.length) fetchImages().finally(() => setPexelsLoading(false));
     }, [data, PEXELS_API_KEY]);
 
     // 🔹 Redirect bij VKM-fetch errors
@@ -127,7 +149,7 @@ const VkmsPage: React.FC = () => {
                     const id = String(vkm._id);
 
                     return (
-                        <Col md={4} key={id} className="mb-4 d-flex">
+                        <Col xs={12} md={6} xl={4} key={id} className="mb-4 d-flex">
                             <div
                                 className="vkm-card-wrapper"
                                 style={{animationDelay: `${index * 100}ms`}}
@@ -220,18 +242,39 @@ const VkmsPage: React.FC = () => {
             </div>
 
             <div className={`side-drawer ${isDrawerOpen ? "open" : ""}`}>
-                <div className="side-drawer-panel">
+              <div className="side-drawer-panel">
 
+                {/* TOGGLE — INSIDE PANEL */}
+                <button
+                  className={`side-drawer-toggle ${isDrawerOpen ? "open" : ""}`}
+                  onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                  aria-label="Toggle side panel"
+                >
+                  <span className="toggle-arrow">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path
+                        d="M5 7.5L10 12.5L15 7.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </button>
+
+                {/* CONTENT */}
+                <div className="side-drawer-content">
+                  {isMobile && isDrawerOpen && (
                     <button
-                        className="side-drawer-toggle"
-                        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                        aria-label="Toggle side panel"
+                      className="side-drawer-close-btn"
+                      onClick={() => setIsDrawerOpen(false)}
                     >
-                        <span className="toggle-arrow"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                                            xmlns="http://www.w3.org/2000/svg"><path
-                            d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                            strokeLinejoin="round"></path></svg></span>
+                      ✕
                     </button>
+                  )}
+                  <AccountDrawer />
+                </div>
 
                     <div className="side-drawer-content">
                         <AccountSection>

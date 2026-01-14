@@ -8,6 +8,12 @@
     padding: 24px;
 }
 
+@media (max-width: 557px) {
+    .ai-container {
+        padding-top: 90px;
+    }
+}
+
 .ai-intro {
     margin-bottom: 10px;
 }
