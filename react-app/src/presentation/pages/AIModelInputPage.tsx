@@ -4,8 +4,8 @@ import "../AIModelInputPage.css";
 import apiClient from "../../infrastructure/ApiClient";
 import { Modal } from "react-bootstrap";
 import { useAppDispatch } from "../../application/store/hooks";
-import { setUser } from "../../application/Slices/authSlice";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {fetchUser} from "../../application/Slices/authSlice.ts";
 
 const interests_options = [
   "Business & Innovatie",
@@ -121,7 +121,7 @@ export default function AIModelInputPage() {
 
     // ✅ Nieuwe fetch naar /auth/me om globale state bij te werken
     const response = await apiClient.get("/auth/me");
-    dispatch(setUser(response.data)); // update globale auth state
+    dispatch(fetchUser()); // update globale auth state
 
     console.log("Profiel succesvol opgeslagen en globale state geüpdatet:", response.data);
 

@@ -21,21 +21,21 @@ import TeacherPage from "./presentation/pages/TeacherPage";
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Layout />}>
+            <Route path="/" element={<Layout/>}>
                 {/* Auth required */}
                 <Route
                     index
                     element={
-                    <AuthGuard requireProfile={false} requireLogin={false}>
-                        <HomePage />
-                    </AuthGuard>
+                        <AuthGuard requireLogin={false}>
+                            <HomePage/>
+                        </AuthGuard>
                     }
                 />
 
                 <Route
                     path="about"
                     element={
-                        <AuthGuard requireProfile={false} requireLogin={false}>
+                        <AuthGuard requireLogin={false}>
                             <AboutPage/>
                         </AuthGuard>
                     }
@@ -44,7 +44,7 @@ function App() {
                 <Route
                     path="account"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <AccountPage/>
                         </AuthGuard>
                     }
@@ -53,7 +53,7 @@ function App() {
                 <Route
                     path="studentenprofiel"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <AIModelInputPage/>
                         </AuthGuard>
                     }
@@ -62,7 +62,7 @@ function App() {
                 <Route
                     path="vkms"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <VkmsPage/>
                         </AuthGuard>
                     }
@@ -71,7 +71,7 @@ function App() {
                 <Route
                     path="vkms/:id"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <VkmsDetailPage/>
                         </AuthGuard>
                     }
@@ -80,7 +80,7 @@ function App() {
                 <Route
                     path="swipe"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <SwipePage/>
                         </AuthGuard>
                     }
@@ -90,7 +90,7 @@ function App() {
                 <Route
                     path="teacher"
                     element={
-                        <AuthGuard roles={["teacher"]} requireProfile={false}>
+                        <AuthGuard roles={["teacher"]}>
                             <TeacherPage/>
                         </AuthGuard>
                     }
@@ -99,7 +99,7 @@ function App() {
                 <Route
                     path="admin"
                     element={
-                        <AuthGuard roles={["admin"]} requireProfile={false}>
+                        <AuthGuard roles={["admin"]}>
                             <AdminPage/>
                         </AuthGuard>
                     }
@@ -109,8 +109,8 @@ function App() {
                 <Route path="*" element={<ErrorPage/>}/>
 
                 {/* Public */}
-                <Route path="login" element={<LoginPage />} />
-                <Route path="register" element={<RegisterPage />} />
+                <Route path="login" element={<LoginPage/>}/>
+                <Route path="register" element={<RegisterPage/>}/>
             </Route>
         </Routes>
     );

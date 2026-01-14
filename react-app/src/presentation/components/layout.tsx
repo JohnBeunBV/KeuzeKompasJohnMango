@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from "react";
-import {Outlet, useNavigate, Link, useLocation} from "react-router-dom";
+import {Outlet, useNavigate, Link} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
 import {logout} from "../../application/Slices/authSlice";
 import {Home, List, Heart, Info, Settings} from "lucide-react";
 import "../index.css";
 import "../accountpage.css";
 import "../navbar.css";
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { Modal } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {useLocation} from "react-router-dom";
+import {Modal} from "react-bootstrap";
+import {hideForceProfileModal} from "../../application/Slices/uiSlice.ts";
 
 
 const Layout: React.FC = () => {
@@ -21,41 +21,20 @@ const Layout: React.FC = () => {
     const roles = user?.roles ?? [];
     const userName = user?.username ?? user?.email ?? null;
 
-    const location = useLocation();
-    const [showForceModal, setShowForceModal] = useState(false);
+    const showForceModal = useAppSelector(
+        (state) => state.ui.forceProfileModal
+    );
 
-    const interests = user?.profile?.interests ?? [];
-    const values = user?.profile?.values ?? [];
-    const goals = user?.profile?.goals ?? [];
-
-    const isProfileComplete =
-        interests.length > 0 &&
-        values.length > 0 &&
-        goals.length > 0;
-
-    const token = useAppSelector((state) => state.auth.token);
-
-    const isTokenExpired = (token?: string | null): boolean => {
-        if (!token) return true;
-        try {
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            return payload.exp * 1000 < Date.now();
-        } catch {
-            return true;
-        }
-    };
-
-    const isPublicRoute =
-    location.pathname.startsWith("/login") ||
-    location.pathname.startsWith("/register") ||
-    location.pathname.startsWith("/error");
-   
 
     const handleLogout = () => {
         dispatch(logout());
         navigate("/login");
     };
 
+    const handleGoToProfile = () => {
+        dispatch(hideForceProfileModal());
+        navigate("/studentenprofiel");
+    };
     const [isMobileNav, setIsMobileNav] = useState(false);
 
     useEffect(() => {
@@ -64,22 +43,6 @@ const Layout: React.FC = () => {
         window.addEventListener("resize", check);
         return () => window.removeEventListener("resize", check);
     }, []);
-
-    useEffect(() => {
-        const shouldForceProfile =
-            isAuthenticated &&
-            !isTokenExpired(token) &&
-            !isProfileComplete &&
-            !isPublicRoute &&
-            location.pathname !== "/studentenprofiel";
-
-        setShowForceModal(shouldForceProfile);
-    }, [
-        isAuthenticated,
-        token,
-        isProfileComplete,
-        location.pathname
-    ]);
 
 
     return (
@@ -256,13 +219,13 @@ const Layout: React.FC = () => {
                 <Modal.Body>
                     Om John Mango te gebruiken moet je eerst
                     minimaal één interesse, waarde en leerdoel invullen.
-                    <br /><br />
+                    <br/><br/>
                     Dit kost maar een paar seconden.
                 </Modal.Body>
                 <Modal.Footer>
                     <button
                         className="btn btn-primary"
-                        onClick={() => navigate("/studentenprofiel")}
+                        onClick={() => handleGoToProfile()}
                     >
                         Ga naar mijn profiel
                     </button>

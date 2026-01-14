@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import vkmsReducer from "../Slices/vkmsSlice";
+import uiReducer from "../Slices/uiSlice.ts";
 import authReducer from "../Slices/authSlice";
 import { setAuthToken } from "../../infrastructure/ApiClient";
 
@@ -7,6 +8,7 @@ export const store = configureStore({
   reducer: {
     vkms: vkmsReducer,
     auth: authReducer,
+      ui: uiReducer,
   },
 });
 

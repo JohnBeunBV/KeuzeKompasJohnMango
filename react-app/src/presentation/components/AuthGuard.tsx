@@ -1,7 +1,8 @@
 import {Navigate, useLocation} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
-import { tokenExpired } from "../../application/Slices/authSlice";
+import {tokenExpired} from "../../application/Slices/authSlice";
 import type {JSX} from "react";
+import {showForceProfileModal} from "../../application/Slices/uiSlice.ts";
 
 const isProfileComplete = (user: any): boolean => {
     if (!user?.profile) return false;
@@ -64,24 +65,18 @@ const AuthGuard = ({
             />
         );
     }
-
     // Profile incomplete → force studentenprofiel
     if (
         requireLogin &&
-        isAuthenticated &&
+        requireProfile &&
+        status === "authenticated" &&
         user &&
-        !isTokenExpired(token ?? "") &&
-        !(isProfileComplete(user) && requireProfile) &&
+        !isProfileComplete(user) &&
         location.pathname !== "/studentenprofiel" &&
         !location.pathname.startsWith("/error")
     ) {
-        return (
-            <Navigate
-                to="/studentenprofiel"
-                replace
-                state={{from: location}}
-            />
-        );
+        console.log("Force modal")
+        dispatch(showForceProfileModal());
     }
 
 
