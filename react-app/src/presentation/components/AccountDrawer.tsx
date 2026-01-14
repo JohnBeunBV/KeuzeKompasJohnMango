@@ -33,21 +33,27 @@ const AccountDrawer: React.FC = () => {
     const [loadingRecs, setLoadingRecs] = useState(true);
 
     const isMobile = window.matchMedia("(max-width: 500px)").matches;
+    const refreshBtnRef = React.useRef<HTMLButtonElement | null>(null);
+    const handleAnimationEnd = (e: React.AnimationEvent) => {
+        e.currentTarget.classList.remove("animate");
+    };
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (status === "authenticated") {
-            refreshRecommendations();
-        }
-    }, [status]);
     useEffect(() => {
         if (favorites) {
             setLocalFavorites(favorites);
         }
     }, [favorites]);
 
+    useEffect(() => {
+        if (status === "authenticated" && isInitialLoad) {
+            refreshRecommendations(false);
+            setIsInitialLoad(false);
+        }
+    }, [status, isInitialLoad]);
 
     // Auto-hide favorites message
     useEffect(() => {
@@ -62,18 +68,28 @@ const AccountDrawer: React.FC = () => {
         }
     }, [favoritesMessage]);
 
-    const refreshRecommendations = async () => {
+    const refreshRecommendations = async (isManualClick = false) => {
         if (!user) return;
+
+        // Only add the 'animate' class if it's a manual click
+        const btn = refreshBtnRef.current;
+        if (btn && isManualClick) {
+            btn.classList.remove("animate");
+            void btn.offsetWidth; 
+            btn.classList.add("animate");
+        }
+
         setLoadingRecs(true);
         try {
             const res = await apiClient.get("/auth/recommendations");
             setRecommendations(res.data.recommendations || []);
         } catch (err) {
-            console.error("Refresh recommendations failed", err);
+            console.error("Refresh failed", err);
         } finally {
             setLoadingRecs(false);
         }
     };
+
     const handleRemoveFavorite = async (vkmId: string) => {
         setLocalFavorites(prev => prev.filter(f => f._id !== vkmId));
 
@@ -82,16 +98,13 @@ const AccountDrawer: React.FC = () => {
             setFavoritesMessage({ text: "Module verwijderd.", type: "success" });
 
             dispatch(fetchUser()); // sync with backend
-            refreshRecommendations();
-
+            refreshRecommendations(false);
         } catch (err) {
             setLocalFavorites(favorites);
             setFavoritesMessage({ text: "Verwijderen mislukt.", type: "danger" });
             console.error(err);
         }
     };
-
-
 
     if (!user) return <Spinner animation="border" className="d-block mx-auto mt-3"/>;
 
@@ -106,7 +119,7 @@ const AccountDrawer: React.FC = () => {
             {!localFavorites ? (
                 <Spinner animation="border" role="status" className="d-block mx-auto mt-3"/>
             ) : localFavorites.length === 0 ? (
-                <p className="text-white mt-3">Hier komen uw favorieten te staan!</p>
+                <p className="text-white mt-3">Hier komen jouw favorieten te staan!</p>
             ) : (
                 <div className="favorites-list">
                     {localFavorites.map((fav) => (
@@ -219,19 +232,28 @@ const AccountDrawer: React.FC = () => {
 
                 {/* Right Side: Refresh Button */}
                 <button
-                    onClick={refreshRecommendations}
-                    className="refresh-btn"
+                    ref={refreshBtnRef}
+                    onClick={() => refreshRecommendations(true)}
+                    disabled={loadingRecs}
+                    onAnimationEnd={handleAnimationEnd} // Clean up when done
+                    className="refresh-btn" // Remove the conditional ${loadingRecs ? "animate" : ""}
                     style={{
                         background: "none",
                         border: "none",
                         padding: 0,
-                        cursor: "pointer",
+                        cursor: loadingRecs ? "default" : "pointer",
                         display: "flex",
                         alignItems: "center",
                     }}
                 >
                     <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 12C21 16.9706 16.9706 21 12 21C9.69494 21 7.59227 20.1334 6 18.7083L3 16M3 12C3 7.02944 7.02944 3 12 3C14.3051 3 16.4077 3.86656 18 5.29168L21 8M3 21V16M3 16H8M21 3V8M21 8H16" stroke="#ffc43b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path 
+                            d="M21 12C21 16.9706 16.9706 21 12 21C9.69494 21 7.59227 20.1334 6 18.7083L3 16M3 12C3 7.02944 7.02944 3 12 3C14.3051 3 16.4077 3.86656 18 5.29168L21 8M3 21V16M3 16H8M21 3V8M21 8H16" 
+                            stroke="#ffc43b" 
+                            strokeWidth="2" 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round"
+                        />
                     </svg>
                 </button>
             </div>

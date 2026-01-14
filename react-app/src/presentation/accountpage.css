@@ -11,40 +11,6 @@
   font-size: 0.9rem;
 }
 
-.xai-hover-box {
-  position: absolute;
-  top: 28px;
-  /* adjust depending on button size */
-  left: 0;
-  width: 700px;
-  max-width: 90vw;
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 6px;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  padding: 10px;
-  transform: translateX(-42%);
-}
-
-.xai-hover-box2 {
-  position: fixed;
-  top: 28px;
-  /* adjust depending on button size */
-  left: 0;
-  width: 700px;
-  max-width: 90vw;
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 6px;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  padding: 10px;
-  transform: translateX(-55%);
-}
-
 .xai-header {
   display: flex;
   justify-content: space-between;
@@ -130,8 +96,9 @@
 /* --- 1. SHARED XAI MODAL COMPONENTS --- */
 .xai-interaction-wrapper {
     position: relative;
-    display: inline-flex;
-    align-items: center;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
 }
 
 .xai-modal-card {
@@ -225,33 +192,99 @@
 /* --- UPDATED DESKTOP HOVER POSITIONING --- */
 @media (min-width: 501px) {
     .xai-desktop-hover-box {
-        position: absolute;
-        top: 30px; 
-        right: 0; 
+        position: fixed;
+        top: 50%;
+        left: 50%;                /* center relative to viewport */
+        transform: translate(-50%, -50%); /* perfect center both axes */
         z-index: 1000;
-        cursor: default;
+        pointer-events: auto;
+
+        max-width: min(380px, calc(100vw - 24px)); /* never overflow viewport */
     }
 
     .xai-modal-card {
         width: 380px;
+        max-width: 100%;
         position: relative;
     }
 
-    /* Bridge to prevent flicker */
+    /* optional hover bridge */
     .xai-desktop-hover-box::before {
         content: "";
-        position: absolute;
-        top: -15px;
-        left: 0;
-        width: 100%;
-        height: 15px;
+        position: fixed;
+        top: calc(50% - 14px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 14px;
+        z-index: 999;
     }
 }
 
-/* Ensure the refresh icon rotates when clicked (optional polish) */
-.refresh-btn:active svg {
-    transform: rotate(90deg);
-    transition: 0.2s;
+.favorites-card {
+    position: relative; /* make this the positioning context for the modal */
+}
+
+@keyframes refresh-spin-friction-bounce {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    /* 1. Wind-up */
+    12% {
+        transform: rotate(-45deg);
+    }
+
+    /* 2. Acceleration */
+    35% {
+        transform: rotate(720deg);
+    }
+
+    42% {
+        transform: rotate(900deg);
+    }
+
+    /* 3. Progressive friction (smooth decay) */
+    50% {
+        transform: rotate(1000deg); /* +100 */
+    }
+
+    58% {
+        transform: rotate(1050deg); /* +50 */
+    }
+
+    65% {
+        transform: rotate(1080deg); /* +30 */
+    }
+
+    71% {
+        transform: rotate(1095deg); /* +15 */
+    }
+
+    76% {
+        transform: rotate(1102deg); /* +7 */
+    }
+
+    80% {
+        transform: rotate(1105deg); /* +3 overshoot */
+    }
+
+    /* 4. Elastic settle */
+    100% {
+        transform: rotate(1080deg);
+    }
+}
+
+.refresh-btn svg {
+    transform-origin: center;
+    backface-visibility: hidden;
+}
+
+.refresh-btn.animate svg {
+    animation: refresh-spin-friction-bounce
+        1.9s
+        linear
+        forwards;
 }
 
 /* --- 4. ANIMATIONS --- */
