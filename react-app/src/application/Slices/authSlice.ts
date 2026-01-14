@@ -133,6 +133,18 @@ const authSlice = createSlice({
 
             setAuthToken(null);
         },
+        tokenExpired: (state) => {
+            state.token = null;
+            state.user = null;
+            state.status = "unauthenticated";
+            state.authError = "expired_token";
+            state.isRefreshing = false;
+
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setAuthToken(null);
+        }
+
     },
     extraReducers: (builder) => {
         builder
@@ -165,5 +177,5 @@ const authSlice = createSlice({
 });
 
 
-export const {loginSuccess, logout} = authSlice.actions;
+export const {loginSuccess, logout, tokenExpired} = authSlice.actions;
 export default authSlice.reducer;

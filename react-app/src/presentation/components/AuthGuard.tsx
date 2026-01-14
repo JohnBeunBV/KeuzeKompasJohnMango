@@ -1,5 +1,6 @@
 import {Navigate, useLocation} from "react-router-dom";
-import {useAppSelector} from "../../application/store/hooks";
+import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
+import { tokenExpired } from "../../application/Slices/authSlice";
 import type {JSX} from "react";
 
 interface AuthGuardProps {
@@ -23,15 +24,17 @@ const AuthGuard = ({
                        roles = [],
                    }: AuthGuardProps) => {
     const location = useLocation();
+    const dispatch = useAppDispatch();
 
     const {token, status, user} = useAppSelector((state) => state.auth);
 
     const userRoles = user?.roles ?? ["student"];
     // Token expired → 401 but with reason
     if (token && isTokenExpired(token)) {
+        dispatch(tokenExpired());
         return (
             <Navigate
-                to="/error?status=401&reason=expired"
+                to="/error?status=401&reason=expired_token"
                 replace
                 state={{from: location}}
             />
