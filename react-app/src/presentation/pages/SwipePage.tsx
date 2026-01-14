@@ -5,17 +5,26 @@ import type { Vkm } from "@domain/models/vkm.model";
 import { useNavigate } from "react-router-dom";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import Toast from "react-bootstrap/Toast";
+import apiClient from "../../infrastructure/ApiClient";
+import {
+    useAppDispatch,
+    useAppSelector,
+} from "../../application/store/hooks.ts";
+import {fetchUser} from "../../application/Slices/authSlice.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
 
 export default function SwipePage() {
+    
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
     const [vkms, setVkms] = useState<Vkm[]>([]);
     const [index, setIndex] = useState(0);
     const [loading, setLoading] = useState(true);
+    const {user} = useAppSelector((s) => s.auth);
     const [pexelsImages, setPexelsImages] = useState<Record<string, string>>({});
 
     const [x, setX] = useState(0);
@@ -26,9 +35,28 @@ export default function SwipePage() {
     const [showIntroModal, setShowIntroModal] = useState(false);
     const [swipeOut, setSwipeOut] = useState<"left" | "right" | null>(null);
 
+    const dispatch = useAppDispatch();
+
     useEffect(() => {
-        setShowIntroModal(true);
+        // Show intro modal only the first time the user opens this page.
+        // Persist a flag in localStorage so it won't appear again.
+        try {
+            const seen = localStorage.getItem("swipeIntroShown");
+            if (seen !== "true") {
+                setShowIntroModal(true);
+            }
+        } catch (err) {
+            // localStorage may be unavailable; default to showing once
+            setShowIntroModal(true);
+        }
     }, []);
+
+    // 🔹 Haal gebruiker en favorieten op
+    useEffect(() => {
+        dispatch(fetchUser());
+        setLoading(false);
+        refreshRecommendations();
+    }, [dispatch]);
 
     /* =====================================================
        Pointer Listeners (Fixes "Stickiness")
@@ -85,7 +113,9 @@ export default function SwipePage() {
         fetchVkms();
     }, [token, navigate]);
 
-    // Efficient image fetching (only fetch next 5)
+    /* =====================================================
+          Afbeeldingen laden
+      ===================================================== */
     useEffect(() => {
         const fetchImages = async () => {
             const results = await Promise.all(
@@ -167,7 +197,19 @@ export default function SwipePage() {
 
     return (
         <div className="swipe-page">
-            <Modal show={showIntroModal} onHide={() => setShowIntroModal(false)} centered className="intro-modal">
+            <Modal
+                show={showIntroModal}
+                onHide={() => {
+                    try {
+                        localStorage.setItem("swipeIntroShown", "true");
+                    } catch (err) {
+                        /* ignore */
+                    }
+                    setShowIntroModal(false);
+                }}
+                centered
+                className="intro-modal"
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Hoe werkt het?</Modal.Title>
                 </Modal.Header>
@@ -206,6 +248,20 @@ export default function SwipePage() {
                     <button className="swipe-btn brand" onClick={() => setShowIntroModal(true)}>?</button>
                     <button className="swipe-btn brand" onClick={() => commitSwipe("right")}>♥</button>
                 </div>
+            </div>
+
+            <div className="position-fixed top-0 end-0 p-3" style={{zIndex: 1060}}>
+                <Toast
+                    show={showLikeToast}
+                    onClose={() => setShowLikeToast(false)}
+                    delay={1500}
+                    autohide
+                >
+                    <Toast.Header>
+                        <strong className="me-auto">Geliked</strong>
+                    </Toast.Header>
+                    <Toast.Body>Je hebt deze module geliket!</Toast.Body>
+                </Toast>
             </div>
         </div>
     );

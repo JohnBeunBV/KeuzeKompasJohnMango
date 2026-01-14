@@ -42,7 +42,8 @@ const AccountPage: React.FC = () => {
 
     // 🔹 Validatie functies
     const validateUsername = (username: string) => {
-        if (username.length < 3) return "Gebruikersnaam moet minstens 3 tekens bevatten.";
+        if (username.length < 3)
+            return "Gebruikersnaam moet minstens 3 tekens bevatten.";
         return null;
     };
 
@@ -58,10 +59,14 @@ const AccountPage: React.FC = () => {
         const hasNumber = /\d/;
         const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/;
 
-        if (!minLength.test(password)) return "Het wachtwoord moet minimaal 8 tekens lang zijn.";
-        if (!hasUppercase.test(password)) return "Het wachtwoord moet minstens één hoofdletter bevatten.";
-        if (!hasNumber.test(password)) return "Het wachtwoord moet minstens één cijfer bevatten.";
-        if (!hasSymbol.test(password)) return "Het wachtwoord moet minstens één symbool bevatten.";
+        if (!minLength.test(password))
+            return "Het wachtwoord moet minimaal 8 tekens lang zijn.";
+        if (!hasUppercase.test(password))
+            return "Het wachtwoord moet minstens één hoofdletter bevatten.";
+        if (!hasNumber.test(password))
+            return "Het wachtwoord moet minstens één cijfer bevatten.";
+        if (!hasSymbol.test(password))
+            return "Het wachtwoord moet minstens één symbool bevatten.";
         return null;
     };
 
@@ -135,7 +140,10 @@ const AccountPage: React.FC = () => {
             emailInput === originalEmail &&
             newPassword === "";
         if (nothingChanged) {
-            setMessage({text: "Er zijn geen wijzigingen om op te slaan.", type: "danger"});
+            setMessage({
+                text: "Er zijn geen wijzigingen om op te slaan.",
+                type: "danger",
+            });
             return;
         }
 
@@ -150,7 +158,6 @@ const AccountPage: React.FC = () => {
             const res = await apiClient.get("/auth/me");
             const updatedData: UserData = res.data;
 
-
             setOriginalUsername(updatedData.username || "");
             setOriginalEmail(updatedData.email || "");
             setUsernameInput(updatedData.username || "");
@@ -159,14 +166,23 @@ const AccountPage: React.FC = () => {
             setConfirmPassword("");
             setMessage({text: "Gegevens succesvol bijgewerkt!", type: "success"});
 
-            localStorage.setItem("user", JSON.stringify({username: updatedData.username}));
+            localStorage.setItem(
+                "user",
+                JSON.stringify({username: updatedData.username})
+            );
             window.dispatchEvent(new Event("loginSuccess"));
         } catch (err: any) {
             if (err.response?.status === 401) {
                 localStorage.removeItem("token");
-                navigate("/error", {state: {status: 401, message: "Je bent niet ingelogd."}});
+                navigate("/error", {
+                    state: {status: 401, message: "Je bent niet ingelogd."},
+                });
             } else {
-                setMessage({text: err.response?.data?.error || "Er ging iets mis bij het bijwerken.", type: "danger"});
+                setMessage({
+                    text:
+                        err.response?.data?.error || "Er ging iets mis bij het bijwerken.",
+                    type: "danger",
+                });
             }
         }
     };
@@ -178,16 +194,19 @@ const AccountPage: React.FC = () => {
         navigate("/login");
     };
 
-
     return (
         <div className="terminal-container text-light p-4">
             <div className="account-flex-container">
                 <div className="account-card p-4">
                     <h2 className="terminal-title mb-3">Account Configurator</h2>
-                    <p className="terminal-subtext">Beheer je gebruikersinstellingen hieronder.</p>
+                    <p className="terminal-subtext">
+                        Beheer je gebruikersinstellingen hieronder.
+                    </p>
 
                     <Fade in={showMessage} mountOnEnter unmountOnExit>
-                        <div>{message && <Alert variant={message.type}>{message.text}</Alert>}</div>
+                        <div>
+                            {message && <Alert variant={message.type}>{message.text}</Alert>}
+                        </div>
                     </Fade>
 
                     <Form>
@@ -199,7 +218,9 @@ const AccountPage: React.FC = () => {
                                 placeholder="Voer je gebruikersnaam in"
                                 className="terminal-input"
                             />
-                            {usernameError && <small className="text-danger">{usernameError}</small>}
+                            {usernameError && (
+                                <small className="text-danger">{usernameError}</small>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -211,7 +232,9 @@ const AccountPage: React.FC = () => {
                                 placeholder="Voer je email in"
                                 className="terminal-input"
                             />
-                            {emailError && <small className="text-danger">{emailError}</small>}
+                            {emailError && (
+                                <small className="text-danger">{emailError}</small>
+                            )}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -254,14 +277,20 @@ const AccountPage: React.FC = () => {
             </div>
             {/* end account-flex-container */}
 
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+            <Modal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                centered
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Account verwijderen</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>
-                    <p>Weet je zeker dat je je account permanent wilt verwijderen? Deze actie kan niet ongedaan gemaakt
-                        worden.</p>
+                    <p>
+                        Weet je zeker dat je je account permanent wilt verwijderen? Deze
+                        actie kan niet ongedaan gemaakt worden.
+                    </p>
                 </Modal.Body>
 
                 <Modal.Footer>
