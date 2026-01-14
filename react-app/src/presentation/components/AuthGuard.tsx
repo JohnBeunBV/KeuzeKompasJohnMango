@@ -26,7 +26,7 @@ const AuthGuard = ({
 
     const {token, status, user} = useAppSelector((state) => state.auth);
 
-    const userRoles = user?.roles ?? [];
+    const userRoles = user?.roles ?? ["student"];
     // Token expired → 401 but with reason
     if (token && isTokenExpired(token)) {
         return (

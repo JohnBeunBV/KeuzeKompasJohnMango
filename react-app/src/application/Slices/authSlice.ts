@@ -11,7 +11,9 @@ export function normalizeAuthUser(raw: unknown): AuthUser {
         id: String((u as any).id ?? (u as any)._id ?? ""),
         username: typeof u.username === "string" ? u.username : "",
         email: typeof u.email === "string" ? u.email : "",
-        roles: Array.isArray(u.roles) ? u.roles.filter(r => typeof r === "string") : [],
+        roles: Array.isArray(u.roles) && u.roles.length > 0
+            ? u.roles
+            : ["student"],
         profile: {
             interests: Array.isArray(u.profile?.interests) ? u.profile.interests : [],
             values: Array.isArray(u.profile?.values) ? u.profile.values : [],
