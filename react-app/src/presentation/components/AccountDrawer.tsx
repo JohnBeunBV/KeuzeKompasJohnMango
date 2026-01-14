@@ -144,75 +144,83 @@ const AccountDrawer: React.FC = () => {
                 </div>
             )}
 
-            {/* XAI Info Button + Modal */}
-            <div className="d-flex align-items-center gap-2 position-relative">
-                <h3 className="terminal-title mb-0">Aanbevolen VKM’s</h3>
+            {/* Header Container */}
+            <div className="d-flex align-items-center justify-content-between w-100 position-relative">
                 
-                {/* Wrap the button and modal in a container to bridge the gap for hover */}
-                <div 
-                    className="xai-interaction-wrapper"
-                    onMouseLeave={() => !isMobile && setShowXaiModal(false)}
-                >
-                    <button
-                        className="info-btn"
-                        onMouseEnter={() => !isMobile && setShowXaiModal(true)}
-                        onClick={() => isMobile && setShowXaiModal(true)}
-                        style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+                {/* Left Side: Title and Info Icon */}
+                <div className="d-flex align-items-center gap-2">
+                    <h3 className="terminal-title mb-0">Aanbevolen VKM’s</h3>
+                    
+                    <div 
+                        className="xai-interaction-wrapper"
+                        onMouseLeave={() => !isMobile && setShowXaiModal(false)}
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="#ffc43b"
-                            width="20px"
-                            height="20px"
-                            viewBox="0 0 490.318 490.318"
+                        <button
+                            className="info-btn"
+                            onMouseEnter={() => !isMobile && setShowXaiModal(true)}
+                            onClick={() => isMobile && setShowXaiModal(true)}
+                            style={{ background: "none", border: "none", padding: 0, cursor: "pointer", display: "flex" }}
                         >
-                            <path d="M245.148,0C109.967,0,0.009,109.98,0.009,245.162c0,135.182,109.958,245.156,245.139,245.156 c135.186,0,245.162-109.978,245.162-245.156C490.31,109.98,380.333,0,245.148,0z M245.148,438.415 c-106.555,0-193.234-86.698-193.234-193.253 c0-106.555,86.68-193.258,193.234-193.258 c106.559,0,193.258,86.703,193.258,193.258 C438.406,351.717,351.706,438.415,245.148,438.415z" />
-                            <path d="M270.036,221.352h-49.771c-8.351,0-15.131,6.78-15.131,15.118v147.566 c0,8.352,6.78,15.119,15.131,15.119h49.771 c8.351,0,15.131-6.77,15.131-15.119V236.471 C285.167,228.133,278.387,221.352,270.036,221.352z" />
-                            <path d="M245.148,91.168c-24.48,0-44.336,19.855-44.336,44.336 c0,24.484,19.855,44.34,44.336,44.34 c24.485,0,44.342-19.855,44.342-44.34 C289.489,111.023,269.634,91.168,245.148,91.168z" />
-                        </svg>
-                    </button>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="#ffc43b"
+                                width="20px"
+                                height="20px"
+                                viewBox="0 0 490.318 490.318"
+                            >
+                                <path d="M245.148,0C109.967,0,0.009,109.98,0.009,245.162c0,135.182,109.958,245.156,245.139,245.156 c135.186,0,245.162-109.978,245.162-245.156C490.31,109.98,380.333,0,245.148,0z M245.148,438.415 c-106.555,0-193.234-86.698-193.234-193.253 c0-106.555,86.68-193.258,193.234-193.258 c106.559,0,193.258,86.703,193.258,193.258 C438.406,351.717,351.706,438.415,245.148,438.415z" />
+                                <path d="M270.036,221.352h-49.771c-8.351,0-15.131,6.78-15.131,15.118v147.566 c0,8.352,6.78,15.119,15.131,15.119h49.771 c8.351,0,15.131-6.77,15.131-15.119V236.471 C285.167,228.133,278.387,221.352,270.036,221.352z" />
+                                <path d="M245.148,91.168c-24.48,0-44.336,19.855-44.336,44.336 c0,24.484,19.855,44.34,44.336,44.34 c24.485,0,44.342-19.855,44.342-44.34 C289.489,111.023,269.634,91.168,245.148,91.168z" />
+                            </svg>
+                        </button>
 
-                    {/* Modal/Overlay logic */}
-                    {showXaiModal && (
-                                <div
-                                    className="xai-modal-overlay"
-                                    onClick={() => setShowXaiModal(false)}
-                                >
-                                    <div className="xai-modal-card" onClick={(e) => e.stopPropagation()}>
-                                        <div className="xai-header">
-                                            <span className="xai-title">Hoe komen deze aanbevelingen tot stand?</span>
+                        {/* Modal Logic stays inside the wrapper for hover context */}
+                        {showXaiModal && (
+                            <div
+                                className={isMobile ? "xai-modal-overlay" : "xai-desktop-hover-box"}
+                                onClick={() => isMobile && setShowXaiModal(false)}
+                            >
+                                <div className="xai-modal-card" onClick={(e) => e.stopPropagation()}>
+                                    <div className="xai-header">
+                                        <span className="xai-title">Hoe komen deze aanbevelingen tot stand?</span>
+                                        {isMobile && (
                                             <button className="close-btn" onClick={() => setShowXaiModal(false)}>✕</button>
-                                        </div>
-                                        <div className="xai-body">
+                                        )}
+                                    </div>
+                                    <div className="xai-body">
                                         <div className="xai-score-explanations mb-3">
-                                        <div className="xai-score-item"><strong>96% en hoger:</strong> Sterke match met jouw interesses, sterk aanbevolen.</div>
-                                        <div className="xai-score-item"><strong>85–95%:</strong> Overwegend matchend, maar het kan nuttig zijn eerst wat extra te onderzoeken.</div>
-                                        <div className="xai-score-item"><strong>70–84%:</strong> Gedeeltelijk vergelijkbaar; bespreek dit bij voorkeur eerst met een studiecoach.</div>
-                                        <div className="xai-score-item"><strong>Onder 70%:</strong> Niet aanbevolen om te kiezen.</div>
-                                    </div>
-                                    <hr />
-                                    <div className="xai-section">
-                                        <strong>Inhoudsovereenkomst (45%)</strong>
-                                        <div className="xai-bar"><div className="xai-fill" style={{ width: "45%" }} /></div>
-                                        <p>Vergelijkt de inhoud van VKM’s met jouw favorieten. Modules met vergelijkbare onderwerpen scoren hoger.</p>
-                                    </div>
-                                    <div className="xai-section">
-                                        <strong>Gebruikersprofiel (50%)</strong>
-                                        <div className="xai-bar"><div className="xai-fill" style={{ width: "50%" }} /></div>
-                                        <p>Houdt rekening met jouw studiegedrag, voorkeuren en eerdere keuzes. Dit is de zwaarst meewegende factor.</p>
-                                    </div>
-                                    <div className="xai-section">
-                                        <strong>Populariteit (5%)</strong>
-                                        <div className="xai-bar"><div className="xai-fill" style={{ width: "5%" }} /></div>
-                                        <p>Modules die vaker door andere studenten gekozen worden, krijgen een lichte voorkeur.</p>
+                                            <div className="xai-score-item"><strong>85% en hoger:</strong> Sterke match met jouw interesses, sterk aanbevolen.</div>
+                                            <div className="xai-score-item"><strong>70–84%:</strong> Overwegend matchend, maar het kan nuttig zijn eerst wat extra te onderzoeken.</div>
+                                            <div className="xai-score-item"><strong>55–69%:</strong> Gedeeltelijk vergelijkbaar; bespreek dit bij voorkeur eerst met een studiecoach.</div>
+                                            <div className="xai-score-item"><strong>Onder 55%:</strong> Niet aanbevolen om te kiezen.</div>
+                                        </div>
+                                        <hr />
+                                        <div className="xai-section">
+                                            <strong>Inhoudsovereenkomst (45%)</strong>
+                                            <div className="xai-bar"><div className="xai-fill" style={{ width: "45%" }} /></div>
+                                            <p>Vergelijkt de inhoud van VKM’s met jouw favorieten. Modules met vergelijkbare onderwerpen scoren hoger.</p>
+                                        </div>
+                                        <div className="xai-section">
+                                            <strong>Gebruikersprofiel (50%)</strong>
+                                            <div className="xai-bar"><div className="xai-fill" style={{ width: "50%" }} /></div>
+                                            <p>Houdt rekening met jouw studiegedrag, voorkeuren en eerdere keuzes. Dit is de zwaarst meewegende factor.</p>
+                                        </div>
+                                        <div className="xai-section">
+                                            <strong>Populariteit (5%)</strong>
+                                            <div className="xai-bar"><div className="xai-fill" style={{ width: "5%" }} /></div>
+                                            <p>Modules die vaker door andere studenten gekozen worden, krijgen een lichte voorkeur.</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
+
+                {/* Right Side: Refresh Button */}
                 <button
                     onClick={refreshRecommendations}
+                    className="refresh-btn"
                     style={{
                         background: "none",
                         border: "none",
@@ -220,23 +228,10 @@ const AccountDrawer: React.FC = () => {
                         cursor: "pointer",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center",
                     }}
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="30px"
-                        height="30px"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                    >
-                        <path
-                            d="M21 12C21 16.9706 16.9706 21 12 21C9.69494 21 7.59227 20.1334 6 18.7083L3 16M3 12C3 7.02944 7.02944 3 12 3C14.3051 3 16.4077 3.86656 18 5.29168L21 8M3 21V16M3 16H8M21 3V8M21 8H16"
-                            stroke="#ffc43b"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
+                    <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 12C21 16.9706 16.9706 21 12 21C9.69494 21 7.59227 20.1334 6 18.7083L3 16M3 12C3 7.02944 7.02944 3 12 3C14.3051 3 16.4077 3.86656 18 5.29168L21 8M3 21V16M3 16H8M21 3V8M21 8H16" stroke="#ffc43b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                 </button>
             </div>

@@ -273,9 +273,7 @@ const VkmsPage: React.FC = () => {
                       ✕
                     </button>
                   )}
-                </div>
 
-                    <div className="side-drawer-content">
                         <AccountSection>
                             <AccountDrawer />
                         </AccountSection>
