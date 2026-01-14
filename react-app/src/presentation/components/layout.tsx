@@ -148,9 +148,11 @@ const Layout: React.FC = () => {
 
             {/* ================= MAIN ================= */}
             <main
-                className={`${
-                    location.pathname === "/swipe" ? "" : "container"
-                } my-4 ${isMobileNav ? "has-mobile-nav" : ""}`}
+                className={`${location.pathname === "/swipe" ? "" : "container"}`}
+                style={{
+                    marginBottom: isMobileNav ? 0 : undefined, // removes my-4 margin on small screens
+                    paddingBottom: isMobileNav ? 0 : undefined, // removes has-mobile-nav padding
+                }}
             >
                 <Outlet/>
             </main>
@@ -189,9 +191,11 @@ const Layout: React.FC = () => {
             )}
 
             {/* ================= FOOTER ================= */}
-            <footer className="footer text-center p-3">
-                <p>© {new Date().getFullYear()} John Mango. Alle rechten voorbehouden.</p>
-            </footer>
+            {!isMobileNav && (
+                <footer className="footer text-center p-3">
+                    <p>© {new Date().getFullYear()} John Mango. Alle rechten voorbehouden.</p>
+                </footer>
+            )}
         </>
     );
 };
