@@ -11,13 +11,13 @@ const HomePage: React.FC = () => {
       <header className="homepage-header text-center p-5 mb-5">
         <h1>Welkom bij John Mango</h1>
         <p className="lead">
-          Ontdek en beheer VKM's in een stijlvol, kleurrijk en interactief mango-thema.
+          Ontdek Vrijekeuzemodules en gebruik onze unieke swiper om je aanbevelingen te liken of disliken.
         </p>
         <Button
           className="btn-header2"
-          onClick={() => navigate("/vkms")}
+          onClick={() => navigate("/swiper")}
         >
-          Ontdek VKM's
+          Swipe je favoriten VKM's
         </Button>
       </header>
 
@@ -31,13 +31,13 @@ const HomePage: React.FC = () => {
               alt="Swipe VKM's"
             />
             <Carousel.Caption className="carousel-caption">
-              <h3>Swipe VKM's</h3>
-              <p>Swipe VKM's die passen bij jouw studie en interesses.</p>
+              <h3>Ontdek VKM's</h3>
+              <p>Ontdek VKM's die passen bij jouw studie en interesses.</p>
               <Button
                 className="btn-header"
-                onClick={() => navigate("/swipe")}
+                onClick={() => navigate("/vkms")}
               >
-                Swipe VKM's
+                Ontdek VKM's
               </Button>
             </Carousel.Caption>
           </Carousel.Item>
