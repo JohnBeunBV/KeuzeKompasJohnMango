@@ -6,6 +6,10 @@ import {Home, List, Heart, Info, Settings} from "lucide-react";
 import "../index.css";
 import "../accountpage.css";
 import "../navbar.css";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { Modal } from "react-bootstrap";
+
 
 const Layout: React.FC = () => {
     const navigate = useNavigate();
@@ -16,6 +20,36 @@ const Layout: React.FC = () => {
 
     const roles = user?.roles ?? [];
     const userName = user?.username ?? user?.email ?? null;
+
+    const location = useLocation();
+    const [showForceModal, setShowForceModal] = useState(false);
+
+    const interests = user?.profile?.interests ?? [];
+    const values = user?.profile?.values ?? [];
+    const goals = user?.profile?.goals ?? [];
+
+    const isProfileComplete =
+        interests.length > 0 &&
+        values.length > 0 &&
+        goals.length > 0;
+
+    const token = useAppSelector((state) => state.auth.token);
+
+    const isTokenExpired = (token?: string | null): boolean => {
+        if (!token) return true;
+        try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            return payload.exp * 1000 < Date.now();
+        } catch {
+            return true;
+        }
+    };
+
+    const isPublicRoute =
+    location.pathname.startsWith("/login") ||
+    location.pathname.startsWith("/register") ||
+    location.pathname.startsWith("/error");
+   
 
     const handleLogout = () => {
         dispatch(logout());
@@ -30,6 +64,23 @@ const Layout: React.FC = () => {
         window.addEventListener("resize", check);
         return () => window.removeEventListener("resize", check);
     }, []);
+
+    useEffect(() => {
+        const shouldForceProfile =
+            isAuthenticated &&
+            !isTokenExpired(token) &&
+            !isProfileComplete &&
+            !isPublicRoute &&
+            location.pathname !== "/studentenprofiel";
+
+        setShowForceModal(shouldForceProfile);
+    }, [
+        isAuthenticated,
+        token,
+        isProfileComplete,
+        location.pathname
+    ]);
+
 
     return (
         <>
@@ -191,6 +242,32 @@ const Layout: React.FC = () => {
             <footer className="footer text-center p-3">
                 <p>© {new Date().getFullYear()} John Mango. Alle rechten voorbehouden.</p>
             </footer>
+
+            <Modal
+                show={showForceModal}
+                backdrop="static"
+                keyboard={false}
+                centered
+                className="intro-modal"
+            >
+                <Modal.Header>
+                    <Modal.Title>Profiel nog niet compleet</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Om John Mango te gebruiken moet je eerst
+                    minimaal één interesse, waarde en leerdoel invullen.
+                    <br /><br />
+                    Dit kost maar een paar seconden.
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => navigate("/studentenprofiel")}
+                    >
+                        Ga naar mijn profiel
+                    </button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };

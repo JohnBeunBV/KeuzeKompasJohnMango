@@ -29,7 +29,8 @@
 .recommendations-column-container {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Space between the rows */
+  gap: 12px;
+  /* Space between the rows */
   margin-top: 20px;
 }
 

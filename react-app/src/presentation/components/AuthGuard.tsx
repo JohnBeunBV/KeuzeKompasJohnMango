@@ -3,9 +3,22 @@ import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
 import { tokenExpired } from "../../application/Slices/authSlice";
 import type {JSX} from "react";
 
+const isProfileComplete = (user: any): boolean => {
+    if (!user?.profile) return false;
+
+    const {interests = [], values = [], goals = []} = user.profile;
+
+    return (
+        interests.length > 0 &&
+        values.length > 0 &&
+        goals.length > 0
+    );
+};
+
 interface AuthGuardProps {
     children: JSX.Element;
     requireLogin?: boolean;
+    requireProfile?: boolean;
     roles?: string[];
 }
 
@@ -22,6 +35,7 @@ const AuthGuard = ({
                        children,
                        requireLogin = true,
                        roles = [],
+                       requireProfile = false,
                    }: AuthGuardProps) => {
     const location = useLocation();
     const dispatch = useAppDispatch();
@@ -46,10 +60,30 @@ const AuthGuard = ({
             <Navigate
                 to="/error?status=401&reason=missing_token"
                 replace
-                state={{ from: location }}
+                state={{from: location}}
             />
         );
     }
+
+    // Profile incomplete → force studentenprofiel
+    if (
+        requireLogin &&
+        isAuthenticated &&
+        user &&
+        !isTokenExpired(token ?? "") &&
+        !(isProfileComplete(user) && requireProfile) &&
+        location.pathname !== "/studentenprofiel" &&
+        !location.pathname.startsWith("/error")
+    ) {
+        return (
+            <Navigate
+                to="/studentenprofiel"
+                replace
+                state={{from: location}}
+            />
+        );
+    }
+
 
     // Corruption check
     if (roles.length > 0 && !user) {

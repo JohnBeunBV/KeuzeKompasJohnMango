@@ -118,7 +118,6 @@ const authSlice = createSlice({
             localStorage.setItem("token", action.payload.token);
             localStorage.setItem("user", JSON.stringify(action.payload.user));
 
-            // Also update apiClient token
             setAuthToken(action.payload.token);
         },
 

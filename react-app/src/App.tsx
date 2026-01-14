@@ -21,15 +21,26 @@ import TeacherPage from "./presentation/pages/TeacherPage";
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Layout/>}>
-
-                {/* Public */}
-                <Route index element={<HomePage/>}/>
-                <Route path="about" element={<AboutPage/>}/>
-                <Route path="login" element={<LoginPage/>}/>
-                <Route path="register" element={<RegisterPage/>}/>
-
+            <Route path="/" element={<Layout />}>
                 {/* Auth required */}
+                <Route
+                    index
+                    element={
+                    <AuthGuard requireProfile={false} requireLogin={false}>
+                        <HomePage />
+                    </AuthGuard>
+                    }
+                />
+
+                <Route
+                    path="about"
+                    element={
+                        <AuthGuard requireProfile={false} requireLogin={false}>
+                            <AboutPage/>
+                        </AuthGuard>
+                    }
+                />
+
                 <Route
                     path="account"
                     element={
@@ -79,7 +90,7 @@ function App() {
                 <Route
                     path="teacher"
                     element={
-                        <AuthGuard roles={["teacher"]}>
+                        <AuthGuard roles={["teacher"]} requireProfile={false}>
                             <TeacherPage/>
                         </AuthGuard>
                     }
@@ -88,7 +99,7 @@ function App() {
                 <Route
                     path="admin"
                     element={
-                        <AuthGuard roles={["admin"]}>
+                        <AuthGuard roles={["admin"]} requireProfile={false}>
                             <AdminPage/>
                         </AuthGuard>
                     }
@@ -96,6 +107,10 @@ function App() {
 
                 <Route path="unauthorized" element={<ErrorPage/>}/>
                 <Route path="*" element={<ErrorPage/>}/>
+
+                {/* Public */}
+                <Route path="login" element={<LoginPage />} />
+                <Route path="register" element={<RegisterPage />} />
             </Route>
         </Routes>
     );
