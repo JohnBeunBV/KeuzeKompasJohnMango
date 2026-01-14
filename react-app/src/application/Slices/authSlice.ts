@@ -86,7 +86,6 @@ const authSlice = createSlice({
             localStorage.setItem("token", action.payload.token);
             localStorage.setItem("user", JSON.stringify(action.payload.user));
 
-            // Also update apiClient token
             setAuthToken(action.payload.token);
         },
 
@@ -100,6 +99,15 @@ const authSlice = createSlice({
             localStorage.removeItem("user");
 
             setAuthToken(null);
+        },
+
+        // ✅ Nieuwe action om user/profiel direct bij te werken
+        setUser: (state, action: PayloadAction<AuthUser>) => {
+            state.user = action.payload;
+            state.isAuthenticated = true;
+            state.authError = null;
+
+            localStorage.setItem("user", JSON.stringify(action.payload));
         },
     },
     extraReducers: (builder) => {
@@ -125,5 +133,6 @@ const authSlice = createSlice({
 });
 
 
-export const {loginSuccess, logout} = authSlice.actions;
+
+export const {loginSuccess, logout, setUser} = authSlice.actions;
 export default authSlice.reducer;

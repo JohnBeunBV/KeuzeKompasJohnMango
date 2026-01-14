@@ -14,42 +14,26 @@ const LoginPage: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const handleMicrosoftLogin = async () => {
-        try {
+    const redirectAfterLogin = (user: any) => {
+    console.log("✅ redirectAfterLogin called");
+    console.log("User profiel:", user.profile);
 
-            await initMsal();
-
-            const loginResponse = await msalInstance.loginPopup({
-                scopes: ["openid", "profile", "email"],
-            });
-
-            const idToken = loginResponse.idToken;
-
-            const res = await apiClient.post(
-                "/auth/login/oauth/microsoft",
-                {idToken}
-            );
-
-            dispatch(loginSuccess({
-                token: res.data.token,
-                user: res.data.user,
-            }));
-
-            navigate("/vkms");
-        } catch (err) {
-            setError("Microsoft login mislukt");
-            console.error(err);
-        }
+    if (!user.profile?.interests || user.profile.interests.length === 0) {
+        console.log("Interests leeg → ga naar /studentenprofiel");
+        navigate("/studentenprofiel");
+    } else {
+        console.log("Interests aanwezig → ga naar /vkms");
+        navigate("/vkms");
+    }
     };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log("🔹 handleLogin gestart met email:", email);
 
         try {
-            const res = await apiClient.post("/auth/login", {
-                email,
-                password,
-            });
+            const res = await apiClient.post("/auth/login", { email, password });
+            console.log("Login response:", res.data);
 
             dispatch(
                 loginSuccess({
@@ -58,11 +42,79 @@ const LoginPage: React.FC = () => {
                 })
             );
 
-            navigate("/vkms");
+            console.log("LoginSuccess dispatched, haal full profile op via /auth/me");
+
+            const profileRes = await apiClient.get("/auth/me", {
+                headers: {
+                    Authorization: `Bearer ${res.data.token}`,
+                },
+            });
+
+            console.log("/auth/me response:", profileRes.data);
+            const fullUser = profileRes.data;
+
+            dispatch(
+                loginSuccess({
+                    token: res.data.token,
+                    user: fullUser,
+                })
+            );
+
+            redirectAfterLogin(fullUser);
         } catch (err: any) {
+            console.error("Login error:", err);
             setError(err.response?.data?.error || "Login mislukt");
         }
     };
+
+    const handleMicrosoftLogin = async () => {
+        console.log("🔹 handleMicrosoftLogin gestart");
+        try {
+            await initMsal();
+            const loginResponse = await msalInstance.loginPopup({
+                scopes: ["openid", "profile", "email"],
+            });
+
+            const idToken = loginResponse.idToken;
+            console.log("MSAL login token:", idToken);
+
+            const res = await apiClient.post("/auth/login/oauth/microsoft", { idToken });
+            console.log("Microsoft login response:", res.data);
+
+            dispatch(
+                loginSuccess({
+                    token: res.data.token,
+                    user: res.data.user,
+                })
+            );
+
+            console.log("LoginSuccess dispatched, haal full profile op via /auth/me");
+
+            const profileRes = await apiClient.get("/auth/me", {
+                headers: {
+                    Authorization: `Bearer ${res.data.token}`,
+                },
+            });
+
+            console.log("/auth/me response:", profileRes.data);
+            const fullUser = profileRes.data;
+
+            dispatch(
+                loginSuccess({
+                    token: res.data.token,
+                    user: fullUser,
+                })
+            );
+
+            redirectAfterLogin(fullUser);
+        } catch (err) {
+            console.error("Microsoft login error:", err);
+            setError("Microsoft login mislukt");
+        }
+    };
+
+
+
 
     return (
         <div className="login-container">

@@ -21,15 +21,26 @@ import TeacherPage from "./presentation/pages/TeacherPage";
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Layout/>}>
-
-                {/* Public */}
-                <Route index element={<HomePage/>}/>
-                <Route path="about" element={<AboutPage/>}/>
-                <Route path="login" element={<LoginPage/>}/>
-                <Route path="register" element={<RegisterPage/>}/>
-
+            <Route path="/" element={<Layout />}>
                 {/* Auth required */}
+                <Route
+                    index
+                    element={
+                    <AuthGuard>
+                        <HomePage />
+                    </AuthGuard>
+                    }
+                />
+
+                <Route
+                    path="about"
+                    element={
+                        <AuthGuard>
+                            <AboutPage/>
+                        </AuthGuard>
+                    }
+                />
+
                 <Route
                     path="account"
                     element={
@@ -96,6 +107,10 @@ function App() {
 
                 <Route path="unauthorized" element={<ErrorPage/>}/>
                 <Route path="*" element={<ErrorPage/>}/>
+
+                {/* Public */}
+                <Route path="login" element={<LoginPage />} />
+                <Route path="register" element={<RegisterPage />} />
             </Route>
         </Routes>
     );
