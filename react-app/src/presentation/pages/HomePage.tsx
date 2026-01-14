@@ -1,6 +1,7 @@
 import { Container, Row, Col, Carousel, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
+import "../homepage.css";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();

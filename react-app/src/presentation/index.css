@@ -35,6 +35,9 @@ h1 {
     line-height: 1.1;
 }
 
+body {
+  overflow-x: hidden;
+}
 
 .navbar,
 .footer {
@@ -665,6 +668,12 @@ html {
     align-items: flex-start;
     padding: 2rem;
     box-sizing: border-box;
+}
+
+@media (max-width: 557px) {
+    .terminal-container {
+        margin-top: 105px;
+    }
 }
 
 /* Flex container voor account en favorieten */
