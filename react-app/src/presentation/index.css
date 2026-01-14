@@ -428,6 +428,21 @@ html {
     box-sizing: border-box; /* Zorgt dat alles netjes uitlijnt */
 }
 
+@media (max-width: 557px) {
+    .login-container {
+        min-height: 100svh; /* mobile-safe viewport height */
+        height: 100svh;
+        overflow: hidden; /* kill tiny scroll */
+    }
+}
+
+@media (max-width: 557px) {
+    body:has(.login-container) {
+        padding-bottom: 0 !important;
+        overflow: hidden;
+    }
+}
+
 @keyframes gradientFlow {
     0% {
         background-position: 0% 50%;
