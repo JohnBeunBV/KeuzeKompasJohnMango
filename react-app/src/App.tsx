@@ -26,7 +26,7 @@ function App() {
                 <Route
                     index
                     element={
-                    <AuthGuard>
+                    <AuthGuard requireProfile={false} requireLogin={false}>
                         <HomePage />
                     </AuthGuard>
                     }
@@ -35,7 +35,7 @@ function App() {
                 <Route
                     path="about"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={false} requireLogin={false}>
                             <AboutPage/>
                         </AuthGuard>
                     }
@@ -90,7 +90,7 @@ function App() {
                 <Route
                     path="teacher"
                     element={
-                        <AuthGuard roles={["teacher"]}>
+                        <AuthGuard roles={["teacher"]} requireProfile={false}>
                             <TeacherPage/>
                         </AuthGuard>
                     }
@@ -99,7 +99,7 @@ function App() {
                 <Route
                     path="admin"
                     element={
-                        <AuthGuard roles={["admin"]}>
+                        <AuthGuard roles={["admin"]} requireProfile={false}>
                             <AdminPage/>
                         </AuthGuard>
                     }

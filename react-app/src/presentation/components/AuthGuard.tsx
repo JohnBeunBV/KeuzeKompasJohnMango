@@ -1,11 +1,11 @@
 import {Navigate, useLocation} from "react-router-dom";
 import {useAppSelector} from "../../application/store/hooks";
-import type { JSX } from "react";
+import type {JSX} from "react";
 
 const isProfileComplete = (user: any): boolean => {
     if (!user?.profile) return false;
 
-    const { interests = [], values = [], goals = [] } = user.profile;
+    const {interests = [], values = [], goals = []} = user.profile;
 
     return (
         interests.length > 0 &&
@@ -17,6 +17,7 @@ const isProfileComplete = (user: any): boolean => {
 interface AuthGuardProps {
     children: JSX.Element;
     requireLogin?: boolean;
+    requireProfile?: boolean;
     roles?: string[];
 }
 
@@ -33,6 +34,7 @@ const AuthGuard = ({
                        children,
                        requireLogin = true,
                        roles = [],
+                       requireProfile = false,
                    }: AuthGuardProps) => {
     const location = useLocation();
 
@@ -55,19 +57,18 @@ const AuthGuard = ({
             <Navigate
                 to="/error?status=401&reason=missing_token"
                 replace
-                state={{ from: location }}
+                state={{from: location}}
             />
         );
     }
 
-        // Profile incomplete → force studentenprofiel
     // Profile incomplete → force studentenprofiel
     if (
         requireLogin &&
         isAuthenticated &&
         user &&
         !isTokenExpired(token ?? "") &&
-        !isProfileComplete(user) &&
+        !(isProfileComplete(user) && requireProfile) &&
         location.pathname !== "/studentenprofiel" &&
         !location.pathname.startsWith("/error")
     ) {
@@ -75,11 +76,10 @@ const AuthGuard = ({
             <Navigate
                 to="/studentenprofiel"
                 replace
-                state={{ from: location }}
+                state={{from: location}}
             />
         );
     }
-
 
 
     // Corruption check
