@@ -75,7 +75,6 @@ const AuthGuard = ({
         location.pathname !== "/studentenprofiel" &&
         !location.pathname.startsWith("/error")
     ) {
-        console.log("Force modal")
         dispatch(showForceProfileModal());
     }
 

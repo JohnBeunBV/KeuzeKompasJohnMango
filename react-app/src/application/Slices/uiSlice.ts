@@ -13,11 +13,9 @@ const uiSlice = createSlice({
     initialState,
     reducers: {
         showForceProfileModal(state) {
-            console.log("Reducer show for forceProfileModal", state.forceProfileModal);
             state.forceProfileModal = true;
         },
         hideForceProfileModal(state) {
-            console.log("Reducer hide for forceProfileModal", state.forceProfileModal);
             state.forceProfileModal = false;
         },
     },

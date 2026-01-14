@@ -66,7 +66,6 @@ export default function SwipePage() {
     }, [user]);
 
     useEffect(() => {
-        console.log(vkms.length)
         if (vkms.length < 3 && !loading) {
             fetchMoreRecommendations();
         }
@@ -117,13 +116,11 @@ export default function SwipePage() {
       ===================================================== */
     const fetchMoreRecommendations = async () => {
         if (!user) return;
-        console.log("fetchMoreRecommendations");
 
         try {
             const res = await apiClient.get("/auth/recommendations");
             const fresh = filterVkms(res.data.recommendations || []);
 
-            console.log(fresh);
 
             setVkms(prev => {
                 const existing = new Set(prev.map(v => v._id));

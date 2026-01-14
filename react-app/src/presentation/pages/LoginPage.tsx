@@ -17,25 +17,18 @@ const LoginPage: React.FC = () => {
     const navigate = useNavigate();
 
     const redirectAfterLogin = (user: any) => {
-    console.log("✅ redirectAfterLogin called");
-    console.log("User profiel:", user.profile);
-
     if (!user.profile?.interests || user.profile.interests.length === 0) {
-        console.log("Interests leeg → ga naar /studentenprofiel");
         navigate("/studentenprofiel");
     } else {
-        console.log("Interests aanwezig → ga naar /vkms");
         navigate("/vkms");
     }
     };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("🔹 handleLogin gestart met email:", email);
 
         try {
             const res = await apiClient.post("/auth/login", { email, password });
-            console.log("Login response:", res.data);
 
             dispatch(
                 loginSuccess({
@@ -44,15 +37,12 @@ const LoginPage: React.FC = () => {
                 })
             );
 
-            console.log("LoginSuccess dispatched, haal full profile op via /auth/me");
-
             const profileRes = await apiClient.get("/auth/me", {
                 headers: {
                     Authorization: `Bearer ${res.data.token}`,
                 },
             });
 
-            console.log("/auth/me response:", profileRes.data);
             const fullUser = profileRes.data;
 
             dispatch(
@@ -70,7 +60,6 @@ const LoginPage: React.FC = () => {
     };
 
     const handleMicrosoftLogin = async () => {
-        console.log("🔹 handleMicrosoftLogin gestart");
         try {
             await initMsal();
             const loginResponse = await msalInstance.loginPopup({
@@ -78,10 +67,8 @@ const LoginPage: React.FC = () => {
             });
 
             const idToken = loginResponse.idToken;
-            console.log("MSAL login token:", idToken);
 
             const res = await apiClient.post("/auth/login/oauth/microsoft", { idToken });
-            console.log("Microsoft login response:", res.data);
 
             dispatch(
                 loginSuccess({
@@ -90,15 +77,12 @@ const LoginPage: React.FC = () => {
                 })
             );
 
-            console.log("LoginSuccess dispatched, haal full profile op via /auth/me");
-
             const profileRes = await apiClient.get("/auth/me", {
                 headers: {
                     Authorization: `Bearer ${res.data.token}`,
                 },
             });
 
-            console.log("/auth/me response:", profileRes.data);
             const fullUser = profileRes.data;
 
             dispatch(
