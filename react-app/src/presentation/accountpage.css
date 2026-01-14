@@ -127,134 +127,135 @@
   margin: 0 0 15px 0;
 }
 
-/* MOBILE XAI (inside drawer flow) */
-.xai-mobile-box {
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  margin-top: 12px;
-
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 10px;
-  color: #fff;
-
-  box-shadow: none;
-  padding: 12px;
+/* --- 1. SHARED XAI MODAL COMPONENTS --- */
+.xai-interaction-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
 }
 
-/* Make sure content is clickable */
-.xai-mobile-overlay * {
-  pointer-events: auto;
+.xai-modal-card {
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 24px;
+    color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    animation: modalPop 0.25s cubic-bezier(0.17, 0.67, 0.83, 0.67);
 }
 
-.xai-mobile-overlay > div,
-.xai-mobile-overlay > div * {
-  color: #ffffff; /* pure white */
+.xai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
 }
 
-/* The Modal Card itself */
-.xai-mobile-overlay > div {
-  background: #111;
-  border: 1px solid #444;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 600px; /* Desktop width */
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  color: white;
-}
-
-/* Mobile adjustments */
-@media (max-width: 500px) {
-  .xai-mobile-overlay > div {
-    max-width: 92vw;
-    margin-top: 0;
-  }
+.xai-title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #fff;
 }
 
 .close-btn {
-  background: none;
-  border: none;
-  color: #ffc43b;
-  font-size: 20px;
-  cursor: pointer;
+    background: none;
+    border: none;
+    color: #ffc43b;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Progress Bar & Scores */
+.xai-score-item {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    padding-left: 10px;
+    border-left: 2px solid #ffc43b;
+    color: #ddd;
+}
+
+.xai-section {
+    margin-bottom: 15px;
 }
 
 .xai-section p {
-  font-size: 0.85rem;
-  color: #bbb;
-  margin-bottom: 15px;
+    font-size: 0.8rem;
+    color: #bbb;
+    margin-top: 5px;
 }
 
-/* The Interaction Wrapper ensures mouse movement doesn't break the hover */
-.xai-interaction-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-/* 1. The Dimmer Overlay */
-.xai-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw; /* Cover whole screen */
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4); /* Subtle dimming */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000; /* Must be higher than Side Drawer */
-  cursor: default;
-}
-
-/* 2. The Modal Card - Centered on screen for better UX */
-.xai-modal-card {
-  background: #111;
-  border: 1px solid #444;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 450px; 
-  padding: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-  color: white;
-  animation: modalPop 0.25s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-}
-
-@keyframes modalPop {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* 3. Bar Styling Improvements */
 .xai-bar {
-  background-color: #222;
-  height: 8px;
-  border-radius: 4px;
-  margin: 10px 0;
-  overflow: hidden;
-  border: 1px solid #333;
+    background-color: #222;
+    height: 8px;
+    border-radius: 4px;
+    margin: 8px 0;
+    overflow: hidden;
+    border: 1px solid #333;
 }
 
 .xai-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #ffc43b, #ff9d00);
+    height: 100%;
+    background: linear-gradient(90deg, #ffc43b, #ff9d00);
 }
 
-.xai-score-item {
-  font-size: 0.85rem;
-  margin-bottom: 6px;
-  padding-left: 10px;
-  border-left: 2px solid #ffc43b;
+/* --- 2. MOBILE SPECIFIC (FULL SCREEN OVERLAY) --- */
+@media (max-width: 500px) {
+    .xai-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.7); /* Darker backdrop for mobile focus */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        cursor: default;
+    }
+
+    .xai-modal-card {
+        width: 92vw;
+        max-width: 400px;
+    }
 }
 
-/* Cleanup old classes */
-.xai-hover-box, .xai-hover-box2, .xai-mobile-overlay, .xai-mobile-box {
-  display: none !important;
+/* --- UPDATED DESKTOP HOVER POSITIONING --- */
+@media (min-width: 501px) {
+    .xai-desktop-hover-box {
+        position: absolute;
+        top: 30px; 
+        right: 0; 
+        z-index: 1000;
+        cursor: default;
+    }
+
+    .xai-modal-card {
+        width: 380px;
+        position: relative;
+    }
+
+    /* Bridge to prevent flicker */
+    .xai-desktop-hover-box::before {
+        content: "";
+        position: absolute;
+        top: -15px;
+        left: 0;
+        width: 100%;
+        height: 15px;
+    }
+}
+
+/* Ensure the refresh icon rotates when clicked (optional polish) */
+.refresh-btn:active svg {
+    transform: rotate(90deg);
+    transition: 0.2s;
+}
+
+/* --- 4. ANIMATIONS --- */
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.95) translateY(5px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
