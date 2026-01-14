@@ -128,7 +128,8 @@ export default function AIModelInputPage() {
     </p>
 
     <p className="ai-subtext">
-      Je kunt meerdere opties selecteren (Ctrl/⌘ + klik).
+      Je kunt meerdere opties selecteren
+      <span className="desktop-only"> (Ctrl/⌘ + klik)</span>.
     </p>
 
     {savedProfile && (
