@@ -353,9 +353,22 @@ const AccountPage: React.FC = () => {
 
                             <button
                                 className="info-btn"
-                                onMouseEnter={() => setShowXaiModal(true)}
-                                onMouseLeave={() => setShowXaiModal(false)}
-                                style={{background: "none", border: "none", padding: 0, cursor: "pointer"}}
+                                onClick={() => {
+                                    if (window.matchMedia("(max-width: 500px)").matches) {
+                                        setShowXaiModal(true); // mobile opens overlay
+                                    }
+                                }}
+                                onMouseEnter={() => {
+                                    if (!window.matchMedia("(max-width: 500px)").matches) {
+                                        setShowXaiModal(true); // desktop hover stays the same
+                                    }
+                                }}
+                                onMouseLeave={() => {
+                                    if (!window.matchMedia("(max-width: 500px)").matches) {
+                                        setShowXaiModal(false);
+                                    }
+                                }}
+                                style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -379,64 +392,68 @@ const AccountPage: React.FC = () => {
                                 </svg>
                             </button>
 
-                            {showXaiModal && (
+                            {showXaiModal && window.matchMedia("(max-width: 500px)").matches && (
                                 <div
-                                    className="xai-hover-box"
-                                    onMouseEnter={() => setShowXaiModal(true)}
-                                    onMouseLeave={() => setShowXaiModal(false)}
+                                    className="xai-mobile-overlay"
+                                    onClick={() => setShowXaiModal(false)}
                                 >
-                                    <div className="xai-header">
-                                        <span className="xai-title">Hoe komen deze aanbevelingen tot stand?</span>
-                                    </div>
-
-                                    <div className="xai-body" style={{maxWidth: "700px"}}>
-                                        {/* Score explanations */}
-                                        <div className="xai-score-explanations mb-3">
-                                            <div className="xai-score-item">
-                                                <strong>96% en hoger:</strong> Sterke match met jouw interesses, sterk
-                                                aanbevolen.
-                                            </div>
-                                            <div className="xai-score-item">
-                                                <strong>85–95%:</strong> Overwegend matchend, maar het kan nuttig zijn eerst wat
-                                                extra te onderzoeken.
-                                            </div>
-                                            <div className="xai-score-item">
-                                                <strong>70–84%:</strong> Gedeeltelijk vergelijkbaar; bespreek dit bij voorkeur
-                                                eerst met een studiecoach.
-                                            </div>
-                                            <div className="xai-score-item">
-                                                <strong>Onder 70%:</strong> Niet aanbevolen om te kiezen.
-                                            </div>
+                                    <div onClick={(e) => e.stopPropagation()}>
+                                        <div className="xai-header">
+                                            <span className="xai-title">
+                                                Hoe komen deze aanbevelingen tot stand?
+                                            </span>
+                                            <button
+                                                className="close-btn"
+                                                onClick={() => setShowXaiModal(false)}
+                                                aria-label="Sluiten"
+                                            >
+                                                ✕
+                                            </button>
                                         </div>
 
-                                        <hr/>
-
-                                        {/* Original AI weight bars */}
-                                        <div className="xai-section">
-                                            <strong>Inhoudsovereenkomst (45%)</strong>
-                                            <div className="xai-bar">
-                                                <div className="xai-fill" style={{width: "45%"}}/>
+                                        <div className="xai-body" style={{ maxWidth: "700px" }}>
+                                            {/* Score explanations */}
+                                            <div className="xai-score-explanations mb-3">
+                                                <div className="xai-score-item">
+                                                    <strong>96% en hoger:</strong> Sterke match met jouw interesses, sterk aanbevolen.
+                                                </div>
+                                                <div className="xai-score-item">
+                                                    <strong>85–95%:</strong> Overwegend matchend, maar het kan nuttig zijn eerst wat extra te onderzoeken.
+                                                </div>
+                                                <div className="xai-score-item">
+                                                    <strong>70–84%:</strong> Gedeeltelijk vergelijkbaar; bespreek dit bij voorkeur eerst met een studiecoach.
+                                                </div>
+                                                <div className="xai-score-item">
+                                                    <strong>Onder 70%:</strong> Niet aanbevolen om te kiezen.
+                                                </div>
                                             </div>
-                                            <p>Vergelijkt de inhoud van VKM’s met jouw favorieten. Modules met
-                                                vergelijkbare onderwerpen scoren hoger.</p>
-                                        </div>
 
-                                        <div className="xai-section">
-                                            <strong>Gebruikersprofiel (50%)</strong>
-                                            <div className="xai-bar">
-                                                <div className="xai-fill" style={{width: "50%"}}/>
-                                            </div>
-                                            <p>Houdt rekening met jouw studiegedrag, voorkeuren en eerdere keuzes. Dit
-                                                is de zwaarst meewegende factor.</p>
-                                        </div>
+                                            <hr />
 
-                                        <div className="xai-section">
-                                            <strong>Populariteit (5%)</strong>
-                                            <div className="xai-bar">
-                                                <div className="xai-fill" style={{width: "5%"}}/>
+                                            {/* Original AI weight bars */}
+                                            <div className="xai-section">
+                                                <strong>Inhoudsovereenkomst (45%)</strong>
+                                                <div className="xai-bar">
+                                                    <div className="xai-fill" style={{ width: "45%" }} />
+                                                </div>
+                                                <p>Vergelijkt de inhoud van VKM’s met jouw favorieten. Modules met vergelijkbare onderwerpen scoren hoger.</p>
                                             </div>
-                                            <p>Modules die vaker door andere studenten gekozen worden, krijgen een
-                                                lichte voorkeur.</p>
+
+                                            <div className="xai-section">
+                                                <strong>Gebruikersprofiel (50%)</strong>
+                                                <div className="xai-bar">
+                                                    <div className="xai-fill" style={{ width: "50%" }} />
+                                                </div>
+                                                <p>Houdt rekening met jouw studiegedrag, voorkeuren en eerdere keuzes. Dit is de zwaarst meewegende factor.</p>
+                                            </div>
+
+                                            <div className="xai-section">
+                                                <strong>Populariteit (5%)</strong>
+                                                <div className="xai-bar">
+                                                    <div className="xai-fill" style={{ width: "5%" }} />
+                                                </div>
+                                                <p>Modules die vaker door andere studenten gekozen worden, krijgen een lichte voorkeur.</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
