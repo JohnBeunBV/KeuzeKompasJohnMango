@@ -1,8 +1,7 @@
 import "../swipe.css";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import axios from "axios";
-import type { Vkm } from "@domain/models/vkm.model";
-import { useNavigate } from "react-router-dom";
+import type {Vkm} from "@domain/models/vkm.model";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Toast from "react-bootstrap/Toast";
@@ -17,13 +16,15 @@ const API_BASE_URL = import.meta.env.VITE_API_URL;
 const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
 
 export default function SwipePage() {
-    
-    const navigate = useNavigate();
-    const token = localStorage.getItem("token");
 
+    const token = localStorage.getItem("token");
+    // Vkms
     const [vkms, setVkms] = useState<Vkm[]>([]);
-    const [index, setIndex] = useState(0);
     const [loading, setLoading] = useState(true);
+
+    // Session-only memory
+    const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
+
     const {user} = useAppSelector((s) => s.auth);
     const [pexelsImages, setPexelsImages] = useState<Record<string, string>>({});
 
@@ -31,8 +32,10 @@ export default function SwipePage() {
     const [dragging, setDragging] = useState(false);
     const [startX, setStartX] = useState(0);
 
-    const SWIPE_THRESHOLD = 120; 
+    const SWIPE_THRESHOLD = 120;
     const [showIntroModal, setShowIntroModal] = useState(false);
+    const [showLikeToast, setShowLikeToast] = useState(false);
+
     const [swipeOut, setSwipeOut] = useState<"left" | "right" | null>(null);
 
     const dispatch = useAppDispatch();
@@ -54,9 +57,20 @@ export default function SwipePage() {
     // 🔹 Haal gebruiker en favorieten op
     useEffect(() => {
         dispatch(fetchUser());
-        setLoading(false);
-        refreshRecommendations();
     }, [dispatch]);
+
+    useEffect(() => {
+        if (user) {
+            fetchMoreRecommendations().finally(() => setLoading(false));
+        }
+    }, [user]);
+
+    useEffect(() => {
+        console.log(vkms.length)
+        if (vkms.length < 3 && !loading) {
+            fetchMoreRecommendations();
+        }
+    }, [vkms.length]);
 
     /* =====================================================
        Pointer Listeners (Fixes "Stickiness")
@@ -86,32 +100,41 @@ export default function SwipePage() {
             window.removeEventListener("pointermove", handleGlobalPointerMove);
         };
     }, [dragging, x, startX]);
+    // Filter vkm list
+    const filterVkms = (incoming: Vkm[]) => {
+        const favoriteIds = new Set(
+            (user?.favorites ?? []).map((f: any) => f._id)
+        );
+
+        return incoming.filter(vkm =>
+            !favoriteIds.has(vkm._id) &&
+            !seenIds.has(vkm._id)
+        );
+    };
 
     /* =====================================================
-       Auth & Data Fetching
-    ===================================================== */
-    useEffect(() => {
-        if (!token) {
-            navigate("/error", { state: { status: 401, message: "Log in om te swipen." } });
-        }
-    }, [token, navigate]);
+            Fetch VKMs → redirect bij DB/API fout
+      ===================================================== */
+    const fetchMoreRecommendations = async () => {
+        if (!user) return;
+        console.log("fetchMoreRecommendations");
 
-    useEffect(() => {
-        if (!token) return;
-        const fetchVkms = async () => {
-            try {
-                const res = await axios.get(`${API_BASE_URL}/vkms`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setVkms(res.data.vkms);
-            } catch (err) {
-                navigate("/error", { state: { status: 500, message: "Modules laden mislukt." } });
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchVkms();
-    }, [token, navigate]);
+        try {
+            const res = await apiClient.get("/auth/recommendations");
+            const fresh = filterVkms(res.data.recommendations || []);
+
+            console.log(fresh);
+
+            setVkms(prev => {
+                const existing = new Set(prev.map(v => v._id));
+                const deduped = fresh.filter(v => !existing.has(v._id));
+                return [...prev, ...deduped];
+            });
+        } catch (err) {
+            console.error("Failed to fetch recommendations", err);
+        }
+    };
+
 
     /* =====================================================
           Afbeeldingen laden
@@ -119,73 +142,100 @@ export default function SwipePage() {
     useEffect(() => {
         const fetchImages = async () => {
             const results = await Promise.all(
-                vkms.slice(index, index + 5).map(async (vkm) => {
-                    const cacheKey = `vkm-image-${vkm._id}`;
-                    const cached = localStorage.getItem(cacheKey);
-                    if (cached) return { _id: vkm._id, img: cached };
-                    try {
-                        const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(vkm.name)}&per_page=1`, {
-                            headers: { Authorization: PEXELS_API_KEY },
-                        });
-                        const json = await res.json();
-                        const img = json.photos?.[0]?.src?.large || "/john-mango.png";
-                        localStorage.setItem(cacheKey, img);
-                        return { _id: vkm._id, img };
-                    } catch {
-                        return { _id: vkm._id, img: "/john-mango.png" };
-                    }
-                })
+                vkms
+                    .slice(0, 5) // current + next 4
+                    .filter(vkm => !pexelsImages[vkm._id]) // already loaded? skip
+                    .map(async (vkm) => {
+                        const cacheKey = `vkm-image-${vkm._id}`;
+                        const cached = localStorage.getItem(cacheKey);
+
+                        if (cached) {
+                            return {_id: vkm._id, img: cached};
+                        }
+
+                        try {
+                            const res = await fetch(
+                                `https://api.pexels.com/v1/search?query=${encodeURIComponent(vkm.name)}&per_page=1`,
+                                {headers: {Authorization: PEXELS_API_KEY}}
+                            );
+                            const json = await res.json();
+                            const img =
+                                json.photos?.[0]?.src?.large ?? "/john-mango.png";
+
+                            localStorage.setItem(cacheKey, img);
+                            return {_id: vkm._id, img};
+                        } catch {
+                            return {_id: vkm._id, img: "/john-mango.png"};
+                        }
+                    })
             );
+
+            if (results.length === 0) return;
+
             setPexelsImages(prev => {
-                const updated = { ...prev };
-                results.forEach(r => updated[r._id] = r.img);
+                const updated = {...prev};
+                results.forEach(r => {
+                    updated[r._id] = r.img;
+                });
                 return updated;
             });
         };
-        if (vkms.length > 0) fetchImages();
-    }, [vkms, index]);
+
+        if (vkms.length > 0) {
+            fetchImages();
+        }
+    }, [vkms, pexelsImages]);
+
 
     const commitSwipe = (direction: "left" | "right") => {
-        const currentVkm = vkms[index];
-        if (!currentVkm) return;
+        const current = vkms[0];
+        if (!current) return;
 
-        // 1. TRIGGER ANIMATION IMMEDIATELY
+        // 1️⃣ Animate immediately
         setSwipeOut(direction);
-        const flyDistance = (direction === "right" ? window.innerWidth : -window.innerWidth) * 1.5;
-        setX(x + flyDistance);
+        const flyDistance =
+            (direction === "right" ? window.innerWidth : -window.innerWidth) * 1.5;
+        setX(flyDistance);
 
-        // 2. DO THE API CALL WITHOUT 'AWAIT'
-        // This runs in the background while the card is flying
+        // 2️⃣ Background API call
         if (direction === "right") {
-            axios.post(`${API_BASE_URL}/auth/users/favorites/${currentVkm._id}`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            }).catch(e => console.error("Favorite failed", e));
+            setShowLikeToast(true);
+            axios.post(
+                `${API_BASE_URL}/auth/users/favorites/${current._id}`,
+                {},
+                {headers: {Authorization: `Bearer ${token}`}}
+            ).catch(console.error);
         }
 
-        // 3. CLEANUP AFTER ANIMATION
+        // 3️⃣ Mark as seen (session only)
+        setSeenIds(prev => new Set(prev).add(current._id));
+
+        // 4️⃣ Remove card after animation
         setTimeout(() => {
+            setVkms(prev => prev.slice(1));
             setSwipeOut(null);
             setX(0);
-            setIndex((prev) => prev + 1);
-        }, 500); 
+        }, 400);
     };
 
     if (loading) return <div className="swipe-page"><p>Modules laden...</p></div>;
 
-    const currentVkm = vkms[index];
-    const nextVkm = vkms[index + 1];
+    const currentVkm = vkms[0];
+    const nextVkm = vkms[1];
 
     if (!currentVkm) return <div className="swipe-page"><h3>Geen modules meer!</h3></div>;
 
     const renderCard = (vkm: Vkm) => (
         <div className="vkm-info-card">
-            <img 
-                src={pexelsImages[vkm._id] || "/john-mango.png"} 
-                alt={vkm.name} 
-                onError={(e) => { (e.target as HTMLImageElement).src = "/john-mango.png"; }}
+            <img
+                src={pexelsImages[vkm._id] || "/john-mango.png"}
+                alt={vkm.name}
+                onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/john-mango.png";
+                }}
             />
             <h4 className="mb-3">{vkm.name}</h4>
-            <hr />
+            <hr/>
             <p><strong>Studiepunten:</strong> {vkm.studycredit}</p>
             <p><strong>Locatie:</strong> {vkm.location}</p>
             <p><strong>Startdatum:</strong> {vkm.start_date}</p>
@@ -203,6 +253,7 @@ export default function SwipePage() {
                     try {
                         localStorage.setItem("swipeIntroShown", "true");
                     } catch (err) {
+                        console.log(err);
                         /* ignore */
                     }
                     setShowIntroModal(false);
@@ -232,7 +283,10 @@ export default function SwipePage() {
                     )}
                     <div
                         className={`swipe-card swipe-card-top ${swipeOut ? 'swiping-out' : ''}`}
-                        onPointerDown={(e) => { setStartX(e.clientX); setDragging(true); }}
+                        onPointerDown={(e) => {
+                            setStartX(e.clientX);
+                            setDragging(true);
+                        }}
                         style={{
                             transform: `translateX(${x}px) rotate(${x / 15}deg)`,
                             transition: dragging || swipeOut ? "transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)" : "none",

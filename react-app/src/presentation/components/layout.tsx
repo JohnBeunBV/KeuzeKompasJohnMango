@@ -3,7 +3,6 @@ import {Outlet, useNavigate, Link, useLocation} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
 import {logout} from "../../application/Slices/authSlice";
 import {Home, List, Heart, Info, Settings} from "lucide-react";
-
 import "../index.css";
 import "../accountpage.css";
 import "../navbar.css";
