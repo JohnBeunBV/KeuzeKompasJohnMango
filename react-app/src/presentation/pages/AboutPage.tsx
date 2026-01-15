@@ -208,7 +208,8 @@ const AboutPage: React.FC = () => {
       </section>
       <hr />
 <section className="feature-section">
-  <h2>De inspiratie achter het project</h2>
+  <h1>De inspiratie achter het project</h1>
+  <hr />
 
   <div className="feature-cards">
     <div className="feature-card react">
@@ -219,8 +220,25 @@ const AboutPage: React.FC = () => {
         waren beperkt beschikbaar, waardoor hij al vroeg merkte hoe lastig het is
         om zonder richting vooruit te komen.
       </p>
+      <img src="/johnmangoskeer.png" alt="skeremango" />
     </div>
-
+     <div className="col-12 col-md-6 col-lg-3">
+        <div className="ad-wrapper">
+          <h1>John Beun</h1>
+          <p>John beun is in ontwikkeling:
+            Wordt verwacht zomer 2026!
+          </p>
+          <img
+            src="/JohnBeun.png"
+            alt="Advertisement 2"
+            className="ad-image img-fluid"
+            style={{objectFit: "cover", width: "100%" }}
+          />
+          <p className="text-muted mb-2">
+            Gesponsord door <strong>John B.V.</strong>
+          </p>
+        </div>
+      </div>
     <div className="feature-card angular">
       <h3>Gebrek aan begeleiding</h3>
       <p>
@@ -228,7 +246,9 @@ const AboutPage: React.FC = () => {
         een grote uitdaging. John zag niet alleen zijn eigen worsteling, maar ook die van
         andere studenten die belangrijke beslissingen moesten nemen zonder overzicht of ondersteuning.
       </p>
+      <img src="/johnmangoplan.png" alt="johnmangoplan" />
     </div>
+    
   </div>
 
   {/* Tekst onder de eerste twee cards */}
@@ -246,7 +266,34 @@ const AboutPage: React.FC = () => {
         Hij combineerde zijn persoonlijke ervaringen met technische kennis en ontdekte
         hoe digitale middelen kunnen bijdragen aan begeleiding en inzicht.
       </p>
+      <img src="/johnmangobeunen.png" alt="johnmangobeunen" />
     </div>
+       {/* Advertentie 1 */}
+<div className="col-12 col-md-6 col-lg-3">
+  <div className="ad-wrapper">
+    <a
+      href="https://johnpork.aptrs.nl/"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
+      <h1>John Pork Trashboard</h1>
+
+      <img
+        src="/Branding3.png"
+        alt="Advertisement 1"
+        className="ad-image img-fluid"
+        style={{ maxHeight: "cover", width: "100%", cursor: "pointer" }}
+      />
+    </a>
+
+    <p>Bekijk en analyseer zwerfafval in de gemeente Breda</p>
+
+    <p className="text-muted mb-2">
+      Gesponsord door <strong>John B.V.</strong>
+    </p>
+  </div>
+</div>
 
     <div className="feature-card nestjs">
       <h3>De realisatie</h3>
@@ -255,9 +302,9 @@ const AboutPage: React.FC = () => {
         een platform dat studenten helpt hun voorkeuren te verkennen, beschikbare opties te vergelijken
         en keuzes te maken die aansluiten bij hun interesses en ambities.
       </p>
+      <img src="/johnmangorijk.png" alt="rijkemango" />
     </div>
   </div>
-
   {/* Grote conclusie onder de tweede twee cards */}
   <p className="framework-conclusion">
     Het Avans KeuzeKompas is geïnspireerd op dit gedachtegoed. Binnen dit project ontwikkelen wij
@@ -309,6 +356,7 @@ const AboutPage: React.FC = () => {
           ))}
         </div>
       </section>
+
     </div>
   );
 };
