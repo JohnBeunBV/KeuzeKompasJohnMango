@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import "../index.css";
 
-interface UserStory {
+interface Technique {
   id: string;
   title: string;
   description: string;
-  criteria: string[];
+  details: string[];
 }
 
 interface Epic {
   id: string;
   title: string;
   goal: string;
-  userStories: UserStory[];
+  userStories: Technique[];
 }
 
 const AboutPage: React.FC = () => {
@@ -23,111 +23,111 @@ const AboutPage: React.FC = () => {
   const epics: Epic[] = [
     {
       id: "1",
-      title: "Epic 1 – Gebruikersauthenticatie & Profielbeheer",
-      goal: "Een veilige authenticatieflow waarmee gebruikers kunnen registreren, inloggen, hun profiel beheren en beveiligd toegang krijgen tot hun persoonlijke data.",
+      title: "Frontend",
+      goal: "De frontend verzorgt de gebruikerservaring en visuele presentatie van het VKM-dashboard.",
       userStories: [
         {
           id: "1.1",
-          title: "User Story 1.1 – Registratie",
-          description: "Als nieuwe gebruiker wil ik een account aanmaken zodat ik toegang krijg tot de applicatie en mijn eigen favorieten kan opslaan.",
-          criteria: [
-            "Gebruiker kan een account aanmaken via een formulier.",
-            "Een foutmelding verschijnt bij een bestaand e-mailadres.",
-            "Na registratie wordt de gebruiker doorgestuurd naar het dashboard."
+          title: "React + TypeScript",
+          description: "De frontend is ontwikkeld met React in combinatie met TypeScript.",
+          details: [
+            "Component-based architectuur",
+            "Typeveiligheid en betere onderhoudbaarheid",
+            "Grote community en ecosysteem"
           ]
         },
         {
           id: "1.2",
-          title: "User Story 1.2 – Inloggen",
-          description: "Als gebruiker wil ik kunnen inloggen zodat ik mijn gegevens kan beheren.",
-          criteria: [
-            "Gebruiker kan inloggen met e-mail en wachtwoord.",
-            "Verkeerde inloggegevens tonen een foutmelding.",
-            "Na succesvol inloggen wordt de sessie onthouden."
+          title: "State & interactie",
+          description: "De applicatie maakt gebruik van React hooks voor interactieve functionaliteit.",
+          details: [
+            "useState voor dynamische UI",
+            "Conditionele rendering",
+            "Duidelijke en leesbare logica"
           ]
         },
         {
           id: "1.3",
-          title: "User Story 1.3 – Profiel beheren",
-          description: "Als gebruiker wil ik mijn profiel kunnen aanpassen of verwijderen zodat ik controle heb over mijn account.",
-          criteria: [
-            "Gebruiker kan naam en e-mailadres wijzigen.",
-            "Er is een optie om het account permanent te verwijderen.",
-            "Wijzigingen worden direct opgeslagen en zichtbaar."
+          title: "Styling & layout",
+          description: "De layout is opgebouwd met custom CSS.",
+          details: [
+            "Consistente styling",
+            "Card-based ontwerp",
+            "Responsieve opzet"
           ]
         }
       ]
     },
     {
       id: "2",
-      title: "Epic 2 – VKM Weergave & Detailpagina’s",
-      goal: "Een overzichtelijke interface waarin gebruikers beschikbare VKM’s kunnen bekijken, filteren en details raadplegen.",
+      title: "Backend",
+      goal: "De backend verwerkt data, verzorgt authenticatie en communiceert met de database.",
       userStories: [
         {
           id: "2.1",
-          title: "User Story 2.1 – VKM Overzicht",
-          description: "Toont alle beschikbare VKM’s met naam, locatie en studiepunten.",
-          criteria: [
-            "Lijst toont minimaal naam, locatie en studiepunten.",
-            "Data wordt opgehaald via de API.",
-            "Gebruiker kan op een item klikken voor details."
+          title: "Express API",
+          description: "De backend is gebouwd met Express als REST API.",
+          details: [
+            "Lichtgewicht en flexibel",
+            "Snelle setup",
+            "Volledige controle over routing"
           ]
         },
         {
           id: "2.2",
-          title: "User Story 2.2 – VKM Detailpagina",
-          description: "Geeft uitgebreide informatie over een specifieke VKM.",
-          criteria: [
-            "Detailpagina toont beschrijving, studiepunten en competenties.",
-            "Er is een knop om terug te keren naar het overzicht.",
-            "De data wordt dynamisch geladen."
+          title: "Authenticatie",
+          description: "Gebruikersdata wordt beveiligd via backend-authenticatie.",
+          details: [
+            "Login- en registratie-endpoints",
+            "Beveiligde routes",
+            "Data-afscherming"
           ]
         },
         {
           id: "2.3",
-          title: "User Story 2.3 – Zoeken & filteren",
-          description: "Gebruikers kunnen VKM’s filteren op naam, locatie en studiepunten.",
-          criteria: [
-            "Zoekveld filtert resultaten real-time.",
-            "Dropdowns bevatten unieke waarden uit de dataset.",
-            "Filters kunnen gecombineerd worden."
+          title: "Database-integratie",
+          description: "Data wordt persistent opgeslagen in een database.",
+          details: [
+            "Opslag van gebruikers en favorieten",
+            "Consistente datamodellen",
+            "Betrouwbare data tussen sessies"
           ]
         }
       ]
     },
     {
       id: "3",
-      title: "Epic 3 – Favorietenbeheer",
-      goal: "Gebruikers kunnen VKM’s opslaan als favoriet, beheren en snel terugvinden.",
+      title: "Python Model",
+      goal: "Het Python-model analyseert data en ondersteunt intelligente functionaliteit.",
       userStories: [
         {
           id: "3.1",
-          title: "User Story 3.1 – Favoriet toevoegen",
-          description: "Gebruiker kan een VKM toevoegen aan zijn favorietenlijst.",
-          criteria: [
-            "Knop op detailpagina voegt VKM toe aan favorieten.",
-            "Favorieten worden opgeslagen in de database.",
-            "Een bevestiging verschijnt na toevoegen."
+          title: "Data preprocessing",
+          description: "Ruwe data wordt opgeschoond en voorbereid voor analyse.",
+          details: [
+            "Opschonen van datasets",
+            "Normalisatie",
+            "Structurering van data"
           ]
         },
         {
           id: "3.2",
-          title: "User Story 3.2 – Favoriet verwijderen",
-          description: "Gebruiker kan een VKM verwijderen uit zijn favorietenlijst.",
-          criteria: [
-            "Verwijderknop verwijdert VKM direct uit lijst.",
-            "De database wordt geüpdatet.",
-            "Een melding bevestigt de actie."
+          title: "Analyse & logica",
+          description: "Het model voert analyses of voorspellingen uit.",
+          details: [
+            "Gebruik van Python libraries",
+            "Herbruikbare functies",
+            "Uitbreidbaar ontwerp"
           ]
         },
         {
           id: "3.3",
-          title: "User Story 3.3 – Favorietenlijst bekijken",
-          description: "Toont de opgeslagen favoriete VKM’s van de gebruiker.",
-          criteria: [
-            "De lijst toont alle opgeslagen VKM’s.",
-            "Elk item heeft een directe link naar de detailpagina.",
-            "Favorieten blijven behouden tussen sessies."
+          title: "Backend-koppeling",
+          description: "Het model communiceert met de backend via API-calls.",
+          details: [
+            "JSON-communicatie",
+            "Losgekoppelde architectuur",
+            "Makkelijk te testen"
           ]
         }
       ]
@@ -138,7 +138,6 @@ const AboutPage: React.FC = () => {
     setOpenEpics(prev => {
       const isOpen = prev.includes(id);
       if (isOpen) {
-        // Epic sluiten -> alle user stories ook sluiten
         setOpenUserStories(prev => ({ ...prev, [id]: [] }));
         setAllOpen(false);
         return prev.filter(e => e !== id);
@@ -149,7 +148,7 @@ const AboutPage: React.FC = () => {
   };
 
   const toggleUserStory = (epicId: string, usId: string, e: React.MouseEvent) => {
-    e.preventDefault(); // voorkom default toggle van <details>
+    e.preventDefault();
     setOpenUserStories(prev => {
       const openStories = prev[epicId] || [];
       if (openStories.includes(usId)) {
@@ -186,54 +185,97 @@ const AboutPage: React.FC = () => {
         </button>
       </header>
 
+      {/* 🔹 NIEUWE SECTIE */}
       <section className="feature-section">
-        <h2>Frameworkkeuze: React vs Angular</h2>
-        <div className="feature-cards">
-          <div className="feature-card react">
-            <h3>React</h3>
-            <p>
-              React is eenvoudig te leren, flexibel en heeft een grote community. 
-              TypeScript wordt goed ondersteund en het framework is ideaal voor snelle ontwikkeling.
-            </p>
-          </div>
-          <div className="feature-card angular">
-            <h3>Angular</h3>
-            <p>
-              Angular biedt een complete structuur met ingebouwde tools, sterke TypeScript-integratie
-              en is perfect voor enterprise-omgevingen en schaalbare systemen.
-            </p>
-          </div>
-        </div>
-        <p className="framework-conclusion">
-          Voor dit project koos ik <strong>React</strong> vanwege de flexibiliteit, eenvoud en communityondersteuning.
+        <h2>Projectintroductie & Doel</h2>
+        <p>
+          In periode 2.3 staan studenten voor de uitdaging om een passende keuze te maken binnen de vrije keuzeruimte.
+          Dit keuzeproces is vaak lastig door een gebrek aan overzicht, begeleiding en persoonlijke afstemming.
+          Hierdoor lopen studenten het risico keuzes te maken die niet aansluiten bij hun interesses,
+          vaardigheden of carrièreambities.
+        </p>
+        <p>
+          Om dit probleem aan te pakken ontwikkelen wij het <strong>Avans KeuzeKompas</strong>:
+          een webapplicatie die studenten ondersteunt bij het maken van bewuste en onderbouwde modulekeuzes.
+          De applicatie helpt studenten bij het reflecteren op hun voorkeuren, het vergelijken van beschikbare modules
+          en het ontvangen van gepersonaliseerde aanbevelingen.
+        </p>
+        <p>
+          Het doel van dit project is het realiseren van een functionerend <strong>Minimum Viable Product (MVP)</strong>
+          binnen de projectperiode (blok LU3). Dit MVP bestaat uit een full-stack webapplicatie met een frontend,
+          backend, database en een AI-component die aanbevelingen doet op basis van ingevoerde gebruikersdata.
         </p>
       </section>
+      <hr />
 <section className="feature-section">
-  <h2>Frameworkkeuze: Express vs NestJS</h2>
+  <h2>De inspiratie achter het project</h2>
+
   <div className="feature-cards">
-    <div className="feature-card express">
-      <h3 className="feature-title">Express</h3>
+    <div className="feature-card react">
+      <h3>Een bescheiden begin</h3>
       <p>
-        Express is een minimalistisch en flexibel Node.js-framework. 
-        Het is lichtgewicht en ideaal voor snelle API-ontwikkeling zonder veel structuur. 
-        Je hebt volledige controle over routing en middleware.
+        John Mango, officieel genaamd <em>Johannes Beunes Mangones</em>, groeide op in een landelijke omgeving
+        waar middelen schaars waren en kansen niet vanzelfsprekend. Onderwijs en begeleiding
+        waren beperkt beschikbaar, waardoor hij al vroeg merkte hoe lastig het is
+        om zonder richting vooruit te komen.
       </p>
     </div>
-    <div className="feature-card nestjs">
-      <h3 className="feature-title">NestJS</h3>
+
+    <div className="feature-card angular">
+      <h3>Gebrek aan begeleiding</h3>
       <p>
-        NestJS is een volledig gestructureerd framework met TypeScript-integratie. 
-        Het maakt gebruik van modules, controllers en services voor schaalbare applicaties. 
-        Perfect voor grotere projecten en teams die een duidelijke architectuur willen.
+        Zonder financiële ruimte en zonder duidelijke begeleiding was het maken van keuzes
+        een grote uitdaging. John zag niet alleen zijn eigen worsteling, maar ook die van
+        andere studenten die belangrijke beslissingen moesten nemen zonder overzicht of ondersteuning.
       </p>
     </div>
   </div>
+
+  {/* Tekst onder de eerste twee cards */}
   <p className="framework-conclusion">
-    Voor dit project koos ik <strong>Express</strong> vanwege de eenvoud, flexibiliteit en snelle setup voor mijn backend-API.
+    Deze ervaringen vormden de basis voor Johns visie: studenten zouden nooit alleen
+    moeten staan bij keuzes die hun toekomst bepalen. Er moest een hulpmiddel komen
+    dat overzicht biedt, ondersteunt bij reflectie en helpt bij het maken van bewuste beslissingen.
+  </p>
+
+  <div className="feature-cards">
+    <div className="feature-card express">
+      <h3>Een idee ontstaat</h3>
+      <p>
+        Vanuit deze overtuiging begon John zichzelf te ontwikkelen en aan oplossingen te werken.
+        Hij combineerde zijn persoonlijke ervaringen met technische kennis en ontdekte
+        hoe digitale middelen kunnen bijdragen aan begeleiding en inzicht.
+      </p>
+    </div>
+
+    <div className="feature-card nestjs">
+      <h3>De realisatie</h3>
+      <p>
+        Dit leidde tot het ontstaan van het <strong>KeuzeKompas van John Mango</strong>:
+        een platform dat studenten helpt hun voorkeuren te verkennen, beschikbare opties te vergelijken
+        en keuzes te maken die aansluiten bij hun interesses en ambities.
+      </p>
+    </div>
+  </div>
+
+  {/* Grote conclusie onder de tweede twee cards */}
+  <p className="framework-conclusion">
+    Het Avans KeuzeKompas is geïnspireerd op dit gedachtegoed. Binnen dit project ontwikkelen wij
+    een functionerend <strong>Minimum Viable Product (MVP)</strong> dat studenten actief ondersteunt
+    bij het kiezen van modules binnen de vrije keuzeruimte. Door reflectie, vergelijking en
+    gepersonaliseerde aanbevelingen te combineren, streven wij ernaar studenten meer zekerheid,
+    motivatie en richting te bieden. Wat begon als een persoonlijke ervaring,
+    is uitgegroeid tot een oplossing met impact.
+    <strong>Al goed eind goed.</strong>
   </p>
 </section>
+
+
+
+
+
       <section className="epics-section">
-        <h2>Project Epics</h2>
+        <h2>Technische Architectuur</h2>
         <hr />
         <div className="epics-container">
           {epics.map(epic => (
@@ -255,8 +297,8 @@ const AboutPage: React.FC = () => {
                       </summary>
                       <p>{us.description}</p>
                       <ul>
-                        {us.criteria.map((c, i) => (
-                          <li key={i}>{c}</li>
+                        {us.details.map((d, i) => (
+                          <li key={i}>{d}</li>
                         ))}
                       </ul>
                     </details>
