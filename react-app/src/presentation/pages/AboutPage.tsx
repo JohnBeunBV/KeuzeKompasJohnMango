@@ -176,13 +176,11 @@ const AboutPage: React.FC = () => {
   return (
     <div className="about-page">
       <header className="homepage-header">
-        <h1>Over dit project</h1>
+        <h1>Over John Mango Keuzekompas</h1>
         <p className="lead">
-          Leer meer over de keuzes van frameworks, architectuur en de structuur van mijn VKM-dashboard.
+          Leer meer over onze inspiratie en de gebruikte technieken in ons project.
         </p>
-        <button className="btn-header2" onClick={toggleAllEpics}>
-          {allOpen ? "Alles dichtklappen" : "Alle epics openklappen"}
-        </button>
+        
       </header>
 
       {/* 🔹 NIEUWE SECTIE */}
@@ -206,7 +204,6 @@ const AboutPage: React.FC = () => {
           backend, database en een AI-component die aanbevelingen doet op basis van ingevoerde gebruikersdata.
         </p>
       </section>
-      <hr />
 <section className="feature-section">
   <h1>De inspiratie achter het project</h1>
   <hr />
@@ -321,41 +318,54 @@ const AboutPage: React.FC = () => {
 
 
 
-      <section className="epics-section">
-        <h2>Technische Architectuur</h2>
-        <hr />
-        <div className="epics-container">
-          {epics.map(epic => (
-            <div key={epic.id} className="epic-card">
-              <div className="epic-header" onClick={() => toggleEpic(epic.id)}>
-                <h3>{epic.title}</h3>
-                <p>{epic.goal}</p>
-              </div>
-              {openEpics.includes(epic.id) && (
-                <div className="user-stories">
-                  {epic.userStories.map(us => (
-                    <details
-                      key={us.id}
-                      className="user-story"
-                      open={openUserStories[epic.id]?.includes(us.id)}
-                    >
-                      <summary onClick={(e) => toggleUserStory(epic.id, us.id, e)}>
-                        {us.title}
-                      </summary>
-                      <p>{us.description}</p>
-                      <ul>
-                        {us.details.map((d, i) => (
-                          <li key={i}>{d}</li>
-                        ))}
-                      </ul>
-                    </details>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+      <section className="epics-section text-center">
+  {/* Titel */}
+  <h2>Technische Architectuur</h2>
+  <hr style={{ margin: "0 auto 1.5rem auto", width: "200px" }} />
+
+  {/* Knop gecentreerd */}
+  <div className="mb-4">
+    <button className="btn-header" onClick={toggleAllEpics}>
+      {allOpen ? "Alles dichtklappen" : "Alle technische technieken openklappen"}
+    </button>
+  </div>
+   <hr />
+   <br />
+  {/* Epics */}
+  <div className="epics-container">
+    {epics.map(epic => (
+      <div key={epic.id} className="epic-card">
+        <div className="epic-header" onClick={() => toggleEpic(epic.id)}>
+          <h3>{epic.title}</h3>
+          <p>{epic.goal}</p>
         </div>
-      </section>
+
+        {openEpics.includes(epic.id) && (
+          <div className="user-stories">
+            {epic.userStories.map(us => (
+              <details
+                key={us.id}
+                className="user-story"
+                open={openUserStories[epic.id]?.includes(us.id)}
+              >
+                <summary onClick={(e) => toggleUserStory(epic.id, us.id, e)}>
+                  {us.title}
+                </summary>
+                <p>{us.description}</p>
+                <ul>
+                  {us.details.map((d, i) => (
+                    <li key={i}>{d}</li>
+                  ))}
+                </ul>
+              </details>
+            ))}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</section>
+
 
     </div>
   );

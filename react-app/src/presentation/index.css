@@ -1161,9 +1161,9 @@ html {
 
 .epic-card {
     flex: 1 1 30%;
-    background: #fffef5;
+    background: #fff7b1;
     border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(255, 143, 0, 0.15);
+    box-shadow: 0 4px 10px rgba(255, 145, 0, 0.55);
     padding: 1.5rem;
     min-width: 300px;
     display: flex;
