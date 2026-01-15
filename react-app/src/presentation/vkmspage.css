@@ -128,7 +128,6 @@
   .vkms-page {
     padding-left: 8px;
     padding-right: 8px;
-    padding-top: 100px;
   }
 }
 
@@ -145,4 +144,10 @@
   height: 32px;
   z-index: 10;
   cursor: pointer;
+}
+
+@media (max-width: 556px) {
+  .vkms-page {
+    padding-top: 120px;
+  }
 }
