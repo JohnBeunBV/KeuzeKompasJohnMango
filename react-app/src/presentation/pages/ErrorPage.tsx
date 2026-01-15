@@ -1,6 +1,7 @@
 import React from "react";
 import {Container, Row, Col, Button} from "react-bootstrap";
 import {useNavigate, useLocation} from "react-router-dom";
+import "../navbar.css";
 
 const ErrorPage: React.FC = () => {
     const navigate = useNavigate();

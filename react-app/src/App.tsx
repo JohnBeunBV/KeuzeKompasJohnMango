@@ -22,18 +22,29 @@ function App() {
     return (
         <Routes>
             <Route path="/" element={<Layout/>}>
-
-                {/* Public */}
-                <Route index element={<HomePage/>}/>
-                <Route path="about" element={<AboutPage/>}/>
-                <Route path="login" element={<LoginPage/>}/>
-                <Route path="register" element={<RegisterPage/>}/>
-
                 {/* Auth required */}
+                <Route
+                    index
+                    element={
+                        <AuthGuard requireLogin={false}>
+                            <HomePage/>
+                        </AuthGuard>
+                    }
+                />
+
+                <Route
+                    path="about"
+                    element={
+                        <AuthGuard requireLogin={false}>
+                            <AboutPage/>
+                        </AuthGuard>
+                    }
+                />
+
                 <Route
                     path="account"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <AccountPage/>
                         </AuthGuard>
                     }
@@ -42,7 +53,7 @@ function App() {
                 <Route
                     path="studentenprofiel"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <AIModelInputPage/>
                         </AuthGuard>
                     }
@@ -51,7 +62,7 @@ function App() {
                 <Route
                     path="vkms"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <VkmsPage/>
                         </AuthGuard>
                     }
@@ -60,7 +71,7 @@ function App() {
                 <Route
                     path="vkms/:id"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <VkmsDetailPage/>
                         </AuthGuard>
                     }
@@ -69,7 +80,7 @@ function App() {
                 <Route
                     path="swipe"
                     element={
-                        <AuthGuard>
+                        <AuthGuard requireProfile={true}>
                             <SwipePage/>
                         </AuthGuard>
                     }
@@ -96,6 +107,10 @@ function App() {
 
                 <Route path="unauthorized" element={<ErrorPage/>}/>
                 <Route path="*" element={<ErrorPage/>}/>
+
+                {/* Public */}
+                <Route path="login" element={<LoginPage/>}/>
+                <Route path="register" element={<RegisterPage/>}/>
             </Route>
         </Routes>
     );

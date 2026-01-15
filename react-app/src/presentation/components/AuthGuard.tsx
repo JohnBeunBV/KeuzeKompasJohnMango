@@ -1,9 +1,25 @@
 import {Navigate, useLocation} from "react-router-dom";
-import {useAppSelector} from "../../application/store/hooks";
+import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
+import {tokenExpired} from "../../application/Slices/authSlice";
+import type {JSX} from "react";
+import {showForceProfileModal} from "../../application/Slices/uiSlice.ts";
+
+const isProfileComplete = (user: any): boolean => {
+    if (!user?.profile) return false;
+
+    const {interests = [], values = [], goals = []} = user.profile;
+
+    return (
+        interests.length > 0 &&
+        values.length > 0 &&
+        goals.length > 0
+    );
+};
 
 interface AuthGuardProps {
     children: JSX.Element;
     requireLogin?: boolean;
+    requireProfile?: boolean;
     roles?: string[];
 }
 
@@ -20,32 +36,48 @@ const AuthGuard = ({
                        children,
                        requireLogin = true,
                        roles = [],
+                       requireProfile = false,
                    }: AuthGuardProps) => {
     const location = useLocation();
+    const dispatch = useAppDispatch();
 
-    const {token, isAuthenticated, user} = useAppSelector((state) => state.auth);
+    const {token, status, user} = useAppSelector((state) => state.auth);
 
-    const userRoles = user?.roles ?? [];
+    const userRoles = user?.roles ?? ["student"];
     // Token expired → 401 but with reason
     if (token && isTokenExpired(token)) {
+        dispatch(tokenExpired());
         return (
             <Navigate
-                to="/error?status=401&reason=expired"
+                to="/error?status=401&reason=expired_token"
                 replace
                 state={{from: location}}
             />
         );
     }
     // Not logged in / missing token
-    if (requireLogin && !isAuthenticated) {
+    if (requireLogin && status === "idle") {
         return (
             <Navigate
                 to="/error?status=401&reason=missing_token"
                 replace
-                state={{ from: location }}
+                state={{from: location}}
             />
         );
     }
+    // Profile incomplete → force studentenprofiel
+    if (
+        requireLogin &&
+        requireProfile &&
+        status === "authenticated" &&
+        user &&
+        !isProfileComplete(user) &&
+        location.pathname !== "/studentenprofiel" &&
+        !location.pathname.startsWith("/error")
+    ) {
+        dispatch(showForceProfileModal());
+    }
+
 
     // Corruption check
     if (roles.length > 0 && !user) {

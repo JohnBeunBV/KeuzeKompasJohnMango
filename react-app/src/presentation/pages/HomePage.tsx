@@ -1,6 +1,7 @@
 import { Container, Row, Col, Carousel, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "../index.css";
+import "../homepage.css";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -8,18 +9,35 @@ const HomePage: React.FC = () => {
   return (
     <div className="homepage">
       {/* Header */}
-      <header className="homepage-header text-center p-5 mb-5">
-        <h1>Welkom bij John Mango</h1>
-        <p className="lead">
-          Ontdek en beheer VKM's in een stijlvol, kleurrijk en interactief mango-thema.
-        </p>
-        <Button
-          className="btn-header2"
-          onClick={() => navigate("/vkms")}
-        >
-          Ontdek VKM's
-        </Button>
-      </header>
+<header className="homepage-header text-center p-5 mb-5">
+  <h1>Welkom bij John Mango</h1>
+
+  {/* Introductie */}
+  <p className="lead mt-4">
+    John Mango helpt studenten die moeite hebben met het kiezen van de juiste
+    <strong> vrije keuzemodules.</strong> Door jouw interesses centraal te zetten, maken we
+    studiekeuzes overzichtelijk en makkelijker.
+  </p>
+
+  {/* Uitleg sectie */}
+  <div className="row justify-content-center mt-5">
+    <div className="col-md-8">
+      <p>
+        Gebruik onze interactieve swiper
+        om aanbevolen modules te <strong>liken</strong> of <strong>disliken</strong>.
+      </p>
+    </div>
+  </div>
+
+  {/* Call to action */}
+  <Button
+    className="btn-header2 mt-4"
+    onClick={() => navigate("/swipe")}
+  >
+    Swipe je aanbevolen VKM's
+  </Button>
+</header>
+
 
       {/* Carousel */}
       <Container className="my-5">
@@ -31,13 +49,13 @@ const HomePage: React.FC = () => {
               alt="Swipe VKM's"
             />
             <Carousel.Caption className="carousel-caption">
-              <h3>Swipe VKM's</h3>
-              <p>Swipe VKM's die passen bij jouw studie en interesses.</p>
+              <h3>Ontdek VKM's</h3>
+              <p>Ontdek VKM's die passen bij jouw studie en interesses.</p>
               <Button
                 className="btn-header"
-                onClick={() => navigate("/swipe")}
+                onClick={() => navigate("/vkms")}
               >
-                Swipe VKM's
+                Ontdek VKM's
               </Button>
             </Carousel.Caption>
           </Carousel.Item>
@@ -49,7 +67,7 @@ const HomePage: React.FC = () => {
             />
             <Carousel.Caption className="carousel-caption">
               <h3>Smart Study Coach</h3>
-              <p>Bekijk jouw aanbevolen VKM's op je profiel pagina!</p>
+              <p>Bekijk jouw aanbevolen VKM's op je profiel pagina.</p>
 
               <Button
                 className="btn-header"
@@ -66,8 +84,14 @@ const HomePage: React.FC = () => {
               alt="Altijd up-to-date"
             />
             <Carousel.Caption className="carousel-caption">
-              <h3>Altijd up-to-date</h3>
-              <p>Blijf op de hoogte van nieuwe VKM's en beschikbare plekken.</p>
+              <h3>Studentenprofiel</h3>
+              <p>Vul je interesses, waarden en doelen in op je studentenprofiel.</p>
+              <Button
+                className="btn-header"
+                onClick={() => navigate("/studentenprofiel")}
+              >
+                Studentenprofiel
+              </Button>
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
@@ -94,7 +118,7 @@ const HomePage: React.FC = () => {
               </button>
               <div className="feature-details">
                 <p>
-                  Filter VKM's op locatie, studiepunten of tags en ontdek snel de modules die bij jou passen.
+                  Filter VKM's op naam, locatie, studiepunten, moeilijkheid en/of tags en ontdek snel de modules die bij jou passen.
                 </p>
               </div>
             </div>
@@ -116,7 +140,7 @@ const HomePage: React.FC = () => {
               </button>
               <div className="feature-details">
                 <p>
-                  Sla je favoriete modules op en bekijk ze in een overzichtelijke lijst met één klik.
+                  Sla je favoriete modules op en bekijk ze in een overzichtelijke lijst op de vkm pagina en account pagina.
                 </p>
               </div>
             </div>
@@ -125,8 +149,8 @@ const HomePage: React.FC = () => {
           {/* Card 3 */}
           <Col md={4} className="d-flex justify-content-center">
             <div className="feature-card wide-card">
-              <h4 className="feature-title">Altijd up-to-date</h4>
-              <p>Ontvang notificaties over nieuwe VKM's en beschikbare plekken.</p>
+              <h4 className="feature-title">Bekijk de about page</h4>
+              <p>Leer meer over John Mango</p>
               <button
                 className="feature-toggle"
                 onClick={(e) => {
@@ -138,7 +162,7 @@ const HomePage: React.FC = () => {
               </button>
               <div className="feature-details">
                 <p>
-                  Blijf op de hoogte van wijzigingen en updates zodat je nooit een interessante module mist.
+                  Leer de developers kennen en de technologieën achter John Mango op onze about page.
                 </p>
               </div>
             </div>

@@ -143,3 +143,6 @@ vite.config.ts.timestamp-*
 
 # Python cache files
 __pycache__/
+
+# venv
+python-model/venv/

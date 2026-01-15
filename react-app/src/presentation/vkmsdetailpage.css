@@ -1,0 +1,26 @@
+@media (max-width: 992px) {
+  .shortdescription-wrapper {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .john-mango-image {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    object-fit: contain;
+    align-self: center;
+  }
+}
+
+@media (max-width: 556px) {
+  .vkm-info {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .info-box {
+    margin-top: 65px;
+    margin-bottom: 1rem;
+  }
+}

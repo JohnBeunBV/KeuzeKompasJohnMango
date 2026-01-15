@@ -8,6 +8,18 @@
     padding: 24px;
 }
 
+@media (max-width: 557px) {
+    .ai-container {
+        padding-top: 130px;
+    }
+}
+
+@media (max-width: 1000px) {
+  .desktop-only {
+    display: none;
+  }
+}
+
 .ai-intro {
     margin-bottom: 10px;
 }
