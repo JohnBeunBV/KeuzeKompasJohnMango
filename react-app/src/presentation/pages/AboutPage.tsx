@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../index.css";
+import "../homepage.css";
 
 interface Technique {
   id: string;
