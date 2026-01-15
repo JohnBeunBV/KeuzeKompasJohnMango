@@ -10,11 +10,15 @@
     "tsc:check": "npm run tsc:check-app && npm run tsc:check-cypress",
     "tsc:check-app": "tsc --noEmit --project \"./tsconfig.json\"",
     "tsc:check-cypress": "tsc --noEmit --project \"./cypress/tsconfig.json\"",
-    "test:e2e": "cypress run"
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "concurrently -k -s first \"npm run dev:all\" \"wait-on http://localhost:5173 && npm run cypress:run\"",
+    "test:e2e:open": "concurrently -k -s first \"npm run dev:all\" \"wait-on http://localhost:5173 && npm run cypress:open\""
   },
   "devDependencies": {
-    "concurrently": "^9.1.2",
-    "cypress": "^15.9.0"
+    "concurrently": "^9.2.1",
+    "cypress": "^15.9.0",
+    "wait-on": "^9.0.3"
   },
   "dependencies": {
     "tsc": "^2.0.4",
