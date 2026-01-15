@@ -43,3 +43,19 @@
 .account-password-toggle:hover svg {
   color: #ff8f00;
 }
+
+@media (min-width: 1001px) {
+  .login-container {
+    margin-top: 40px;
+  }
+
+  .terminal-container {
+    margin-top: 40px;
+  }
+}
+
+@media (min-width: 983px) and (max-width: 1000px) {
+  .terminal-container {
+    margin-bottom: 60px;
+  }
+}
