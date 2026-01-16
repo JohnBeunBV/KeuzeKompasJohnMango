@@ -167,6 +167,14 @@ jobs:
           # Creating a token https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # !! Hier nog Unit Tests !!
+  # !! Bij deploy to portainer cypress-run vervangen door unit-tests wanneer de job geschreven is !!
+
+  # unit-tests:
+  #   name: Run Unit Tests
+  #   runs-on: ubuntu-latest
+  #   needs: cypress-run
+
   sonarqube:
     name: SonarQube Scan
     runs-on: ubuntu-latest
@@ -241,7 +249,7 @@ jobs:
   deploy:
     name: Deploy via Portainer
     runs-on: ubuntu-latest
-    needs: [security,  cypress-run]
+    needs: [security,  cypress-run] # !! Hier cypress-run vervangen voor unit-tests wanneer die job toegevoegd is !!
 
     steps:
       - name: Deploy to Portainer
