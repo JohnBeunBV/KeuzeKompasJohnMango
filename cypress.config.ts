@@ -8,6 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 let testCredentials: { email: string; password: string; username: string } | null = null;
 
 export default defineConfig({
+  projectId: process.env.CYPRESS_PROJECT_ID,
   e2e: {
     baseUrl: 'https://johnmango.aptrs.nl',
     setupNodeEvents(on, config) {
