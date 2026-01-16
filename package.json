@@ -5,7 +5,7 @@
   "scripts": {
     "install-all": "npm install --prefix server/react-server && npm install --prefix client/react-app",
     "build": "npm run build --prefix client/react-app && npm run build --prefix server/react-server",
-    "start": "npm run build --prefix client/react-app && npm start --prefix server/react-server",
+    "start": "concurrently \"npm run dev --prefix react-app\" \"npm run start --prefix react-server\"",
     "dev": "concurrently \"npm run dev --prefix server/react-server\" \"npm run dev --prefix client/react-app\"",
     "tsc:check": "npm run tsc:check-app && npm run tsc:check-cypress",
     "tsc:check-app": "tsc --noEmit --project \"./tsconfig.json\"",
