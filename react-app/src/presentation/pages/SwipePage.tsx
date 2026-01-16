@@ -28,6 +28,11 @@ export default function SwipePage() {
     const {user} = useAppSelector((s) => s.auth);
     const [pexelsImages, setPexelsImages] = useState<Record<string, string>>({});
 
+    const [dislikedIds, setDislikedIds] = useState<Set<string>>(() => {
+    const stored = localStorage.getItem("dislikedVkms");
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+    });
+
     const [x, setX] = useState(0);
     const [dragging, setDragging] = useState(false);
     const [startX, setStartX] = useState(0);
@@ -39,6 +44,17 @@ export default function SwipePage() {
     const [swipeOut, setSwipeOut] = useState<"left" | "right" | null>(null);
 
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        try {
+            const stored = localStorage.getItem("dislikedVkms");
+            if (stored) {
+                setDislikedIds(new Set(JSON.parse(stored)));
+            }
+        } catch (err) {
+            console.error("Failed to load disliked VKMs:", err);
+        }
+    }, []);
 
     useEffect(() => {
         // Show intro modal only the first time the user opens this page.
@@ -107,7 +123,8 @@ export default function SwipePage() {
 
         return incoming.filter(vkm =>
             !favoriteIds.has(vkm._id) &&
-            !seenIds.has(vkm._id)
+            !seenIds.has(vkm._id) &&
+            !dislikedIds.has(vkm._id)
         );
     };
 
@@ -184,6 +201,15 @@ export default function SwipePage() {
         }
     }, [vkms, pexelsImages]);
 
+    const saveDislikedId = (id: string) => {
+            try {
+                const updated = new Set(dislikedIds).add(id);
+                setDislikedIds(updated);
+                localStorage.setItem("dislikedVkms", JSON.stringify(Array.from(updated)));
+            } catch (err) {
+                console.error("Failed to save disliked VKM:", err);
+            }
+        };
 
     const commitSwipe = (direction: "left" | "right") => {
         const current = vkms[0];
@@ -203,6 +229,8 @@ export default function SwipePage() {
                 {},
                 {headers: {Authorization: `Bearer ${token}`}}
             ).catch(console.error);
+        } else {
+            saveDislikedId(current._id);
         }
 
         // 3️⃣ Mark as seen (session only)
