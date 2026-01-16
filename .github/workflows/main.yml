@@ -60,10 +60,6 @@ jobs:
       - name: Install dependencies
         working-directory: python-model
         run: pip install -r requirements.txt
-        env:
-          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
-          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
-          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
 
       - name: Verify AI Model installation
         working-directory: python-model
@@ -100,10 +96,12 @@ jobs:
         run: |
           python -m uvicorn main:app --port 8000 &
           sleep 5
-          # Verify the server is running
           curl -f http://localhost:8000/docs || echo "Python Model server not ready yet"
         env:
           PYTHONUNBUFFERED: 1
+          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
+          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
+          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
 
       - name: Cypress run
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
@@ -140,11 +138,6 @@ jobs:
           SEED_ADMIN_ROLE: ${{ secrets.SEED_ADMIN_ROLE }}
           MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
           MICROSOFT_TENANT_ID: ${{ secrets.MICROSOFT_TENANT_ID }}
-
-          # python ai
-          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
-          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
-          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
 
           # Creating a token https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
