@@ -43,8 +43,8 @@ jobs:
       - name: NPM Audit
         run: npm audit --audit-level=high
 
-  build-ai-model:
-    name: Build Python AI Model
+  build-python-model:
+    name: Build Python Model
     runs-on: ubuntu-latest
 
     steps:
@@ -58,18 +58,18 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        working-directory: ai-model
+        working-directory: python-model
         run: pip install -r requirements.txt
 
       - name: Verify AI Model installation
-        working-directory: ai-model
+        working-directory: python-model
         run: |
           python -c "import uvicorn; print('uvicorn installed')"
           python -c "import sys; print(f'Python {sys.version}')"
         
   cypress-run:
     runs-on: ubuntu-latest
-    needs: [build-ts, build-ai-model]
+    needs: [build-ts, build-python-model]
     # Runs tests in parallel with matrix strategy https://docs.cypress.io/guides/guides/parallelization
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
     # Also see warning here https://github.com/cypress-io/github-action#parallel
@@ -81,23 +81,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python for AI Model
+      - name: Setup Python for Python Model
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
       - name: Install Python dependencies
-        working-directory: ai-model
+        working-directory: python-model
         run: pip install -r requirements.txt
 
-      - name: Start AI Model server
-        working-directory: ai-model
+      - name: Start Python Model server ai
+        working-directory: python-model
         run: |
           python -m uvicorn main:app --port 8000 &
           sleep 5
           # Verify the server is running
-          curl -f http://localhost:8000/docs || echo "AI Model server not ready yet"
+          curl -f http://localhost:8000/docs || echo "Python Model server not ready yet"
         env:
           PYTHONUNBUFFERED: 1
 
