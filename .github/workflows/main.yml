@@ -83,6 +83,28 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
+      - name: Install Dependencies Backend
+        working-directory: react-server
+        run: npm ci
+
+      - name: Start Backend
+        working-directory: react-server
+        run: npm run start
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MODEL_API_URL: ${{ secrets.MODEL_API_URL }}
+          SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+          SEED_ADMIN_USERNAME: ${{ secrets.SEED_ADMIN_USERNAME }}
+          SEED_ADMIN_ROLE: ${{ secrets.SEED_ADMIN_ROLE }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_TENANT_ID: ${{ secrets.MICROSOFT_TENANT_ID }}
+          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
+          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
+          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
+
       - name: Install Python dependencies
         working-directory: python-model
         run: pip install -r requirements.txt
@@ -134,6 +156,9 @@ jobs:
           SEED_ADMIN_ROLE: ${{ secrets.SEED_ADMIN_ROLE }}
           MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
           MICROSOFT_TENANT_ID: ${{ secrets.MICROSOFT_TENANT_ID }}
+          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
+          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
+          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
 
           # Creating a token https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
