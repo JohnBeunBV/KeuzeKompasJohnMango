@@ -74,6 +74,12 @@ const Layout: React.FC = () => {
                                     Teacher
                                 </Link>
                             )}
+
+                            {roles.includes("admin") && (
+                                <Link to="/admin" className="nav-link role-link teacher">
+                                    Admin
+                                </Link>
+                            )}
                         </nav>
                     </div>
 
