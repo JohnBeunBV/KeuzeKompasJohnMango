@@ -329,7 +329,7 @@ const AccountPage: React.FC = () => {
 
                         {user?.profile && (
                         <div className="mt-5 p-3 border rounded terminal-subsection">
-                            <h5 className="mb-3">Jouw ingevulde voorkeuren</h5>
+                            <h2 className="terminal-title mb-3">Jouw ingevulde voorkeuren</h2>
 
                             <PreferenceList
                                 title="Interesses"
