@@ -118,9 +118,10 @@ export default function SwipePage() {
         if (!user) return;
 
         try {
-            const res = await apiClient.get("/auth/recommendations");
+            const res = await apiClient.get("/auth/recommendations", {
+                params: { topN: 15 }  // ← params object voor GET requests
+            });
             const fresh = filterVkms(res.data.recommendations || []);
-
 
             setVkms(prev => {
                 const existing = new Set(prev.map(v => v._id));

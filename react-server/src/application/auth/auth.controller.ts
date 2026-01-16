@@ -160,7 +160,8 @@ export const getFavoritesByUserId = async (req: AuthRequest, res: Response) => {
 
 export const getRecommendations = async (req: AuthRequest, res: Response) => {
     try {
-        const recommendations = await authService.getRecommendations(getUserIdFromRequest(req));
+        const topN = parseInt(req.query.topN as string) || 15;
+        const recommendations = await authService.getRecommendations(getUserIdFromRequest(req), topN);
         res.json({recommendations});
     } catch (err: any) {
         res.status(400).json({error: err.message});
