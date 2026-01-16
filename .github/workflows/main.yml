@@ -93,7 +93,7 @@ jobs:
 
       - name: Start Backend
         working-directory: react-server
-        run: npm run start
+        run: npm run start &
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
