@@ -10,7 +10,7 @@ let testCredentials: { email: string; password: string; username: string } | nul
 export default defineConfig({
   projectId: process.env.CYPRESS_PROJECT_ID,
   e2e: {
-    baseUrl: 'https://johnmango.aptrs.nl',
+    baseUrl: 'http://localhost:4173',
     setupNodeEvents(on, config) {
 
       const testPassword = process.env.CYPRESS_TEST_PASSWORD;

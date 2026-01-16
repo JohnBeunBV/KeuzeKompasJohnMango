@@ -7,6 +7,7 @@
     "react-app"
   ],
   "scripts": {
+    "start": "concurrently \"npm run start -w react-server\" \"npm run start -w react-app\"",
     "dev": "concurrently \"npm run dev -w react-server\" \"npm run dev -w react-app\"",
     "build": "npm run build -w react-app && npm run build -w react-server",
 

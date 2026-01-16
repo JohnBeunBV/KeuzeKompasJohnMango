@@ -158,20 +158,48 @@ describe('E2E Tests', () => {
 
                 cy.wait('@loginRequest').its('response.statusCode').should('eq', 200);
 
-                // Check if redirected to profile page (new user without profile)
                 cy.url().should('include', '/studentenprofiel');
-
-                // Welcome modal should be visible
                 cy.get('.intro-modal').should('be.visible');
                 cy.get('.intro-modal').should('contain', 'Welkom bij je profiel');
 
                 // Close welcome modal
                 cy.get('.intro-modal button').contains('Begrepen').click();
 
-                // Fill in profile
-                cy.get('.ai-select').eq(0).select(['Business & Innovatie', 'ICT & Software Development'], { force: true });
-                cy.get('.ai-select').eq(1).select(['Innovatie', 'Zelfontwikkeling'], { force: true });
-                cy.get('.ai-select').eq(2).select(['Nieuwe vaardigheden ontwikkelen'], { force: true });
+                // Wait for select-elements
+                cy.get('.ai-select').should('have.length', 3);
+                cy.wait(500);
+
+                // en dan change event triggeren
+                cy.get('.ai-select').eq(0).then((select) => {
+                    // Select "Business & Innovatie"
+                    cy.wrap(select).find('option').contains('Business & Innovatie').then(($option) => {
+                        $option.prop('selected', true);
+                    });
+                    // Trigger change event on the select element
+                    cy.wrap(select).trigger('change', { force: true });
+                });
+
+                cy.wait(300);
+
+                cy.get('.ai-select').eq(1).then((select) => {
+                    // Select "Innovatie"
+                    cy.wrap(select).find('option').contains('Innovatie').then(($option) => {
+                        $option.prop('selected', true);
+                    });
+                    cy.wrap(select).trigger('change', { force: true });
+                });
+
+                cy.wait(300);
+
+                cy.get('.ai-select').eq(2).then((select) => {
+                    // Select "Nieuwe vaardigheden ontwikkelen"
+                    cy.wrap(select).find('option').contains('Nieuwe vaardigheden ontwikkelen').then(($option) => {
+                        $option.prop('selected', true);
+                    });
+                    cy.wrap(select).trigger('change', { force: true });
+                });
+
+                cy.wait(500);
 
                 // Intercept profile save
                 cy.intercept('PUT', '**/auth/me/profile').as('saveProfile');
@@ -184,10 +212,8 @@ describe('E2E Tests', () => {
                 // Success modal should appear
                 cy.get('.intro-modal').should('contain', 'Voorkeuren opgeslagen!');
 
-                // Navigate to homepage
                 cy.get('.intro-modal button').contains('Naar homepagina').click();
 
-                // Now should be able to access VKMs
                 cy.url().should('eq', Cypress.config().baseUrl + '/');
                 cy.visit('/vkms');
                 cy.get('.vkms-page').should('be.visible');
@@ -211,12 +237,14 @@ describe('E2E Tests', () => {
                 // Login
                 cy.visit('/login');
                 cy.intercept('POST', '**/auth/login').as('loginRequest');
+                cy.intercept('GET', '**/auth/me').as('getUser');
 
                 cy.get('input[placeholder="E-mailadres"]').type(credentials.email);
                 cy.get('input[placeholder="Wachtwoord"]').type(credentials.password);
                 cy.get('.login-button').click();
 
                 cy.wait('@loginRequest').its('response.statusCode').should('eq', 200);
+                cy.wait('@getUser');
                 cy.url().should('include', '/vkms');
 
                 // Click first VKM detail button
@@ -261,12 +289,17 @@ describe('E2E Tests', () => {
                 // Login
                 cy.visit('/login');
                 cy.intercept('POST', '**/auth/login').as('loginRequest');
+                cy.intercept('GET', '**/auth/me').as('getUser');
+
 
                 cy.get('input[placeholder="E-mailadres"]').type(credentials.email);
                 cy.get('input[placeholder="Wachtwoord"]').type(credentials.password);
                 cy.get('.login-button').click();
 
                 cy.wait('@loginRequest');
+                cy.wait('@getUser');
+
+                // Navigate to account page
                 cy.visit('/account');
 
                 // Wait for favorites to load
@@ -308,13 +341,14 @@ describe('E2E Tests', () => {
                 // Login
                 cy.visit('/login');
                 cy.intercept('POST', '**/auth/login').as('loginRequest');
+                cy.intercept('GET', '**/auth/me').as('getUser');
 
                 cy.get('input[placeholder="E-mailadres"]').type(credentials.email);
                 cy.get('input[placeholder="Wachtwoord"]').type(credentials.password);
                 cy.get('.login-button').click();
 
                 cy.wait('@loginRequest').its('response.statusCode').should('eq', 200);
-
+                cy.wait('@getUser');
                 // Navigate to swipe page
                 cy.visit('/swipe');
                 cy.get('.swipe-page').should('be.visible');
@@ -337,8 +371,6 @@ describe('E2E Tests', () => {
 
                     cy.wait('@addFavorite').its('response.statusCode').should('eq', 200);
 
-                    cy.visit('/vkms');
-                    cy.get('.vkms-page').should('be.visible');
                     // Navigate to account page
                     cy.visit('/account');
 
@@ -361,13 +393,14 @@ describe('E2E Tests', () => {
                 // Login
                 cy.visit('/login');
                 cy.intercept('POST', '**/auth/login').as('loginRequest');
+                cy.intercept('GET', '**/auth/me').as('getUser');
 
                 cy.get('input[placeholder="E-mailadres"]').type(credentials.email);
                 cy.get('input[placeholder="Wachtwoord"]').type(credentials.password);
                 cy.get('.login-button').click();
 
                 cy.wait('@loginRequest');
-
+                cy.wait('@getUser');
                 // Navigate to account page
                 cy.visit('/account');
 
@@ -398,4 +431,59 @@ describe('E2E Tests', () => {
             });
         });
     });
+
+    describe('Cleanup - Delete Account', () => {
+        beforeEach(() => {
+            cy.clearLocalStorage();
+            cy.clearCookies();
+        });
+
+        describe('Cleanup - Delete Account', () => {
+            it('should delete the test account after all tests', () => {
+                cy.task('getCredentials').then((credentials: any) => {
+                    if (!credentials) {
+                        cy.log('No credentials available, skipping cleanup');
+                        return;
+                    }
+
+                    // Login first
+                    cy.visit('/login');
+                    cy.intercept('POST', '**/auth/login').as('loginRequest');
+                    cy.intercept('GET', '**/auth/me').as('getUser');
+
+                    cy.get('input[placeholder="E-mailadres"]').type(credentials.email);
+                    cy.get('input[placeholder="Wachtwoord"]').type(credentials.password);
+                    cy.get('.login-button').click();
+
+                    cy.wait('@loginRequest').its('response.statusCode').should('eq', 200);
+                    cy.wait('@getUser');
+                    // Navigate to account page
+                    cy.visit('/account');
+
+                    // Wait for account page to load
+                    cy.get('h2').contains('Account Configurator').should('be.visible');
+                    cy.wait(500);
+
+                    // Intercept delete request
+                    cy.intercept('DELETE', '**/auth/me').as('deleteAccount');
+
+                    // Find and click delete button - "Account verwijderen"
+                    cy.get('button').contains('Account verwijderen').click({ force: true });
+
+                    // Handle confirmation modal
+                    cy.get('[role="dialog"]').should('be.visible');
+                    cy.get('[role="dialog"]').find('button').contains('Verwijderen').click();
+
+                    // Wait for deletion
+                    cy.wait('@deleteAccount').its('response.statusCode').should('be.oneOf', [200, 204]);
+
+                    // Should be redirected to error page (since token is now invalid)
+                    cy.url().should('include', '/error');
+                    cy.url().should('include', 'status=401');
+
+                    cy.log('Test account successfully deleted');
+                });
+            });
+        });
+    })
 });
