@@ -87,6 +87,10 @@ jobs:
         working-directory: react-server
         run: npm ci
 
+      - name: Build Backend TypeScript
+        working-directory: react-server
+        run: npm run build
+
       - name: Start Backend
         working-directory: react-server
         run: npm run start
