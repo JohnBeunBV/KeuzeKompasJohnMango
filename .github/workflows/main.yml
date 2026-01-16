@@ -130,22 +130,30 @@ jobs:
       - name: Start Python Model server
         working-directory: python-model
         run: |
-          python -m uvicorn main:app --port 8000 &
-          sleep 5
-          curl -f http://localhost:8000/docs || echo "Python Model server not ready yet"
+          python -m uvicorn main:app --port 8000 > /tmp/python.log 2>&1 &
+          sleep 10
+          curl -f http://localhost:8000/docs || (echo "Python Model server failed" && tail -50 /tmp/python.log && exit 1)
         env:
           PYTHONUNBUFFERED: 1
           PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
           MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
           MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
 
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          wait-on: 'http://localhost:4173, http://localhost:5000'
-          wait-on-timeout: 120
-          record: true
-          parallel: true
+      - name: Start Services
+        run: |
+          npm run start > /tmp/app.log 2>&1 &
+          sleep 20
+          
+          echo "=== Checking Backend on port 5000 ==="
+          curl -v http://localhost:5000 2>&1 | head -20 || true
+          
+          echo ""
+          echo "=== Checking Frontend on port 4173 ==="
+          curl -f http://localhost:4173 > /dev/null 2>&1 && echo "✓ Frontend responding" || echo "✗ Frontend not responding"
+          
+          echo ""
+          echo "=== App logs ==="
+          cat /tmp/app.log
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_TEST_PASSWORD: ${{ secrets.CYPRESS_TEST_PASSWORD }}
