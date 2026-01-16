@@ -320,6 +320,16 @@ export default function SwipePage() {
                         }}
                     >
                         {renderCard(currentVkm)}
+                        
+                        {/* Dislike overlay (left) */}
+                        <div className="swipe-overlay swipe-overlay-dislike" style={{ opacity: x < -30 ? Math.min((Math.abs(x) - 30) / 90, 1) : 0 }}>
+                            ✕
+                        </div>
+                        
+                        {/* Like overlay (right) */}
+                        <div className="swipe-overlay swipe-overlay-like" style={{ opacity: x > 30 ? Math.min((x - 30) / 90, 1) : 0 }}>
+                            ♥
+                        </div>
                     </div>
                 </div>
 
