@@ -1,18 +1,23 @@
 .side-drawer {
-  position: fixed;
-  top: 8%;
-  right: 0;
-  z-index: 1200;
-  pointer-events: none;
+    position: fixed;
+    top: 0; /* Start from the literal top of the viewport */
+    right: 0;
+    height: 100vh; /* Full height container */
+    z-index: 1200; /* Keep this lower than the navbar's 9999 */
+    pointer-events: none;
 }
 
 /* PANEL */
 .side-drawer-panel {
+  margin-top: 150px;
   width: 460px;
+  max-width: calc(100vw - 40px);
   max-height: 84vh;
   background: #111;
   border-radius: 14px 0 0 14px;
   box-shadow: none;
+
+  pointer-events: auto;
 
   display: flex;
   flex-direction: column;
@@ -28,11 +33,10 @@
   pointer-events: auto;
 }
 
-/* TOGGLE BUTTON */
 .side-drawer-toggle {
   position: absolute;
-  left: -40px; /* sits outside the panel edge */
-  top: 10px;
+  left: -40px;          /* sticks outside panel */
+  top: 20px;
 
   width: 40px;
   height: 40px;
@@ -49,8 +53,56 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   pointer-events: auto;
+
+  z-index: 5;
+}
+
+@media (max-width: 500px) {
+  .side-drawer {
+    /* Ensure the drawer covers the whole viewport and is the positioning context */
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1200;
+    pointer-events: none;
+  }
+
+  .side-drawer-panel {
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+    /* Subtract bottom nav height (64px) from viewport height */
+    height: calc(100vh - 64px);
+    max-height: calc(100vh - 64px);
+    margin-top: 56px; /* If your navbar is 56px tall, adjust as needed */
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+  }
+
+  .side-drawer-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    margin-top: 45px;
+    margin-bottom: 50px;
+  }
+
+  .side-drawer-toggle {
+    top: 72px;
+  }
+
+  .side-drawer-close-btn {
+    display: block !important;
+  }
+}
+@media (min-width: 502px) {
+  .side-drawer-close-btn {
+    display: none !important; /* Hide X button on desktop */
+  }
 }
 
 /* Arrow rotation only */
@@ -59,12 +111,43 @@
   transform: rotate(90deg);
 }
 
-.side-drawer.open .side-drawer-toggle .toggle-arrow {
+.side-drawer-toggle.open .toggle-arrow {
   transform: rotate(270deg);
 }
 
 /* CONTENT */
 .side-drawer-content {
-  padding: 16px;
+  flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain; /* This stops the background page from scrolling */
+  padding: 20px;
+  position: relative; /* Needed for the close button to scroll with it */
+}
+
+@media (max-width: 767px) {
+  .vkms-page {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* Close button inside drawer for mobile */
+.side-drawer-close-btn {
+  position: absolute; /* Absolute relative to the CONTENT, so it scrolls away */
+  top: 26px;
+  right: 26px;
+  background: #ffc43b;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+@media (max-width: 556px) {
+  .vkms-page {
+    padding-top: 120px;
+  }
 }

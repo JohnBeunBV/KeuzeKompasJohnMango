@@ -24,13 +24,12 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
         const status = error.response?.status;
-        const data = error.response?.data as { error?: string } | undefined;
-        const message = data?.error || error.message;
+        // const data = error.response?.data as { error?: string } | undefined;
+        // const message = data?.error || error.message;
 
         // Direct naar error page zonder 500 flash
         if (status === 429) {
-            window.location.href = `/error?status=429&message=${encodeURIComponent(
-                message || "Te veel requests, probeer later opnieuw."
+            window.location.href = `/error?status=429&message=${encodeURIComponent("Te veel requests, probeer later opnieuw."
             )}`;
             return new Promise(() => {
             }); // houdt de promise pending zodat React niks flasht
@@ -38,8 +37,7 @@ apiClient.interceptors.response.use(
 
         if (status === 401) {
             window.location.href =
-                `/error?status=401&reason=expired_token&message=${encodeURIComponent(
-                    message || "Sessie verlopen. Log opnieuw in."
+                `/error?status=401&reason=expired_token&message=${encodeURIComponent("Sessie verlopen. Log opnieuw in."
                 )}`;
 
             return new Promise(() => {

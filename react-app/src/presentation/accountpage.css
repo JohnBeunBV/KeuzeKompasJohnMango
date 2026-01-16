@@ -11,40 +11,6 @@
   font-size: 0.9rem;
 }
 
-.xai-hover-box {
-  position: absolute;
-  top: 28px;
-  /* adjust depending on button size */
-  left: 0;
-  width: 700px;
-  max-width: 90vw;
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 6px;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  padding: 10px;
-  transform: translateX(-42%);
-}
-
-.xai-hover-box2 {
-  position: fixed;
-  top: 28px;
-  /* adjust depending on button size */
-  left: 0;
-  width: 700px;
-  max-width: 90vw;
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 6px;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  padding: 10px;
-  transform: translateX(-55%);
-}
-
 .xai-header {
   display: flex;
   justify-content: space-between;
@@ -56,35 +22,15 @@
   font-weight: bold;
 }
 
-.close-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-}
-
 .xai-section {
   margin-bottom: 8px;
-}
-
-.xai-bar {
-  background-color: #333;
-  height: 6px;
-  border-radius: 3px;
-  margin: 2px 0;
-  overflow: hidden;
-}
-
-.xai-fill {
-  height: 100%;
-  background-color: #0d6efd;
 }
 
 .recommendations-column-container {
   display: flex;
   flex-direction: column;
-  gap: 12px; /* Space between the rows */
+  gap: 12px;
+  /* Space between the rows */
   margin-top: 20px;
 }
 
@@ -146,4 +92,204 @@
 .explanation-divider {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin: 0 0 15px 0;
+}
+
+/* --- 1. SHARED XAI MODAL COMPONENTS --- */
+.xai-interaction-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.xai-modal-card {
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 24px;
+    color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    animation: modalPop 0.25s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+}
+
+.xai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.xai-title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #ffc43b;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* Progress Bar & Scores */
+.xai-score-item {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    padding-left: 10px;
+    border-left: 2px solid #ffc43b;
+    color: #ddd;
+}
+
+.xai-section {
+    margin-bottom: 15px;
+}
+
+.xai-section p {
+    font-size: 0.8rem;
+    color: #bbb;
+    margin-top: 5px;
+}
+
+.xai-bar {
+    background-color: #222;
+    height: 8px;
+    border-radius: 4px;
+    margin: 8px 0;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+.xai-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffc43b, #ff9d00);
+}
+
+/* --- 2. MOBILE SPECIFIC (FULL SCREEN OVERLAY) --- */
+@media (max-width: 500px) {
+    .xai-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.7); /* Darker backdrop for mobile focus */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        cursor: default;
+    }
+
+    .xai-modal-card {
+        width: 92vw;
+        max-width: 400px;
+    }
+}
+
+/* --- UPDATED DESKTOP HOVER POSITIONING --- */
+@media (min-width: 501px) {
+    .xai-desktop-hover-box {
+        position: fixed;
+        top: 50%;
+        left: 50%;                /* center relative to viewport */
+        transform: translate(-50%, -50%); /* perfect center both axes */
+        z-index: 1000;
+        pointer-events: auto;
+
+        max-width: min(380px, calc(100vw - 24px)); /* never overflow viewport */
+    }
+
+    .xai-modal-card {
+        width: 380px;
+        max-width: 100%;
+        position: relative;
+    }
+
+    /* optional hover bridge */
+    .xai-desktop-hover-box::before {
+        content: "";
+        position: fixed;
+        top: calc(50% - 14px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 14px;
+        z-index: 999;
+    }
+}
+
+.favorites-card {
+    position: relative; /* make this the positioning context for the modal */
+}
+
+@keyframes refresh-spin-friction-bounce {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    /* 1. Wind-up */
+    12% {
+        transform: rotate(-45deg);
+    }
+
+    /* 2. Acceleration */
+    35% {
+        transform: rotate(720deg);
+    }
+
+    42% {
+        transform: rotate(900deg);
+    }
+
+    /* 3. Progressive friction (smooth decay) */
+    50% {
+        transform: rotate(1000deg); /* +100 */
+    }
+
+    58% {
+        transform: rotate(1050deg); /* +50 */
+    }
+
+    65% {
+        transform: rotate(1080deg); /* +30 */
+    }
+
+    71% {
+        transform: rotate(1095deg); /* +15 */
+    }
+
+    76% {
+        transform: rotate(1102deg); /* +7 */
+    }
+
+    80% {
+        transform: rotate(1105deg); /* +3 overshoot */
+    }
+
+    /* 4. Elastic settle */
+    100% {
+        transform: rotate(1080deg);
+    }
+}
+
+.refresh-btn svg {
+    transform-origin: center;
+    backface-visibility: hidden;
+}
+
+.refresh-btn.animate svg {
+    animation: refresh-spin-friction-bounce
+        1.9s
+        linear
+        forwards;
+}
+
+/* --- 4. ANIMATIONS --- */
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.95) translateY(5px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }

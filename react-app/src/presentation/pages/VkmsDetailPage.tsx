@@ -6,7 +6,7 @@ import {useAppDispatch, useAppSelector} from "../../application/store/hooks";
 import apiClient from "../../infrastructure/ApiClient";
 import {fetchUser} from "../../application/Slices/authSlice";
 import {fetchVkmById} from "../../application/Slices/vkmsSlice";
-
+import "../vkmsdetailpage.css"
 
 const VkmsDetailPage: React.FC = () => {
     const {id} = useParams<{ id: string }>();
@@ -15,10 +15,11 @@ const VkmsDetailPage: React.FC = () => {
 
     const location = useLocation();
 
-    const {isAuthenticated, user} = useAppSelector((s) => s.auth);
+    const {status, user} = useAppSelector((s) => s.auth);
 
     const vkm = useAppSelector((state) => state.vkms.selected);
-    const isFavorite = !!user?.favorites.find((f) => f._id === id);
+    const favorites = user?.favorites ?? [];
+    const isFavorite = favorites.some(f => String(f._id) === id);
 
 
     const [imageUrl, setImageUrl] = useState<string>(
@@ -100,7 +101,7 @@ const VkmsDetailPage: React.FC = () => {
         });
     };
 
-    if (!isAuthenticated) {
+    if (status === "loading" || !user) {
         return (
             <Container className="text-center mt-5">
                 <Spinner animation="border" role="status"/>
@@ -115,7 +116,6 @@ const VkmsDetailPage: React.FC = () => {
         dispatch(fetchUser());
     };
 
-    if (status === "loading") return <p>Loading...</p>;
     if (!vkm) {
         return (
             <Container className="text-center mt-5">
