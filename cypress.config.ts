@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 let testCredentials: { email: string; password: string; username: string } | null = null;
 
 export default defineConfig({
-  projectId: process.env.CYPRESS_PROJECT_ID,
+  projectId: "tv5pjo",
   e2e: {
     baseUrl: 'http://localhost:4173',
     setupNodeEvents(on, config) {
