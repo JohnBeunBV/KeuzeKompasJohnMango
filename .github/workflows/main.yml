@@ -11,8 +11,8 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build
+  build-ts:
+    name: Build Typescript Containers
     runs-on: ubuntu-latest
 
     strategy:
@@ -40,15 +40,36 @@ jobs:
       - name: TypeScript build
         run: npm run build
 
-     # - name: Run tests
-       # run: npm test --if-present
-
       - name: NPM Audit
         run: npm audit --audit-level=high
+
+  build-ai-model:
+    name: Build Python AI Model
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: ai-model
+        run: pip install -r requirements.txt
+
+      - name: Verify AI Model installation
+        working-directory: ai-model
+        run: |
+          python -c "import uvicorn; print('uvicorn installed')"
+          python -c "import sys; print(f'Python {sys.version}')"
         
   cypress-run:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build-ts, build-ai-model]
     # Runs tests in parallel with matrix strategy https://docs.cypress.io/guides/guides/parallelization
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
     # Also see warning here https://github.com/cypress-io/github-action#parallel
@@ -59,6 +80,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Python for AI Model
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        working-directory: ai-model
+        run: pip install -r requirements.txt
+
+      - name: Start AI Model server
+        working-directory: ai-model
+        run: |
+          python -m uvicorn main:app --port 8000 &
+          sleep 5
+          # Verify the server is running
+          curl -f http://localhost:8000/docs || echo "AI Model server not ready yet"
+        env:
+          PYTHONUNBUFFERED: 1
+
       - name: Cypress run
         # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
         uses: cypress-io/github-action@v6
@@ -77,7 +119,6 @@ jobs:
           # in GitHub repo → Settings → Secrets → Actions
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_TEST_PASSWORD: ${{ secrets.CYPRESS_TEST_PASSWORD }}
-          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
 
           #frontend
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
@@ -107,7 +148,7 @@ jobs:
   sonarqube:
     name: SonarQube Scan
     runs-on: ubuntu-latest
-    needs: cypress-run
+    needs: build-ts
 
     steps:
       - name: Checkout repository
@@ -178,7 +219,7 @@ jobs:
   deploy:
     name: Deploy via Portainer
     runs-on: ubuntu-latest
-    needs: security
+    needs: [security,  cypress-run]
 
     steps:
       - name: Deploy to Portainer
