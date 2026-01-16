@@ -101,7 +101,11 @@ jobs:
         run: npm run build
 
       - name: Start Frontend and Backend
-        run: npm run start
+        run: |
+          npm run start > /tmp/app.log 2>&1 &
+          sleep 15
+          timeout 30 bash -c 'until curl -f http://localhost:4173; do sleep 1; done' || true
+          timeout 30 bash -c 'until curl -f http://localhost:3000; do sleep 1; done' || true
         env:
           # frontend
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
