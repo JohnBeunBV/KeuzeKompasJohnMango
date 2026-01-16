@@ -279,6 +279,37 @@ describe('E2E Tests', () => {
             });
         });
 
+        it('should give recommendations under favourites after favoriting VKMs', () => {
+            cy.task('getCredentials').then((credentials: any) => {
+                if (!credentials) {
+                    cy.log('No credentials available, skipping test');
+                    return;
+                }
+
+                // Login
+                cy.visit('/login');
+                cy.intercept('POST', '**/auth/login').as('loginRequest');
+                cy.intercept('GET', '**/auth/me').as('getUser');
+
+                cy.get('input[placeholder="E-mailadres"]').type(credentials.email);
+                cy.get('input[placeholder="Wachtwoord"]').type(credentials.password);
+                cy.get('.login-button').click();
+
+                cy.wait('@loginRequest').its('response.statusCode').should('eq', 200);
+                cy.wait('@getUser');
+                cy.url().should('include', '/vkms');
+
+                // Navigate to account page
+                cy.visit('/account');
+
+                // Verify recommendations column is visible
+                cy.get('.recommendations-column-container').should('be.visible');
+
+                // Check if the container has at least one child with the class
+                cy.get('.recommendations-column-container .terminal-recommendation-item').should('exist');
+            })
+        });
+
         it('should unfavorite a VKM from account page', () => {
             cy.task('getCredentials').then((credentials: any) => {
                 if (!credentials) {
