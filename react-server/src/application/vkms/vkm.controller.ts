@@ -63,6 +63,10 @@ export const getVkmById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
+        if (Array.isArray(id)) {
+            return res.status(400).json({ message: "Invalid ID format" });
+        }
+
         if (!Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Ongeldige VKM ID" });
         }
