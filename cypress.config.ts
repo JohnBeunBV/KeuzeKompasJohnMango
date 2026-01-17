@@ -10,7 +10,7 @@ let testCredentials: { email: string; password: string; username: string } | nul
 export default defineConfig({
   projectId: "tv5pjo",
   e2e: {
-    baseUrl: 'http://localhost:4173',
+    baseUrl: process.env.CYPRESS_FRONTEND_URL,
     setupNodeEvents(on, config) {
 
       const testPassword = process.env.CYPRESS_TEST_PASSWORD;

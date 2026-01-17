@@ -380,39 +380,48 @@ describe('E2E Tests', () => {
 
                 cy.wait('@loginRequest').its('response.statusCode').should('eq', 200);
                 cy.wait('@getUser');
-                // Navigate to swipe page
+
+                // Go to swipe page
                 cy.visit('/swipe');
                 cy.get('.swipe-page').should('be.visible');
 
-                // Wait for modal to appear and close it
+                // Close intro modal
                 cy.get('.intro-modal').should('be.visible');
                 cy.get('.intro-modal button').contains('Begrepen!').click();
 
-                // Get current VKM name from the card
-                let vkmNameToFavorite = '';
-                cy.get('.vkm-info-card h4').first().invoke('text').then((name) => {
-                    vkmNameToFavorite = name.trim();
-                    cy.log('VKM to favorite: ' + vkmNameToFavorite);
+                // Capture VKM name
+                cy.get('.swipe-card-top .vkm-info-card h4')
+                    .invoke('text')
+                    .then((vkmNameToFavorite) => {
+                        const trimmedName = vkmNameToFavorite.trim();
+                        cy.log(`VKM to favorite: ${trimmedName}`);
 
-                    // Intercept favorite request
-                    cy.intercept('POST', '**/auth/users/favorites/**').as('addFavorite');
+                        // Intercept favorite call
+                        cy.intercept('POST', '**/auth/users/favorites/**').as('addFavorite');
+                        cy.intercept('GET', '**/auth/me').as('getUserAfterLike');
 
-                    // Click heart button to swipe right (last button)
-                    cy.get('.swipe-actions button').last().click();
+                        // Like VKM
+                        cy.get('.swipe-actions button').contains('♥').click();
 
-                    cy.wait('@addFavorite').its('response.statusCode').should('eq', 200);
+                        cy.wait('@addFavorite').its('response.statusCode').should('eq', 200);
 
-                    // Navigate to account page
-                    cy.visit('/account');
+                        cy.wait('@getUserAfterLike').its('response.statusCode').should('eq', 200);
 
-                    // Wait for favorites card to load
-                    cy.get('.favorites-card').should('be.visible');
+                        // Go to account page
+                        cy.visit('/account');
 
-                    // Verify VKM in favorites
-                    cy.get('.favorites-card .favorite-item span').first().should('contain', vkmNameToFavorite);
-                });
+
+                        // Wait until favorites list is rendered (spinner gone)
+                        cy.get('.favorites-card').should('be.visible');
+                        cy.get('.favorites-list').should('exist');
+
+                        // Assert favorite exists by name
+                        cy.get('.favorites-list .favorite-item span')
+                            .should('contain.text', trimmedName);
+                    });
             });
         });
+
 
         it('should unfavorite a VKM from swipe page favorites', () => {
             cy.task('getCredentials').then((credentials: any) => {

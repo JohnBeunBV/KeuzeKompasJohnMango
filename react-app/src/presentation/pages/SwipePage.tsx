@@ -1,6 +1,5 @@
 import "../swipe.css";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import type {Vkm} from "@domain/models/vkm.model";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -12,12 +11,10 @@ import {
 } from "../../application/store/hooks.ts";
 import {fetchUser} from "../../application/Slices/authSlice.ts";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
 const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
 
 export default function SwipePage() {
 
-    const token = localStorage.getItem("token");
     // Vkms
     const [vkms, setVkms] = useState<Vkm[]>([]);
     const [loading, setLoading] = useState(true);
