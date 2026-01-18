@@ -143,6 +143,7 @@ jobs:
           # in GitHub repo → Settings → Secrets → Actions
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_TEST_PASSWORD: ${{ secrets.CYPRESS_TEST_PASSWORD }}
+          CYPRESS_FRONTEND_URL: ${{ secrets.CYPRESS_FRONTEND_URL }}
 
           #frontend
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
