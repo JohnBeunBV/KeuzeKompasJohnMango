@@ -92,6 +92,8 @@ VITE_MICROSOFT_CLIENT_ID=your_client_id
 VITE_MICROSOFT_TENANT_ID=your_tenant_id
 ```
 
+### Setup and Start John Mango Keuzekompas
+
 Setup the front- and back-end:
 ```bash
 cd KeuzeKompasJohnMango
