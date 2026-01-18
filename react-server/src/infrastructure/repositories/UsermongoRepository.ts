@@ -1,10 +1,12 @@
 // infrastructure/repositories/UsermongoRepository.ts
 import {UserModel} from "../modelsinf/userinf.model";
 import {UserRepository} from "../../domain/repositories/UserRepository";
-import {User} from "../../domain/models/user.model";
+import {StudentProfile, User} from "../../domain/models/user.model";
 import mongoose, {Types} from "mongoose";
 import {Vkm} from "../../domain/models/vkm.model";
-
+export type UserUpdate = Omit<Partial<User>, "profile"> & {
+    profile?: Partial<StudentProfile>;
+};
 export class UserMongoRepository implements UserRepository {
     async getById(id: string): Promise<User | null> {
         const user = await UserModel.findById({_id: id}).populate("favorites");
@@ -23,7 +25,8 @@ export class UserMongoRepository implements UserRepository {
         return {...createdUser.toObject(), _id: createdUser._id.toString()};
     }
 
-    async update(id: string, updates: Partial<User>): Promise<User | null> {
+    async update(id: string, updates: UserUpdate): Promise<User | null> {
+
         const user = await UserModel.findById(id);
         if (!user) return null;
         // Merge updates, maar behoud bestaande nested objects zoals profile

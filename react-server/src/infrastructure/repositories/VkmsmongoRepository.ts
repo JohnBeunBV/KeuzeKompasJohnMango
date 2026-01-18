@@ -11,11 +11,14 @@ export class VkmsMongoRepository implements VkmsRepository {
             return null;
         }
 
-        return VkmModel.findById(id).lean();
+        const vkm = await VkmModel.findById(id).lean();
+        if (!vkm) return null;
+
+        return { ...vkm, _id: vkm._id.toString() } as any;
     }
 
     async getAll(
-        filter: any = {},
+        filter: Record<string, unknown> = {},
         skip = 0,
         limit = 10
     ): Promise<{ vkms: Vkm[]; total: number }> {
@@ -24,6 +27,9 @@ export class VkmsMongoRepository implements VkmsRepository {
             VkmModel.countDocuments(filter),
         ]);
 
-        return { vkms, total };
+        return {
+            vkms: vkms.map(v => ({ ...v, _id: v._id.toString() } as any)),
+            total,
+        };
     }
 }
