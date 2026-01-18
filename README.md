@@ -8,7 +8,7 @@ The project consists of three main services:
 
 - **Frontend** (React + Vite): User-facing web application
 - **Backend API** (Node.js/Express): REST API for modules, users, and authentication
-- **ML Model API** (Python/FastAPI): ML-powered recommendation engine
+- **Python AI Model API** (Python/FastAPI): ML-powered recommendation engine
 
 ## Prerequisites
 
@@ -16,7 +16,7 @@ The project consists of three main services:
 - OR for manual setup:
   - Node.js 22+ (for backend)
   - Node.js 20+ (for frontend)
-  - Python 3.11+ (for ML model)
+  - Python 3.11+ (for AI model)
   - MongoDB (for database)
 
 ## Quick Start with Docker (Recommended)
@@ -48,7 +48,7 @@ SEED_ADMIN_PASSWORD=your_secure_password
 SEED_ADMIN_USERNAME=admin
 SEED_ADMIN_ROLE=admin
 
-# ML Model (python-model) Configuration
+# AI Model (python-model) Configuration
 PYTHON_API_KEY=your_python_api_key
 MODEL_API_PORT=8000
 MODEL_API_URL=http://model-api:8000
@@ -128,7 +128,7 @@ MODEL_API_PORT=8000
 MODULES_API_URL=http://localhost:5000/api/vkms
 ```
 
-Start the ML model API (with activated venv):
+Start the AI model API (with activated venv):
 ```bash
 uvicorn main:app --reload --port 8000
 ```
@@ -136,30 +136,54 @@ uvicorn main:app --reload --port 8000
 ## Key Features
 
 ### Authentication & Authorization
+
 - JWT-based authentication
 - User roles and permissions
-- Microsoft Azure AD integration support
+- Microsoft OAuth login
 
 ### Recommendations Engine
-- ML-powered module recommendations
-- User preference learning
-- Multi-factor recommendation algorithms
 
-### Module Management
-- Create, read, update, delete VKM modules
-- Tag-based categorization
-- Course credits and study outcomes
-- Location-based modules
+- AI-powered module recommendations
+- User preference learning
+- Multi-factor recommendation algorithm
+
+### Module Discovery & Interaction
+
+- **Swiper** (Core Feature): Swiper interface to discover modules - swipe left to dislike or right to like modules
+- Browse and filter VKM modules by tags, location, difficulty and credits
+- View module details like description and amount of open spaces
+- Tag-based categorization and location-based filtering
+- Read-only access to module content (authenticated users only)
+- Add modules to favorites for recommendations by AI
+- Explainable AI information hover
+- Module data can be imported via CSV upload to MongoDB
 
 ### User Features
+
 - User accounts and authentication
-- Favorites/saved modules (requires login)
+- Favorite/save modules to personalized collection
 - User profile management
-- Learning history tracking
+- Responsive UI supporting all devices (mobile, tablet, desktop)
+
+### Teacher Features
+
+- See how many users have favorited each module
+- Monitor learning trends across modules
+- Identify popular and engaging content
+
+### Admin Features
+
+- User role management (assign/modify user, teacher roles)
+- AI model management:
+  - Retrain recommendation models
+  - Evaluate model performance
+  - Monitor model metrics and insights
+- System configuration and monitoring
 
 ## Important Notes
 
 ### Favorites Feature
+
 Favorites functionality requires an authenticated user with a valid JWT token stored in browser localStorage.
 
 ### Environment Variables
@@ -172,7 +196,7 @@ MongoDB connection string should be a full URI with credentials. For local devel
 
 ### API Documentation
 - Backend API: `http://localhost:5000/api` (REST endpoints)
-- ML Model API: `http://localhost:8000/docs` (Swagger/OpenAPI documentation)
+- AI Model API: `http://localhost:8000/docs` (Swagger/OpenAPI documentation)
 
 ## Example Test Data
 
