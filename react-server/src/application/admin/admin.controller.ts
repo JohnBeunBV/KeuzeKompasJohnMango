@@ -15,7 +15,7 @@ export const getAllUsers = async (_: Request, res: Response) => {
 export const updateUserRoles = async (req: Request, res: Response) => {
     const { roles } = req.body;
     const updated = await UserModel.findByIdAndUpdate(
-        req.params.id,
+        { $eq: req.params.id},
         { roles },
         { new: true }
     ).lean();
