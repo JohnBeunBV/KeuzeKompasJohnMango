@@ -174,7 +174,7 @@ jobs:
   unit-tests:
     name: Run Unit Tests
     runs-on: ubuntu-latest
-    needs: build-ts  # Make sure the code is built before testing
+    needs: cypress-run  # Make sure the code is built before testing
 
     strategy:
       matrix:
