@@ -62,7 +62,7 @@ BACKEND_PORT=5000
 ### 3. Start All Services with Docker Compose
 
 ```bash
-docker compose up --build
+docker-compose up --build
 ```
 
 This will build and start all three services:
