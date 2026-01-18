@@ -258,7 +258,7 @@ export default function SwipePage() {
     const currentVkm = vkms[0];
     const nextVkm = vkms[1];
 
-    if (!currentVkm) return <div className="swipe-page"><h3>Geen modules meer!</h3></div>;
+    if (!currentVkm) return <div className="swipe-page"><h3>Je hebt alle modules beoordeeld!</h3></div>;
 
     const renderCard = (vkm: Vkm) => (
         <div className="vkm-info-card">
