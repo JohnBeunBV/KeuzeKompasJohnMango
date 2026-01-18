@@ -31,6 +31,8 @@ if (!process.env.MONGO_URI) {
 connectDB(process.env.MONGO_URI).then(r => seedAdminUser());
 
 // 🔹 Rate limiter (5 minuten, max 100 requests per IP)
+app.set("trust proxy", 1);
+
 const apiLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 200,
