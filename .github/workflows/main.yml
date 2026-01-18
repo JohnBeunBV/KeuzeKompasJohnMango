@@ -11,8 +11,8 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build
+  build-ts:
+    name: Build Typescript Containers
     runs-on: ubuntu-latest
 
     strategy:
@@ -39,9 +39,6 @@ jobs:
 
       - name: TypeScript build
         run: npm run build
-
-     # - name: Run tests
-       # run: npm test --if-present
 
       - name: NPM Audit
         run: npm audit --audit-level=high
@@ -78,10 +75,168 @@ jobs:
           # Creating a token https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  build-python-model:
+    name: Build Python Model
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: python-model
+        run: pip install -r requirements.txt
+
+      - name: Verify AI Model installation
+        working-directory: python-model
+        run: |
+          python -c "import uvicorn; print('uvicorn installed')"
+          python -c "import sys; print(f'Python {sys.version}')"
+        
+  cypress-run:
+    runs-on: ubuntu-latest
+    needs: [build-ts, build-python-model]
+    # Runs tests in parallel with matrix strategy https://docs.cypress.io/guides/guides/parallelization
+    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+    # Also see warning here https://github.com/cypress-io/github-action#parallel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python for Python Model
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies Backend
+        working-directory: react-server
+        run: npm ci
+
+      - name: Build Backend TypeScript
+        working-directory: react-server
+        run: npm run build
+
+      - name: Start Backend
+        working-directory: react-server
+        run: npm run start &
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MODEL_API_URL: ${{ secrets.MODEL_API_URL }}
+          SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+          SEED_ADMIN_USERNAME: ${{ secrets.SEED_ADMIN_USERNAME }}
+          SEED_ADMIN_ROLE: ${{ secrets.SEED_ADMIN_ROLE }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_TENANT_ID: ${{ secrets.MICROSOFT_TENANT_ID }}
+          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
+          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
+          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
+
+      - name: Install Python dependencies
+        working-directory: python-model
+        run: pip install -r requirements.txt
+
+      - name: Start Python Model server ai
+        working-directory: python-model
+        run: |
+          python -m uvicorn main:app --port 8000 &
+          sleep 5
+          curl -f http://localhost:8000/docs || echo "Python Model server not ready yet"
+        env:
+          PYTHONUNBUFFERED: 1
+          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
+          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
+          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
+
+      - name: Cypress run
+        # Uses the official Cypress GitHub action https://github.com/cypress-io/github-action
+        uses: cypress-io/github-action@v6
+        with:
+          # Starts web server for E2E tests - replace with your own server invocation
+          # https://docs.cypress.io/guides/continuous-integration/introduction#Boot-your-server
+          build: npm run build
+          start: npm run start
+          wait-on: 'http://localhost:4173' # Waits for above
+          # Records to Cypress Cloud
+          # https://docs.cypress.io/guides/cloud/projects#Set-up-a-project-to-record
+          record: true
+          parallel: true # Runs test in parallel using settings above
+        env:
+          # For recording and parallelization to work you must set your CYPRESS_RECORD_KEY
+          # in GitHub repo → Settings → Secrets → Actions
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_TEST_PASSWORD: ${{ secrets.CYPRESS_TEST_PASSWORD }}
+          CYPRESS_FRONTEND_URL: ${{ secrets.CYPRESS_FRONTEND_URL }}
+
+          #frontend
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_PEXELS_KEY: ${{ secrets.VITE_PEXELS_KEY }}
+          FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+
+          # backend
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MODEL_API_URL: ${{ secrets.MODEL_API_URL }}
+          SEED_ADMIN_EMAIL: ${{ secrets.SEED_ADMIN_EMAIL }}
+          SEED_ADMIN_PASSWORD: ${{ secrets.SEED_ADMIN_PASSWORD }}
+          SEED_ADMIN_USERNAME: ${{ secrets.SEED_ADMIN_USERNAME }}
+          SEED_ADMIN_ROLE: ${{ secrets.SEED_ADMIN_ROLE }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_TENANT_ID: ${{ secrets.MICROSOFT_TENANT_ID }}
+          PYTHON_API_KEY: ${{ secrets.PYTHON_API_KEY }}
+          MODEL_API_PORT: ${{ secrets.MODEL_API_PORT }}
+          MODULES_API_URL: ${{ secrets.MODULES_API_URL }}
+
+          # Creating a token https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # !! Hier nog Unit Tests !!
+  # !! Bij deploy to portainer cypress-run vervangen door unit-tests wanneer de job geschreven is !!
+
+  unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    needs: build-ts  # Make sure the code is built before testing
+
+    strategy:
+      matrix:
+        service: [react-server, react-app]
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.service }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.service }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Unit Tests
+        run: npm test
+
   sonarqube:
     name: SonarQube Scan
     runs-on: ubuntu-latest
-    needs: cypress-run
+    needs: build-ts
 
     steps:
       - name: Checkout repository
@@ -152,7 +307,7 @@ jobs:
   deploy:
     name: Deploy via Portainer
     runs-on: ubuntu-latest
-    needs: security
+    needs: [security,  unit-tests] # !! Hier cypress-run vervangen voor unit-tests wanneer die job toegevoegd is !!
 
     steps:
       - name: Deploy to Portainer

@@ -282,3 +282,43 @@
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none;     /* Edge */
 }
+
+/* ============================
+   Swipe Overlays (Like/Dislike feedback)
+============================ */
+.swipe-overlay {
+  position: absolute;
+  bottom: 20px;
+  font-size: 80px;
+  font-weight: bold;
+  transition: opacity 0.1s;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.swipe-overlay-dislike {
+  right: 20px;
+  color: #ff4444;
+  text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+.swipe-overlay-like {
+  right: 20px;
+  color: #ff6b9d;
+  text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+}
+
+@media (max-width: 420px) {
+  .swipe-overlay {
+    font-size: 60px;
+    bottom: 15px;
+  }
+  
+  .swipe-overlay-dislike {
+    right: 15px;
+  }
+  
+  .swipe-overlay-like {
+    right: 15px;
+  }
+}

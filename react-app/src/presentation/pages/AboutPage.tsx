@@ -223,7 +223,7 @@ const AboutPage: React.FC = () => {
      <div className="col-12 col-md-6 col-lg-3">
         <div className="ad-wrapper">
           <h1>John Beun</h1>
-          <p>John beun is in ontwikkeling:
+          <p>John Beun is in ontwikkeling:
             Wordt verwacht zomer 2026!
           </p>
           <img

@@ -22,7 +22,7 @@ export interface User {
     oauth?: OAuthInfo;
     roles: ("admin" | "teacher" | "student")[];
     profile?: StudentProfile;
-    favorites?: Vkm[];
+    favorites: Vkm[];
 }
 
 export interface PublicUser {

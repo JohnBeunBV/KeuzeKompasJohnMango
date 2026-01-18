@@ -6,26 +6,25 @@
     "react-server"
   ],
   "private": true,
+  "workspaces": [
+    "react-server",
+    "react-app"
+  ],
   "scripts": {
-    "install-all": "npm install --prefix react-server && npm install --prefix react-app",
-    "build": "npm run build --prefix react-app && npm run build --prefix react-server",
-    "start": "npm run build --prefix react-server && concurrently \"npm run dev --prefix react-app\" \"npm run start --prefix react-server\"",
-    "dev": "concurrently \"npm run dev --prefix react-server\" \"npm run dev --prefix react-app\"",
-    "tsc:check": "npm run tsc:check-app && npm run tsc:check-cypress",
-    "tsc:check-app": "tsc --noEmit --project \"./tsconfig.json\"",
-    "tsc:check-cypress": "tsc --noEmit --project \"./cypress/tsconfig.json\"",
+    "start": "concurrently \"npm run start -w react-server\" \"npm run start -w react-app\"",
+    "dev": "concurrently \"npm run dev -w react-server\" \"npm run dev -w react-app\"",
+    "build": "npm run build -w react-app && npm run build -w react-server",
+
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test:e2e": "concurrently -k -s first \"npm run dev:all\" \"wait-on http://localhost:5173 && npm run cypress:run\"",
-    "test:e2e:open": "concurrently -k -s first \"npm run dev:all\" \"wait-on http://localhost:5173 && npm run cypress:open\""
+
+    "test:e2e": "concurrently -k -s first \"npm run dev\" \"wait-on http://localhost:5173 && npm run cypress:run\"",
+    "test:e2e:open": "concurrently -k -s first \"npm run dev\" \"wait-on http://localhost:5173 && npm run cypress:open\""
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
     "cypress": "^15.9.0",
     "wait-on": "^9.0.3",
-    "typescript": "^5.9.2"
-  },
-  "dependencies": {
-
+    "typescript": "^5.9.3"
   }
 }

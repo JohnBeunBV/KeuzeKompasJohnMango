@@ -197,6 +197,22 @@ const AccountPage: React.FC = () => {
         navigate("/login");
     };
 
+    const PreferenceList: React.FC<{ title: string; items: string[] }> = ({ title, items }) => (
+    <div className="mb-3">
+        <h6 className="johnmango-accent">{title}</h6>
+        {items.length > 0 ? (
+            <ul className="mb-0">
+                {items.map((item, index) => (
+                    <li key={index}>{item}</li>
+                ))}
+            </ul>
+        ) : (
+            <small className="text-muted">Nog niets ingevuld</small>
+        )}
+    </div>
+    );
+
+
     return (
         <div className="terminal-container text-light p-4">
             <div className="account-flex-container">
@@ -310,6 +326,32 @@ const AccountPage: React.FC = () => {
                                 Account verwijderen
                             </Button>
                         </div>
+
+                        {user?.profile && (
+                        <div className="mt-5 p-3 rounded terminal-subsection">
+                            <h2 className="terminal-title mb-3">Jouw ingevulde voorkeuren</h2>
+                               <hr/>
+                            <PreferenceList
+                                title="Interesses"
+                                items={user.profile.interests}
+                            />
+
+                            <PreferenceList
+                                title="Waarden"
+                                items={user.profile.values}
+                            />
+
+                            <PreferenceList
+                                title="Leerdoelen"
+                                items={user.profile.goals}
+                            />
+
+                            <Button variant="warning" onClick={() => navigate("/studentenprofiel")}>
+                                Toch niet tevreden? Pas ze hier aan
+                            </Button>
+                        </div>
+                    )}
+
                     </Form>
                 </div>
 

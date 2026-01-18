@@ -64,14 +64,18 @@ const Layout: React.FC = () => {
                             <Link to="/" className="nav-link">Home</Link>
                             <Link to="/vkms" className="nav-link">VKM Lijst</Link>
                             <Link to="/swipe" className="nav-link">Swipe</Link>
+                            <Link to="/studentenprofiel" className="nav-link">Studentenprofiel</Link>
                             <Link to="/about" className="nav-link">About</Link>
-                            <Link to="/studentenprofiel" className="nav-link">
-                                Studentenprofiel
-                            </Link>
 
                             {roles.includes("teacher") && (
                                 <Link to="/teacher" className="nav-link role-link teacher">
                                     Teacher
+                                </Link>
+                            )}
+
+                            {roles.includes("admin") && (
+                                <Link to="/admin" className="nav-link role-link teacher">
+                                    Admin
                                 </Link>
                             )}
                         </nav>

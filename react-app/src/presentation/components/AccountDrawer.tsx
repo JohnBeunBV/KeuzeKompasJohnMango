@@ -81,7 +81,9 @@ const AccountDrawer: React.FC = () => {
 
         setLoadingRecs(true);
         try {
-            const res = await apiClient.get("/auth/recommendations");
+            const res = await apiClient.get("/auth/recommendations", {
+                params: { topN: 5 }  // ← Voeg deze regel toe
+            });
             setRecommendations(res.data.recommendations || []);
         } catch (err) {
             console.error("Refresh failed", err);

@@ -15,7 +15,7 @@ import {seedAdminUser} from "./application/seed/admin.seed";
 import * as path from "path";
 
 
-const app = express();
+export const app = express();
 app.use(helmet());
 const PORT = process.env.PORT || 5000;
 
@@ -24,13 +24,19 @@ app.use(cors());
 app.use(express.json());
 
 // 🔹 Database connectie
-if (!process.env.MONGO_URI) {
-    throw new Error("MONGO_URI environment variable is missing");
+if (process.env.NODE_ENV !== 'test') {
+    if (!process.env.MONGO_URI) {
+        throw new Error("MONGO_URI environment variable is missing");
+    }
+
+    connectDB(process.env.MONGO_URI).then(() => {
+        seedAdminUser();
+        app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    });
 }
-
-connectDB(process.env.MONGO_URI).then(r => seedAdminUser());
-
 // 🔹 Rate limiter (5 minuten, max 100 requests per IP)
+app.set("trust proxy", 1);
+
 const apiLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 200,

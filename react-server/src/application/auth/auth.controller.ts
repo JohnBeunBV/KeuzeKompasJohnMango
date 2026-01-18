@@ -104,6 +104,11 @@ export const addFavorite = async (req: AuthRequest, res: Response) => {
     const userId = getUserIdFromRequest(req);
     const {vkmId} = req.params;
 
+    if (Array.isArray(vkmId)) {
+        return res.status(400).json({message: "Invalid ID format"});
+    }
+
+
     if (!Types.ObjectId.isValid(vkmId)) {
         return res.status(400).json({error: "VKM ID must be a valid ObjectId."});
     }
@@ -125,7 +130,9 @@ export const addFavorite = async (req: AuthRequest, res: Response) => {
 export const removeFavorite = async (req: AuthRequest, res: Response) => {
     const userId = getUserIdFromRequest(req);
     const {vkmId} = req.params;
-
+    if (Array.isArray(vkmId)) {
+        return res.status(400).json({message: "Invalid ID format"});
+    }
     if (!Types.ObjectId.isValid(vkmId)) {
         return res.status(400).json({error: "VKM ID must be a valid ObjectId."});
     }
@@ -153,14 +160,17 @@ export const getFavorites = async (req: AuthRequest, res: Response) => {
 
 export const getFavoritesByUserId = async (req: AuthRequest, res: Response) => {
     const {userId} = req.params;
-
+    if (Array.isArray(userId)) {
+        return res.status(400).json({message: "Invalid ID format"});
+    }
     const favorites = await authService.getFavorites(userId);
     res.json(favorites);
 };
 
 export const getRecommendations = async (req: AuthRequest, res: Response) => {
     try {
-        const recommendations = await authService.getRecommendations(getUserIdFromRequest(req));
+        const topN = parseInt(req.query.topN as string) || 15;
+        const recommendations = await authService.getRecommendations(getUserIdFromRequest(req), topN);
         res.json({recommendations});
     } catch (err: any) {
         res.status(400).json({error: err.message});

@@ -59,3 +59,14 @@
     margin-bottom: 60px;
   }
 }
+
+.terminal-subsection {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: #f4b400 !important;
+  border: #f4b400 2px solid !important;
+}
+
+.johnmango-accent {
+  color: #f4b400;
+  /* oranje/geel – pas aan indien nodig */
+}

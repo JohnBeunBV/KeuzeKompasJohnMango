@@ -157,7 +157,10 @@ export default function AIModelInputPage() {
       <p className="ai-intro">
         Selecteer hieronder jouw interesses, waarden en doelen. Dit helpt ons om betere aanbevelingen te doen.
       </p>
-      <p className="ai-subtext">Je kunt meerdere opties selecteren (Ctrl/⌘ + klik).</p>
+      <p className="ai-subtext">
+        Je kunt meerdere opties selecteren <span 
+        className="desktop-only"> (Ctrl/⌘ + klik)</span>.
+      </p>
 
       {savedProfile && (
         <section className="ai-current-profile" ref={savedProfileRef}>

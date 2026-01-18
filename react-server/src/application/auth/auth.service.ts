@@ -231,7 +231,7 @@ export const getFavorites = async (userId: string) => {
 import {Types} from "mongoose";
 import {compareSync} from "bcrypt";
 
-export const getRecommendations = async (userId: string) => {
+export const getRecommendations = async (userId: string, topN: number = 15) => {
     const user = await userRepo.getById(userId);
     if (!user) throw new Error("User not found");
 
@@ -280,7 +280,7 @@ export const getRecommendations = async (userId: string) => {
                 favorite_id: favoriteIds,
                 profile_text: profileText,
             },
-            top_n: 5,
+            top_n: topN,
         });
 
         // AI now returns ObjectIds as well
