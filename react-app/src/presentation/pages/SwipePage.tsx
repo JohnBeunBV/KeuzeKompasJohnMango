@@ -1,6 +1,5 @@
 import "../swipe.css";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import type {Vkm} from "@domain/models/vkm.model";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -12,12 +11,10 @@ import {
 } from "../../application/store/hooks.ts";
 import {fetchUser} from "../../application/Slices/authSlice.ts";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
 const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_KEY;
 
 export default function SwipePage() {
 
-    const token = localStorage.getItem("token");
     // Vkms
     const [vkms, setVkms] = useState<Vkm[]>([]);
     const [loading, setLoading] = useState(true);
@@ -212,31 +209,40 @@ export default function SwipePage() {
         };
 
     const commitSwipe = (direction: "left" | "right") => {
-        const current = vkms[0];
-        if (!current) return;
+        // 1. Leg de VKM die NU op het scherm staat direct vast.
+        const targetVkm = vkms[0];
+        if (!targetVkm) return;
 
-        // 1️⃣ Animate immediately
+        // Pak het ID (sommige databases gebruiken id, andere _id)
+        const targetId = targetVkm._id || (targetVkm as any).id;
+
+        // 2. Start de animatie direct
         setSwipeOut(direction);
-        const flyDistance =
-            (direction === "right" ? window.innerWidth : -window.innerWidth) * 1.5;
+        const flyDistance = (direction === "right" ? window.innerWidth : -window.innerWidth) * 1.5;
         setX(flyDistance);
 
-        // 2️⃣ Background API call
+        // 3. Voer de actie uit met het VASTGELEGDE targetId
         if (direction === "right") {
             setShowLikeToast(true);
-            axios.post(
-                `${API_BASE_URL}/auth/users/favorites/${current._id}`,
-                {},
-                {headers: {Authorization: `Bearer ${token}`}}
-            ).catch(console.error);
+            
+            // GEBRUIK apiClient (ipv axios) voor automatische auth-headers
+            apiClient.post(`/auth/users/favorites/${targetId}`, {})
+                .then(() => {
+                    console.log("Succesvol geliked:", targetId);
+                    // 4. VERVERS de user in Redux zodat je favorieten overal up-to-date zijn
+                    dispatch(fetchUser()); 
+                })
+                .catch(err => {
+                    console.error("Fout bij het toevoegen aan favorieten:", err);
+                });
         } else {
-            saveDislikedId(current._id);
+            saveDislikedId(targetId);
         }
 
-        // 3️⃣ Mark as seen (session only)
-        setSeenIds(prev => new Set(prev).add(current._id));
+        // Markeer als gezien voor deze sessie
+        setSeenIds(prev => new Set(prev).add(targetId));
 
-        // 4️⃣ Remove card after animation
+        // Verwijder de kaart na de animatie (400ms)
         setTimeout(() => {
             setVkms(prev => prev.slice(1));
             setSwipeOut(null);
@@ -320,6 +326,16 @@ export default function SwipePage() {
                         }}
                     >
                         {renderCard(currentVkm)}
+                        
+                        {/* Dislike overlay (left) */}
+                        <div className="swipe-overlay swipe-overlay-dislike" style={{ opacity: x < -30 ? Math.min((Math.abs(x) - 30) / 90, 1) : 0 }}>
+                            ✕
+                        </div>
+                        
+                        {/* Like overlay (right) */}
+                        <div className="swipe-overlay swipe-overlay-like" style={{ opacity: x > 30 ? Math.min((x - 30) / 90, 1) : 0 }}>
+                            ♥
+                        </div>
                     </div>
                 </div>
 
