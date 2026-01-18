@@ -31,7 +31,7 @@ describe("VkmsMongoRepository", () => {
         it("returns vkm by id", async () => {
             const created = await VkmModel.create(baseVkm);
 
-            const found = await repo.getById(created._id.toString());
+            const found = await repo.getById((created._id as mongoose.Types.ObjectId).toString());
 
             expect(found).not.toBeNull();
             expect(found!.name).toBe("AI Basics");
