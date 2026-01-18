@@ -74,11 +74,6 @@ This will build and start all three services:
 
 ### Setup Backend
 
-```bash
-cd react-server
-npm install
-```
-
 Create a `.env` file in `react-server/`:
 ```env
 MONGO_URI=mongodb+srv://your_credentials@your_cluster/your_database
@@ -87,17 +82,7 @@ JWT_SECRET=your_jwt_secret_key
 PYTHON_API_KEY=your_python_api_key
 ```
 
-Start the backend:
-```bash
-npm run dev
-```
-
 ### Setup Frontend
-
-```bash
-cd react-app
-npm install
-```
 
 Create a `.env` file in `react-app/`:
 ```env
@@ -107,8 +92,18 @@ VITE_MICROSOFT_CLIENT_ID=your_client_id
 VITE_MICROSOFT_TENANT_ID=your_tenant_id
 ```
 
-Start the frontend:
+Setup the front- and back-end:
 ```bash
+cd KeuzeKompasJohnMango
+npm install
+```
+
+Start the front- and back-end:
+```bash
+cd KeuzeKompasJohnMango
+npm run build
+npm run start
+or
 npm run dev
 ```
 
