@@ -10,7 +10,7 @@ const UserSchema = new Schema<UserDocument>({
 
     password: {
         type: String,
-        required: function () {
+        required: function (this: UserDocument) {
             return this.authMethod === "local";
         }
     },
