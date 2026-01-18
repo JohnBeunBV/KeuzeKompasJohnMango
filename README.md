@@ -62,7 +62,7 @@ BACKEND_PORT=5000
 ### 3. Start All Services with Docker Compose
 
 ```bash
-docker-compose up
+docker compose up --build
 ```
 
 This will build and start all three services:
@@ -151,8 +151,7 @@ uvicorn main:app --reload --port 8000
 
 - **Swiper** (Core Feature): Swiper interface to discover modules - swipe left to dislike or right to like modules
 - Browse and filter VKM modules by tags, location, difficulty and credits
-- View module details like description and amount of open spaces
-- Tag-based categorization and location-based filtering
+- View module details like description and amount of places left in the module
 - Read-only access to module content (authenticated users only)
 - Add modules to favorites for recommendations by AI
 - Explainable AI information hover
@@ -207,7 +206,7 @@ MongoDB connection string should be a full URI with credentials. For local devel
 ### Example VKM/Module
 - **name**: "Full-stack Web Applications With AI"
 - **studycredit**: 30
-- **location**: "Avans Breda"
+- **location**: "Breda"
 - **shortdescription**: "Master modern web development with AI"
 - **description**: "An intensive module covering full-stack web development. Learn to build scalable applications using React for frontend, Node.js/Express for backend, and MongoDB for data persistence. Includes hands-on projects and best practices for production deployment."
 - **learningoutcomes**: "Proficiency in React hooks and state management, RESTful API design, database schema design, authentication implementation, Docker containerization"
